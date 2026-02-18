@@ -24,7 +24,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 <!-- Сайдбар -->
 <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
-        <a href="/ntc-kumir/" class="sidebar-logo">
+        <a href="/" class="sidebar-logo">
             <img src="../<?php echo getSetting('logo_path'); ?>" alt="Логотип">
             <div class="logo-text">
                 <h2>НТЦ КУМИР</h2>

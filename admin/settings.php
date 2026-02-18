@@ -42,23 +42,81 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
     
+
     // Обработка загрузки изображений
-    $imageFields = ['logo', 'favicon', 'background'];
-    
-    foreach ($imageFields as $field) {
+    $imageFields = [
+        'logo' => 'logo',
+        'favicon' => 'favicon',
+        'background' => 'main_background' // ключ в таблице images
+    ];
+
+    foreach ($imageFields as $field => $imageKey) {
         if (isset($_FILES[$field]) && $_FILES[$field]['error'] === UPLOAD_ERR_OK) {
             $uploadResult = uploadImage($_FILES[$field]);
-            
+
             if ($uploadResult['success']) {
+                $path = $uploadResult['path'];
+
+                // ---------- SETTINGS ----------
                 $settingKey = $field === 'background' ? 'background_image' : $field . '_path';
-                $settingValue = $uploadResult['path'];
-                
-                $updateStmt = $conn->prepare("UPDATE settings SET setting_value = ?, updated_at = NOW() WHERE setting_key = ?");
-                $updateStmt->bind_param("ss", $settingValue, $settingKey);
+
+                $updateStmt = $conn->prepare("
+                    UPDATE settings 
+                    SET setting_value = ?, updated_at = NOW() 
+                    WHERE setting_key = ?
+                ");
+                $updateStmt->bind_param("ss", $path, $settingKey);
                 $updateStmt->execute();
+
+                // ---------- IMAGES ----------
+                // Проверяем есть ли запись
+                $checkStmt = $conn->prepare("SELECT id FROM images WHERE image_key = ?");
+                $checkStmt->bind_param("s", $imageKey);
+                $checkStmt->execute();
+                $checkResult = $checkStmt->get_result();
+
+                if ($checkResult->num_rows > 0) {
+                    // Обновляем существующую
+                    $imgStmt = $conn->prepare("
+                        UPDATE images 
+                        SET image_path = ?, created_at = NOW() 
+                        WHERE image_key = ?
+                    ");
+                    $imgStmt->bind_param("ss", $path, $imageKey);
+                    $imgStmt->execute();
+                } else {
+                    // Вставляем новую
+                    $altText = ucfirst($imageKey);
+
+                    $insertStmt = $conn->prepare("
+                        INSERT INTO images (image_key, image_path, alt_text, category, sort_order, created_at)
+                        VALUES (?, ?, ?, 'content', 0, NOW())
+                    ");
+                    $insertStmt->bind_param("sss", $imageKey, $path, $altText);
+                    $insertStmt->execute();
+                }
             }
         }
     }
+
+
+    // Обработка загрузки изображений
+    // $imageFields = ['logo', 'favicon', 'background'];
+    
+    // foreach ($imageFields as $field) {
+    //     if (isset($_FILES[$field]) && $_FILES[$field]['error'] === UPLOAD_ERR_OK) {
+    //         $uploadResult = uploadImage($_FILES[$field]);
+            
+    //         if ($uploadResult['success']) {
+    //             $settingKey = $field === 'background' ? 'background_image' : $field . '_path';
+    //             $settingValue = $uploadResult['path'];
+                
+    //             $updateStmt = $conn->prepare("UPDATE settings SET setting_value = ?, updated_at = NOW() WHERE setting_key = ?");
+    //             $updateStmt->bind_param("ss", $settingValue, $settingKey);
+    //             $updateStmt->execute();
+    //         }
+    //     }
+    // }
     
     logAdminAction('settings_update', 'Обновлены настройки сайта');
     redirectWithNotification('settings.php', 'Настройки успешно сохранены', 'success');
