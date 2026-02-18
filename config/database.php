@@ -1,14 +1,14 @@
 <?php
 
-define('DB_HOST', 'localhost');
-define('DB_USER', 'root');
-define('DB_PASS', 'password');
-define('DB_NAME', 'ntc-kumir');
-
 // define('DB_HOST', 'localhost');
 // define('DB_USER', 'root');
-// define('DB_PASS', '71c%WM6Ge4L8eD1#~s4X');
+// define('DB_PASS', 'password');
 // define('DB_NAME', 'ntc-kumir');
+
+define('DB_HOST', 'localhost');
+define('DB_USER', 'root');
+define('DB_PASS', '71c%WM6Ge4L8eD1#~s4X');
+define('DB_NAME', 'ntc-kumir');
 
 // Функция подключения к БД
 function getDBConnection() {
