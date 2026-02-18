@@ -1,0 +1,17 @@
+/* Стили специально для раздела обращений */
+.unread-row {
+    background-color: rgba(231, 76, 60, 0.05) !important; /* Легкий красноватый оттенок для новых */
+}
+
+.unread-row td {
+    font-weight: 500;
+}
+
+.status-badge.inactive {
+    background-color: #e74c3c; /* Красный для статуса "Новое" */
+    color: #fff;
+}
+
+.btn-edit i.fa-check {
+    color: #2ecc71; /* Зеленая галочка */
+}

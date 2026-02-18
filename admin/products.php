@@ -1,0 +1,421 @@
+<?php
+// Определяем базовый путь
+define('BASE_PATH', dirname(__DIR__));
+
+// Подключаем функции
+require_once BASE_PATH . '/admin/includes/functions.php';
+
+// Проверяем авторизацию
+requireAdminAuth();
+
+// Проверяем права доступа
+if (!hasPermission('editor')) {
+    redirectWithNotification('index.php', 'Недостаточно прав для доступа к этой странице', 'error');
+}
+
+$conn = getDBConnection();
+$action = $_GET['action'] ?? 'list';
+$id = $_GET['id'] ?? 0;
+
+// Получаем список категорий
+$categories = $conn->query("SELECT id, name FROM product_categories WHERE is_active = 1 ORDER BY sort_order")->fetch_all(MYSQLI_ASSOC);
+
+// Обработка добавления/редактирования
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $categoryId = intval($_POST['category_id'] ?? 0);
+    $name = cleanInput($_POST['name'] ?? '');
+    $description = cleanInput($_POST['description'] ?? '');
+    $fullDescription = $_POST['full_description'] ?? '';
+    $price = !empty($_POST['price']) ? floatval($_POST['price']) : null;
+    $isAvailable = isset($_POST['is_available']) ? 1 : 0;
+    $isActive = isset($_POST['is_active']) ? 1 : 0;
+    $sortOrder = intval($_POST['sort_order'] ?? 0);
+    $imagePath = $_POST['existing_image'] ?? '';
+    
+    // Подготовка спецификаций
+    $specifications = [];
+    if (isset($_POST['spec_key']) && isset($_POST['spec_value'])) {
+        $keys = $_POST['spec_key'];
+        $values = $_POST['spec_value'];
+        
+        for ($i = 0; $i < count($keys); $i++) {
+            $key = cleanInput($keys[$i]);
+            $value = cleanInput($values[$i]);
+            
+            if (!empty($key) && !empty($value)) {
+                $specifications[$key] = $value;
+            }
+        }
+    }
+    
+    $specificationsJson = json_encode($specifications, JSON_UNESCAPED_UNICODE);
+    
+    // Генерация слага
+    $slug = createSlug($name);
+    $counter = 1;
+    $originalSlug = $slug;
+    
+    while (!isSlugUnique('products', $slug, $id)) {
+        $slug = $originalSlug . '-' . $counter;
+        $counter++;
+    }
+    
+    // Загрузка изображения
+    if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+        $uploadResult = uploadImage($_FILES['image']);
+        if ($uploadResult['success']) {
+            $imagePath = $uploadResult['path'];
+        }
+    }
+    
+    if ($action === 'add' || ($action === 'edit' && $id)) {
+        if ($action === 'add') {
+            $stmt = $conn->prepare("INSERT INTO products (category_id, name, slug, description, full_description, image_path, price, specifications, is_available, sort_order, is_active) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param("isssssdsiii", $categoryId, $name, $slug, $description, $fullDescription, $imagePath, $price, $specificationsJson, $isAvailable, $sortOrder, $isActive);
+            
+            if ($stmt->execute()) {
+                $newId = $stmt->insert_id;
+                logAdminAction('product_add', "Добавлен товар: " . safeSubstr($name, 0, 50));
+                redirectWithNotification('products.php', 'Товар успешно добавлен', 'success');
+            } else {
+                redirectWithNotification('products.php?action=add', 'Ошибка при добавлении товара', 'error');
+            }
+        } else {
+            $stmt = $conn->prepare("UPDATE products SET category_id = ?, name = ?, slug = ?, description = ?, full_description = ?, image_path = ?, price = ?, specifications = ?, is_available = ?, sort_order = ?, is_active = ?, updated_at = NOW() WHERE id = ?");
+            $stmt->bind_param("isssssdsiiii", $categoryId, $name, $slug, $description, $fullDescription, $imagePath, $price, $specificationsJson, $isAvailable, $sortOrder, $isActive, $id);
+            
+            if ($stmt->execute()) {
+                logAdminAction('product_edit', "Отредактирован товар: " . safeSubstr($name, 0, 50));
+                redirectWithNotification('products.php', 'Товар успешно обновлен', 'success');
+            } else {
+                redirectWithNotification('products.php?action=edit&id=' . $id, 'Ошибка при обновлении товара', 'error');
+            }
+        }
+    }
+}
+
+// Обработка удаления
+if ($action === 'delete' && $id) {
+    // Получаем информацию о товаре для лога
+    $stmt = $conn->prepare("SELECT name FROM products WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $product = $result->fetch_assoc();
+    
+    $stmt = $conn->prepare("DELETE FROM products WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    
+    if ($stmt->execute()) {
+        logAdminAction('product_delete', "Удален товар: " . safeSubstr($product['name'] ?? '', 0, 50));
+        redirectWithNotification('products.php', 'Товар успешно удален', 'success');
+    } else {
+        redirectWithNotification('products.php', 'Ошибка при удалении товара', 'error');
+    }
+}
+
+// Подключаем шапку
+require_once BASE_PATH . '/admin/includes/header.php';
+
+// Подключаем меню
+require_once BASE_PATH . '/admin/includes/menu.php';
+?>
+
+<!-- Основной контент -->
+<div class="main-content">
+    <!-- Шапка -->
+    <header class="header">
+        <div class="header-left">
+            <button class="toggle-sidebar" id="toggleSidebar">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h1 class="header-title">
+                <?php echo $action === 'add' ? 'Добавить товар' : ($action === 'edit' ? 'Редактировать товар' : 'Товары'); ?>
+            </h1>
+        </div>
+        
+        <div class="header-right">
+            <div class="user-menu">
+                <div class="user-avatar">
+                    <?php $admin = getCurrentAdmin(); echo strtoupper(substr($admin['username'], 0, 1)); ?>
+                </div>
+                <div class="user-info">
+                    <h4><?php echo htmlspecialchars($admin['full_name'] ?? $admin['username']); ?></h4>
+                    <span>Администратор</span>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Контент -->
+    <div class="content-container">
+        <?php if ($action === 'list'): ?>
+        <!-- Список товаров -->
+        <div class="page-header">
+            <div class="header-actions">
+                <a href="products.php?action=add" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Добавить товар
+                </a>
+                <a href="categories.php" class="btn btn-secondary">
+                    <i class="fas fa-tags"></i> Управление категориями
+                </a>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h3>Список товаров</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Изображение</th>
+                                <th>Название</th>
+                                <th>Категория</th>
+                                <th>Цена</th>
+                                <th>Наличие</th>
+                                <th>Сортировка</th>
+                                <th>Статус</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            $pagination = getPagination('products', 10);
+                            $stmt = $conn->prepare("
+                                SELECT p.*, pc.name as category_name 
+                                FROM products p 
+                                LEFT JOIN product_categories pc ON p.category_id = pc.id 
+                                ORDER BY p.sort_order, p.created_at DESC 
+                                LIMIT ? OFFSET ?
+                            ");
+                            $stmt->bind_param("ii", $pagination['perPage'], $pagination['offset']);
+                            $stmt->execute();
+                            $result = $stmt->get_result();
+                            
+                            while ($row = $result->fetch_assoc()):
+                                $specifications = json_decode($row['specifications'], true) ?? [];
+                            ?>
+                            <tr>
+                                <td><?php echo $row['id']; ?></td>
+                                <td>
+                                    <?php if ($row['image_path']): ?>
+                                    <img src="../<?php echo $row['image_path']; ?>" alt="<?php echo htmlspecialchars($row['name']); ?>" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
+                                    <?php endif; ?>
+                                </td>
+                                <td>
+                                    <strong><?php echo htmlspecialchars($row['name']); ?></strong>
+                                    <small class="text-muted d-block"><?php echo htmlspecialchars(safeSubstr($row['description'], 0, 50)) . '...'; ?></small>
+                                </td>
+                                <td><?php echo htmlspecialchars($row['category_name'] ?? '—'); ?></td>
+                                <td>
+                                    <?php if ($row['price']): ?>
+                                    <?php echo number_format($row['price'], 2, '.', ' '); ?> ₽
+                                    <?php else: ?>
+                                    —
+                                    <?php endif; ?>
+                                </td>
+                                <td>
+                                    <span class="status-badge <?php echo $row['is_available'] ? 'available' : 'not-available'; ?>">
+                                        <?php echo $row['is_available'] ? 'В наличии' : 'Нет в наличии'; ?>
+                                    </span>
+                                </td>
+                                <td><?php echo $row['sort_order']; ?></td>
+                                <td>
+                                    <span class="status-badge <?php echo $row['is_active'] ? 'active' : 'inactive'; ?>">
+                                        <?php echo $row['is_active'] ? 'Активен' : 'Неактивен'; ?>
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <a href="products.php?action=edit&id=<?php echo $row['id']; ?>" class="btn btn-sm btn-edit">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="products.php?action=delete&id=<?php echo $row['id']; ?>" 
+                                           class="btn btn-sm btn-delete" 
+                                           onclick="return confirm('Удалить этот товар?')">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <?php endwhile; ?>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <?php echo generatePaginationLinks($pagination); ?>
+            </div>
+        </div>
+        
+        <?php elseif ($action === 'add' || $action === 'edit'): ?>
+        <!-- Форма добавления/редактирования -->
+        <?php
+        $product = [];
+        $specifications = [];
+        
+        if ($action === 'edit' && $id) {
+            $stmt = $conn->prepare("SELECT * FROM products WHERE id = ?");
+            $stmt->bind_param("i", $id);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $product = $result->fetch_assoc();
+            
+            if (!$product) {
+                redirectWithNotification('products.php', 'Товар не найден', 'error');
+            }
+            
+            $specifications = json_decode($product['specifications'], true) ?? [];
+        }
+        ?>
+        
+        <div class="card">
+            <div class="card-header">
+                <h3><?php echo $action === 'add' ? 'Добавить новый товар' : 'Редактировать товар'; ?></h3>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="" enctype="multipart/form-data">
+                    <div class="form-row">
+                        <div class="form-group col-md-8">
+                            <label for="name">Название товара *</label>
+                            <input type="text" id="name" name="name" class="form-control" value="<?php echo htmlspecialchars($product['name'] ?? ''); ?>" required>
+                        </div>
+                        
+                        <div class="form-group col-md-4">
+                            <label for="category_id">Категория *</label>
+                            <select id="category_id" name="category_id" class="form-control" required>
+                                <option value="">Выберите категорию</option>
+                                <?php foreach ($categories as $category): ?>
+                                <option value="<?php echo $category['id']; ?>" <?php echo ($product['category_id'] ?? '') == $category['id'] ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($category['name']); ?>
+                                </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="slug">URL (слаг)</label>
+                        <input type="text" id="slug" name="slug" class="form-control" value="<?php echo htmlspecialchars($product['slug'] ?? ''); ?>" readonly>
+                        <small class="text-muted">Генерируется автоматически из названия</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="description">Краткое описание</label>
+                        <textarea id="description" name="description" rows="3" class="form-control"><?php echo htmlspecialchars($product['description'] ?? ''); ?></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="full_description">Полное описание</label>
+                        <textarea id="full_description" name="full_description" rows="6" class="form-control"><?php echo htmlspecialchars($product['full_description'] ?? ''); ?></textarea>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label for="price">Цена (₽)</label>
+                            <input type="number" id="price" name="price" class="form-control" step="0.01" min="0" value="<?php echo $product['price'] ?? ''; ?>">
+                        </div>
+                        
+                        <div class="form-group col-md-4">
+                            <label for="sort_order">Порядок сортировки</label>
+                            <input type="number" id="sort_order" name="sort_order" class="form-control" value="<?php echo $product['sort_order'] ?? 0; ?>">
+                        </div>
+                        
+                        <div class="form-group col-md-4">
+                            <label>Изображение</label>
+                            <?php if (!empty($product['image_path'])): ?>
+                            <div class="existing-image mb-2">
+                                <img src="../<?php echo $product['image_path']; ?>" alt="Текущее изображение" style="max-width: 100px; margin-bottom: 10px;">
+                                <input type="hidden" name="existing_image" value="<?php echo $product['image_path']; ?>">
+                                <a href="javascript:void(0)" onclick="removeImage()" class="btn btn-sm btn-danger">
+                                    <i class="fas fa-trash"></i> Удалить
+                                </a>
+                            </div>
+                            <?php endif; ?>
+                            <input type="file" id="image" name="image" class="form-control" accept="image/*">
+                            <small class="text-muted">Рекомендуемый размер: 800×800px</small>
+                        </div>
+                    </div>
+                    
+                    <!-- Спецификации -->
+                    <div class="form-group">
+                        <label>Характеристики</label>
+                        <div id="specifications-container">
+                            <?php if (!empty($specifications)): ?>
+                                <?php foreach ($specifications as $key => $value): ?>
+                                <div class="specification-row row mb-2">
+                                    <div class="col-md-5">
+                                        <input type="text" name="spec_key[]" class="form-control" placeholder="Название характеристики" value="<?php echo htmlspecialchars($key); ?>">
+                                    </div>
+                                    <div class="col-md-5">
+                                        <input type="text" name="spec_value[]" class="form-control" placeholder="Значение" value="<?php echo htmlspecialchars($value); ?>">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <button type="button" class="btn btn-danger remove-spec">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <div class="specification-row row mb-2">
+                                    <div class="col-md-5">
+                                        <input type="text" name="spec_key[]" class="form-control" placeholder="Название характеристики">
+                                    </div>
+                                    <div class="col-md-5">
+                                        <input type="text" name="spec_value[]" class="form-control" placeholder="Значение">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <button type="button" class="btn btn-danger remove-spec">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                        <button type="button" id="add-spec" class="btn btn-secondary btn-sm mt-2">
+                            <i class="fas fa-plus"></i> Добавить характеристику
+                        </button>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="is_available" value="1" <?php echo ($product['is_available'] ?? 1) ? 'checked' : ''; ?>>
+                                <span>В наличии</span>
+                            </label>
+                        </div>
+                        
+                        <div class="form-group col-md-6">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="is_active" value="1" <?php echo ($product['is_active'] ?? 1) ? 'checked' : ''; ?>>
+                                <span>Активный</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Сохранить
+                        </button>
+                        <a href="products.php" class="btn btn-secondary">Отмена</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <script src="assets/js/products.js"></script>
+        <?php endif; ?>
+    </div>
+</div>
+
+<?php
+// Подключаем скрипты
+require_once BASE_PATH . '/admin/includes/scripts.php';
+
+// Подключаем подвал
+require_once BASE_PATH . '/admin/includes/footer.php';
+?>

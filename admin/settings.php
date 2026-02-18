@@ -1,0 +1,269 @@
+<?php
+// Определяем базовый путь
+define('BASE_PATH', dirname(__DIR__));
+
+// Подключаем функции
+require_once BASE_PATH . '/admin/includes/functions.php';
+
+// Проверяем авторизацию
+requireAdminAuth();
+
+// Проверяем права доступа
+if (!hasPermission('admin')) {
+    redirectWithNotification('index.php', 'Недостаточно прав для доступа к этой странице', 'error');
+}
+
+$conn = getDBConnection();
+
+// Обработка сохранения настроек
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    foreach ($_POST as $key => $value) {
+        if (strpos($key, 'setting_') === 0) {
+            $settingKey = substr($key, 8); // Убираем префикс "setting_"
+            $settingValue = cleanInput($value);
+            
+            // Проверяем, существует ли настройка
+            $stmt = $conn->prepare("SELECT id FROM settings WHERE setting_key = ?");
+            $stmt->bind_param("s", $settingKey);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            
+            if ($result->num_rows > 0) {
+                // Обновляем существующую настройку
+                $updateStmt = $conn->prepare("UPDATE settings SET setting_value = ?, updated_at = NOW() WHERE setting_key = ?");
+                $updateStmt->bind_param("ss", $settingValue, $settingKey);
+                $updateStmt->execute();
+            } else {
+                // Добавляем новую настройку
+                $insertStmt = $conn->prepare("INSERT INTO settings (setting_key, setting_value) VALUES (?, ?)");
+                $insertStmt->bind_param("ss", $settingKey, $settingValue);
+                $insertStmt->execute();
+            }
+        }
+    }
+    
+    // Обработка загрузки изображений
+    $imageFields = ['logo', 'favicon', 'background'];
+    
+    foreach ($imageFields as $field) {
+        if (isset($_FILES[$field]) && $_FILES[$field]['error'] === UPLOAD_ERR_OK) {
+            $uploadResult = uploadImage($_FILES[$field]);
+            
+            if ($uploadResult['success']) {
+                $settingKey = $field === 'background' ? 'background_image' : $field . '_path';
+                $settingValue = $uploadResult['path'];
+                
+                $updateStmt = $conn->prepare("UPDATE settings SET setting_value = ?, updated_at = NOW() WHERE setting_key = ?");
+                $updateStmt->bind_param("ss", $settingValue, $settingKey);
+                $updateStmt->execute();
+            }
+        }
+    }
+    
+    logAdminAction('settings_update', 'Обновлены настройки сайта');
+    redirectWithNotification('settings.php', 'Настройки успешно сохранены', 'success');
+}
+
+// Получаем все настройки
+$settingsResult = $conn->query("SELECT * FROM settings ORDER BY setting_key");
+$settings = [];
+while ($row = $settingsResult->fetch_assoc()) {
+    $settings[$row['setting_key']] = $row['setting_value'];
+}
+
+// Подключаем шапку
+require_once BASE_PATH . '/admin/includes/header.php';
+
+// Подключаем меню
+require_once BASE_PATH . '/admin/includes/menu.php';
+?>
+
+<!-- Основной контент -->
+<div class="main-content">
+    <!-- Шапка -->
+    <header class="header">
+        <div class="header-left">
+            <button class="toggle-sidebar" id="toggleSidebar">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h1 class="header-title">Настройки сайта</h1>
+        </div>
+        
+        <div class="header-right">
+            <div class="user-menu">
+                <div class="user-avatar">
+                    <?php $admin = getCurrentAdmin(); echo strtoupper(substr($admin['username'], 0, 1)); ?>
+                </div>
+                <div class="user-info">
+                    <h4><?php echo htmlspecialchars($admin['full_name'] ?? $admin['username']); ?></h4>
+                    <span>Администратор</span>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Контент -->
+    <div class="content-container">
+        <form method="POST" action="" enctype="multipart/form-data">
+            <!-- Основные настройки -->
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-cog"></i> Основные настройки</h3>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="setting_site_title">Название сайта</label>
+                        <input type="text" id="setting_site_title" name="setting_site_title" 
+                               value="<?php echo htmlspecialchars($settings['site_title'] ?? ''); ?>" required>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="setting_company_name">Название компании</label>
+                            <input type="text" id="setting_company_name" name="setting_company_name" 
+                                   value="<?php echo htmlspecialchars($settings['company_name'] ?? ''); ?>">
+                        </div>
+                        
+                        <div class="form-group col-md-6">
+                            <label for="setting_phone">Телефон</label>
+                            <input type="text" id="setting_phone" name="setting_phone" 
+                                   value="<?php echo htmlspecialchars($settings['phone'] ?? ''); ?>">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="setting_company_email">Email компании</label>
+                            <input type="email" id="setting_company_email" name="setting_company_email" 
+                                   value="<?php echo htmlspecialchars($settings['company_email'] ?? ''); ?>">
+                        </div>
+                        
+                        <div class="form-group col-md-6">
+                            <label for="setting_company_address">Адрес компании</label>
+                            <input type="text" id="setting_company_address" name="setting_company_address" 
+                                   value="<?php echo htmlspecialchars($settings['company_address'] ?? ''); ?>">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Изображения -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h3><i class="fas fa-images"></i> Изображения</h3>
+                </div>
+                <div class="card-body">
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label>Логотип</label>
+                            <?php if (!empty($settings['logo_path'])): ?>
+                            <div class="mb-2">
+                                <img src="../<?php echo $settings['logo_path']; ?>" alt="Логотип" style="max-width: 150px; max-height: 50px;">
+                                <div class="mt-1">
+                                    <small>Текущий: <?php echo basename($settings['logo_path']); ?></small>
+                                </div>
+                            </div>
+                            <?php endif; ?>
+                            <input type="file" name="logo" accept="image/*">
+                            <small>Рекомендуемый размер: 200×60px, формат: SVG, PNG</small>
+                        </div>
+                        
+                        <div class="form-group col-md-4">
+                            <label>Favicon</label>
+                            <?php if (!empty($settings['favicon_path'])): ?>
+                            <div class="mb-2">
+                                <img src="../<?php echo $settings['favicon_path']; ?>" alt="Favicon" style="width: 32px; height: 32px;">
+                                <div class="mt-1">
+                                    <small>Текущий: <?php echo basename($settings['favicon_path']); ?></small>
+                                </div>
+                            </div>
+                            <?php endif; ?>
+                            <input type="file" name="favicon" accept="image/*">
+                            <small>Размер: 32×32px или 64×64px, формат: ICO, PNG</small>
+                        </div>
+                        
+                        <div class="form-group col-md-4">
+                            <label>Фоновое изображение</label>
+                            <?php if (!empty($settings['background_image'])): ?>
+                            <div class="mb-2">
+                                <img src="../<?php echo $settings['background_image']; ?>" alt="Фон" style="max-width: 150px; max-height: 100px; object-fit: cover;">
+                                <div class="mt-1">
+                                    <small>Текущий: <?php echo basename($settings['background_image']); ?></small>
+                                </div>
+                            </div>
+                            <?php endif; ?>
+                            <input type="file" name="background" accept="image/*">
+                            <small>Рекомендуемый размер: 1920×1080px</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Тексты -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h3><i class="fas fa-file-alt"></i> Тексты</h3>
+                </div>
+                <div class="card-body">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="setting_copyright_text">Текст копирайта</label>
+                            <input type="text" id="setting_copyright_text" name="setting_copyright_text" 
+                                   value="<?php echo htmlspecialchars($settings['copyright_text'] ?? '© 2026 Все права защищены'); ?>">
+                        </div>
+                        
+                        <div class="form-group col-md-6">
+                            <label for="setting_developer_text">Текст разработчика</label>
+                            <input type="text" id="setting_developer_text" name="setting_developer_text" 
+                                   value="<?php echo htmlspecialchars($settings['developer_text'] ?? 'Разработано в Prime Group'); ?>">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Дополнительные настройки -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h3><i class="fas fa-sliders-h"></i> Дополнительные настройки</h3>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="setting_default_email">Email по умолчанию для уведомлений</label>
+                        <input type="email" id="setting_default_email" name="setting_default_email" 
+                               value="<?php echo htmlspecialchars($settings['default_email'] ?? ''); ?>">
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="setting_items_per_page">Элементов на странице (админка)</label>
+                            <input type="number" id="setting_items_per_page" name="setting_items_per_page" 
+                                   value="<?php echo htmlspecialchars($settings['items_per_page'] ?? '10'); ?>" min="5" max="100">
+                        </div>
+                        
+                        <div class="form-group col-md-6">
+                            <label for="setting_cache_timeout">Таймаут кэша (секунды)</label>
+                            <input type="number" id="setting_cache_timeout" name="setting_cache_timeout" 
+                                   value="<?php echo htmlspecialchars($settings['cache_timeout'] ?? '3600'); ?>" min="0">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Кнопки сохранения -->
+            <div class="form-actions mt-4">
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="fas fa-save"></i> Сохранить все настройки
+                </button>
+                <button type="reset" class="btn btn-secondary">Сбросить</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<?php
+// Подключаем скрипты
+require_once BASE_PATH . '/admin/includes/scripts.php';
+
+// Подключаем подвал
+require_once BASE_PATH . '/admin/includes/footer.php';
+?>

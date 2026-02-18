@@ -1,0 +1,327 @@
+:root {
+    --primary-blue: #3498db;
+    --dark-blue: #2980b9;
+    --text-dark: #2c3e50;
+    --text-light: #7f8c8d;
+    --bg-light: #f8f9fa;
+    --bg-gradient: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    --shadow-sm: 0 5px 20px rgba(0,0,0,0.08);
+    --shadow-md: 0 10px 40px rgba(0,0,0,0.1);
+    --shadow-lg: 0 20px 60px rgba(0,0,0,0.15);
+    --border-radius: 16px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Общие стили страницы */
+.articles-page,
+.article-detail {
+    padding: 120px 0 60px;
+    background: var(--bg-gradient);
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Шапка страницы */
+.page-header {
+    text-align: center;
+    margin-bottom: 70px;
+    animation: fadeInUp 0.8s ease forwards;
+}
+
+.page-title {
+    font-size: 3rem;
+    color: var(--text-dark);
+    margin-bottom: 1rem;
+    font-weight: 700;
+    background: linear-gradient(45deg, var(--primary-blue), var(--text-dark));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.page-description {
+    font-size: 1.125rem;
+    color: var(--text-light);
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+/* Контейнер для стопки статей */
+.articles-stack {
+    max-width: 900px;
+    margin: 0 auto 3rem;
+    position: relative;
+}
+
+/* Карточка статьи в стопке */
+.article-card-stack {
+    background: white;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 2rem;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: var(--transition);
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.article-card-stack.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.article-card-stack:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+}
+
+.article-link-stack {
+    display: flex;
+    min-height: 250px;
+    text-decoration: none;
+    color: inherit;
+    transition: var(--transition);
+}
+
+.article-link-stack:hover {
+    text-decoration: none;
+}
+
+/* Изображение статьи */
+.article-image-container {
+    flex: 0 0 40%;
+    position: relative;
+    overflow: hidden;
+}
+
+.article-image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s ease;
+}
+
+.article-card-stack:hover .article-image-container img {
+    transform: scale(1.1);
+}
+
+/* Контент карточки */
+.article-content-stack {
+    flex: 1;
+    padding: 2.5rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.article-title-stack {
+    font-size: 1.5rem;
+    color: var(--text-dark);
+    margin-bottom: 1rem;
+    line-height: 1.4;
+    font-weight: 600;
+}
+
+.article-card-stack:hover .article-title-stack {
+    color: var(--primary-blue);
+}
+
+.article-excerpt-stack {
+    color: #666;
+    font-size: 1rem;
+    line-height: 1.7;
+    margin-bottom: 1.5rem;
+    flex-grow: 1;
+}
+
+/* Мета-информация */
+.article-meta-stack {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1.5rem;
+    border-top: 1px solid #eee;
+    font-size: 0.875rem;
+    color: #95a5a6;
+}
+
+.read-more {
+    color: var(--primary-blue);
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: gap 0.3s;
+}
+
+.read-more::after {
+    content: '→';
+    transition: transform 0.3s;
+}
+
+.article-card-stack:hover .read-more {
+    gap: 0.75rem;
+}
+
+.article-card-stack:hover .read-more::after {
+    transform: translateX(5px);
+}
+
+/* Страница отдельной статьи */
+.article-container {
+    max-width: 900px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+    animation: slideUp 0.8s ease;
+}
+
+.article-header {
+    padding: 3rem 3rem 2rem;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+}
+
+.article-detail-image {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+    transition: transform 0.8s;
+}
+
+.article-detail-image:hover {
+    transform: scale(1.02);
+}
+
+.article-body {
+    padding: 2.5rem 3rem 3rem;
+    line-height: 1.8;
+    font-size: 1.125rem;
+}
+
+.article-body p {
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.6s forwards;
+}
+
+/* Кнопка "Назад" */
+.back-link-container {
+    text-align: center;
+    padding: 2rem 0;
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 2rem;
+    background: var(--primary-blue);
+    color: white;
+    text-decoration: none;
+    border-radius: 50px;
+    font-weight: 500;
+    transition: var(--transition);
+    box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+}
+
+.back-link:hover {
+    background: var(--dark-blue);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(52, 152, 219, 0.4);
+    gap: 1rem;
+}
+
+/* Анимации */
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Пустая страница */
+.no-articles {
+    text-align: center;
+    padding: 5rem 1.25rem;
+}
+
+.no-articles p {
+    font-size: 1.125rem;
+    color: var(--text-light);
+}
+
+/* Адаптивность */
+@media (max-width: 992px) {
+    .articles-stack {
+        max-width: 95%;
+    }
+    
+    .article-link-stack {
+        flex-direction: column;
+        min-height: auto;
+    }
+    
+    .article-image-container {
+        flex: 0 0 200px;
+    }
+}
+
+@media (max-width: 768px) {
+    .page-title {
+        font-size: 2.25rem;
+    }
+    
+    .articles-page,
+    .article-detail {
+        padding: 100px 0 40px;
+    }
+    
+    .article-content-stack,
+    .article-header,
+    .article-body {
+        padding: 1.5rem;
+    }
+    
+    .article-title-stack {
+        font-size: 1.25rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-title {
+        font-size: 1.75rem;
+    }
+    
+    .article-body {
+        font-size: 1rem;
+        line-height: 1.6;
+        padding: 1.25rem;
+    }
+    
+    .article-meta-stack {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: flex-start;
+    }
+}

@@ -1,0 +1,344 @@
+:root {
+    --faq-primary: #f39c12;
+    --faq-dark: #d68910;
+    --faq-light: #fef5e7;
+}
+
+/* Общие стили */
+.faq-page {
+    padding: 120px 0 60px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Шапка страницы */
+.page-header {
+    text-align: center;
+    margin-bottom: 70px;
+    animation: fadeInUp 0.8s ease;
+}
+
+.page-title {
+    font-size: 3rem;
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    font-weight: 700;
+    position: relative;
+    display: inline-block;
+}
+
+.page-title::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 4px;
+    background: var(--faq-primary);
+    border-radius: 2px;
+}
+
+.page-description {
+    font-size: 1.125rem;
+    color: #7f8c8d;
+    max-width: 600px;
+    margin: 2rem auto 0;
+    line-height: 1.6;
+}
+
+/* Категории */
+.categories-section {
+    margin-bottom: 3rem;
+}
+
+.categories-title {
+    font-size: 1.5rem;
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+}
+
+.categories-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.category-btn {
+    padding: 0.75rem 1.5rem;
+    background: white;
+    border: 2px solid var(--faq-light);
+    color: #666;
+    border-radius: 50px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.category-btn:hover,
+.category-btn.active {
+    background: var(--faq-primary);
+    border-color: var(--faq-primary);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.category-btn.all {
+    background: var(--faq-light);
+    border-color: var(--faq-primary);
+    color: var(--faq-dark);
+}
+
+/* FAQ список */
+.faq-list {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.faq-item {
+    margin-bottom: 1rem;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    animation: slideUp 0.6s ease;
+    animation-fill-mode: both;
+}
+
+.faq-item:nth-child(1) { animation-delay: 0.1s; }
+.faq-item:nth-child(2) { animation-delay: 0.2s; }
+.faq-item:nth-child(3) { animation-delay: 0.3s; }
+.faq-item:nth-child(4) { animation-delay: 0.4s; }
+.faq-item:nth-child(5) { animation-delay: 0.5s; }
+
+.faq-toggle {
+    display: none;
+}
+
+.faq-question {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem;
+    background: white;
+    cursor: pointer;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #2c3e50;
+    transition: all 0.3s;
+    user-select: none;
+}
+
+.faq-question:hover {
+    background: var(--faq-light);
+}
+
+.faq-icon {
+    margin-right: 1rem;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.faq-arrow {
+    font-size: 0.875rem;
+    transition: transform 0.3s;
+    flex-shrink: 0;
+}
+
+.faq-toggle:checked ~ .faq-question .faq-arrow {
+    transform: rotate(180deg);
+}
+
+.faq-toggle:checked ~ .faq-question {
+    background: var(--faq-light);
+    border-bottom: 2px solid var(--faq-primary);
+}
+
+.faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    background: white;
+}
+
+.faq-toggle:checked ~ .faq-answer {
+    max-height: 1000px;
+}
+
+.faq-answer-content {
+    padding: 1.5rem;
+    color: #666;
+    line-height: 1.7;
+    border-top: 1px solid #eee;
+}
+
+.faq-answer-content p {
+    margin-bottom: 1rem;
+}
+
+.faq-answer-content ul,
+.faq-answer-content ol {
+    margin: 1rem 0 1rem 2rem;
+}
+
+.faq-answer-content li {
+    margin-bottom: 0.5rem;
+}
+
+/* Форма вопроса */
+.question-form-section {
+    margin-top: 4rem;
+    background: white;
+    border-radius: 16px;
+    padding: 3rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.form-title {
+    font-size: 2rem;
+    color: #2c3e50;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.question-form {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #2c3e50;
+    font-weight: 500;
+}
+
+.form-input,
+.form-textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s;
+}
+
+.form-input:focus,
+.form-textarea:focus {
+    outline: none;
+    border-color: var(--faq-primary);
+    box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.1);
+}
+
+.form-textarea {
+    min-height: 150px;
+    resize: vertical;
+}
+
+.submit-btn {
+    background: linear-gradient(135deg, var(--faq-primary), var(--faq-dark));
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    width: 100%;
+}
+
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(243, 156, 18, 0.3);
+}
+
+/* Анимации */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Адаптивность */
+@media (max-width: 992px) {
+    .faq-list {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .faq-page {
+        padding: 100px 0 40px;
+    }
+    
+    .page-title {
+        font-size: 2.25rem;
+    }
+    
+    .question-form-section {
+        padding: 2rem;
+    }
+    
+    .faq-question {
+        padding: 1rem;
+        font-size: 1rem;
+    }
+    
+    .faq-answer-content {
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-title {
+        font-size: 1.75rem;
+    }
+    
+    .form-title {
+        font-size: 1.5rem;
+    }
+    
+    .question-form-section {
+        padding: 1.5rem;
+    }
+    
+    .categories-grid {
+        justify-content: flex-start;
+        overflow-x: auto;
+        padding-bottom: 0.5rem;
+    }
+    
+    .category-btn {
+        white-space: nowrap;
+    }
+}

@@ -1,0 +1,475 @@
+:root {
+    --contacts-primary: #9b59b6;
+    --contacts-dark: #8e44ad;
+    --contacts-light: #f4ecf7;
+}
+
+/* Общие стили */
+.contacts-page {
+    padding: 120px 0 60px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Шапка страницы */
+.page-header {
+    text-align: center;
+    margin-bottom: 70px;
+    animation: fadeInUp 0.8s ease;
+}
+
+.page-title {
+    font-size: 3rem;
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    font-weight: 700;
+    position: relative;
+    display: inline-block;
+}
+
+.page-title::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 4px;
+    background: var(--contacts-primary);
+    border-radius: 2px;
+}
+
+.page-description {
+    font-size: 1.125rem;
+    color: #7f8c8d;
+    max-width: 600px;
+    margin: 2rem auto 0;
+    line-height: 1.6;
+}
+
+/* Сетка контактов */
+.contacts-section {
+    margin-bottom: 4rem;
+}
+
+.section-title {
+    font-size: 2rem;
+    color: #2c3e50;
+    margin-bottom: 2rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--contacts-light);
+}
+
+.contacts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+/* Карточка контакта */
+.contact-item {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+    border-left: 4px solid var(--contacts-primary);
+}
+
+.contact-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(155, 89, 182, 0.15);
+    border-left-width: 8px;
+}
+
+.contact-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.contact-content {
+    flex: 1;
+}
+
+.contact-title {
+    font-size: 1.125rem;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.contact-value {
+    color: #666;
+    text-decoration: none;
+    font-size: 1rem;
+    line-height: 1.5;
+    transition: color 0.3s;
+}
+
+.contact-value:hover {
+    color: var(--contacts-primary);
+}
+
+/* Карта */
+.map-section {
+    margin-bottom: 4rem;
+}
+
+.map-container {
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    height: 400px;
+    position: relative;
+}
+
+#yandex-map {
+    width: 100%;
+    height: 100%;
+}
+
+/* .map-overlay {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    right: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    pointer-events: none;
+}
+
+.map-info-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    max-width: 300px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    pointer-events: auto;
+    animation: slideInLeft 0.6s ease;
+} */
+
+/* Измени этот блок */
+
+.map-overlay {
+    position: absolute;
+    top: 20px;          /* Отступ от верхнего края карты */
+    left: 20px;         /* Прижимаем к левому краю */
+    right: auto;        /* ВАЖНО: убираем растягивание до правого края */
+    bottom: auto;       /* Убираем растягивание до низа */
+    width: auto;        /* Ширина будет зависеть только от контента */
+    padding: 0;         /* Убираем внутренние отступы, если они были */
+    background: none;   /* Убираем фоновый цвет, который все перекрывает */
+    pointer-events: none; /* Пропускаем клики сквозь контейнер на карту */
+    z-index: 10;
+}
+
+/* Сама карточка */
+.map-info-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    width: 300px;       /* Задаем фиксированную ширину карточке */
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    pointer-events: auto; /* Возвращаем возможность кликать по кнопкам */
+}
+
+.map-info-title {
+    font-size: 1.25rem;
+    color: #2c3e50;
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+}
+
+.map-address {
+    color: #666;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+}
+
+.map-actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.map-btn {
+    padding: 0.5rem 1rem;
+    background: var(--contacts-primary);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.map-btn:hover {
+    background: var(--contacts-dark);
+    transform: translateY(-2px);
+}
+
+/* Офисы */
+.offices-section {
+    margin-bottom: 4rem;
+}
+
+.offices-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.office-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+}
+
+.office-card.main-office {
+    border: 2px solid var(--contacts-primary);
+    transform: scale(1.02);
+}
+
+.office-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(155, 89, 182, 0.15);
+}
+
+.office-header {
+    background: linear-gradient(135deg, var(--contacts-primary), var(--contacts-dark));
+    color: white;
+    padding: 1.5rem;
+    position: relative;
+}
+
+.office-city {
+    font-size: 1.5rem;
+    margin: 0;
+    font-weight: 600;
+}
+
+.office-badge {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: white;
+    color: var(--contacts-primary);
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.office-content {
+    padding: 1.5rem;
+}
+
+.office-content p {
+    margin: 0.5rem 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    color: #666;
+}
+
+.office-content a {
+    color: var(--contacts-primary);
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.office-content a:hover {
+    color: var(--contacts-dark);
+    text-decoration: underline;
+}
+
+/* Форма обратной связи */
+.contact-form-section {
+    background: white;
+    border-radius: 16px;
+    padding: 3rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    margin-bottom: 4rem;
+}
+
+.form-title {
+    font-size: 2rem;
+    color: #2c3e50;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.contact-form {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #2c3e50;
+    font-weight: 500;
+}
+
+.form-input,
+.form-textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s;
+}
+
+.form-input:focus,
+.form-textarea:focus {
+    outline: none;
+    border-color: var(--contacts-primary);
+    box-shadow: 0 0 0 3px rgba(155, 89, 182, 0.1);
+}
+
+.form-textarea {
+    min-height: 150px;
+    resize: vertical;
+}
+
+.submit-btn {
+    background: linear-gradient(135deg, var(--contacts-primary), var(--contacts-dark));
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    width: 100%;
+}
+
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(155, 89, 182, 0.3);
+}
+
+/* Анимации */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Адаптивность */
+@media (max-width: 992px) {
+    .contacts-grid,
+    .offices-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .map-overlay {
+        position: relative;
+        top: 0;
+        left: 0;
+        right: 0;
+        margin-bottom: 1rem;
+    }
+    
+    .map-info-card {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .contacts-page {
+        padding: 100px 0 40px;
+    }
+    
+    .page-title {
+        font-size: 2.25rem;
+    }
+    
+    .contact-form-section {
+        padding: 2rem;
+    }
+    
+    .section-title {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-title {
+        font-size: 1.75rem;
+    }
+    
+    .form-title {
+        font-size: 1.5rem;
+    }
+    
+    .contact-form-section {
+        padding: 1.5rem;
+    }
+    
+    .map-actions {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 992px) {
+    .map-container {
+        height: auto; /* Позволяем контейнеру расти вниз */
+        display: flex;
+        flex-direction: column;
+    }
+
+    #yandex-map {
+        height: 400px; /* Фиксируем высоту карты */
+        order: 2;
+    }
+
+    .map-overlay {
+        position: static; /* Выбиваем из абсолютного позиционирования */
+        margin-bottom: 20px;
+        order: 1;
+    }
+
+    .map-info-card {
+        width: 100%;
+        max-width: 100%;
+    }
+}

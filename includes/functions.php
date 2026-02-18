@@ -1,0 +1,198 @@
+<?php
+
+// Подключаем database.php
+require_once __DIR__ . '/../config/database.php';
+
+// Подключаем функции статей
+require_once __DIR__ . '/article-functions.php';
+
+// Подключаем функции вопрос ответ
+require_once __DIR__ . '/faq-functions.php';
+
+// Подключаем функции новостей
+require_once __DIR__ . '/news-functions.php';
+
+// Подключаем функции продукции
+require_once __DIR__ . '/product-functions.php';
+
+// Подключаем функции контактов и FAQ
+require_once __DIR__ . '/contact-functions.php';
+
+// Подключаем функции аутентификации
+require_once __DIR__ . '/auth-functions.php';
+
+
+// Функция для получения изображения
+function getImage($key) {
+    $conn = getDBConnection();
+    $stmt = $conn->prepare("SELECT image_path, alt_text FROM images WHERE image_key = ?");
+    $stmt->bind_param("s", $key);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    if ($row = $result->fetch_assoc()) {
+        return $row;
+    }
+    
+    return ['image_path' => '', 'alt_text' => ''];
+}
+
+// Функция для получения координат карты
+function getMapLocation() {
+    $conn = getDBConnection();
+    $result = $conn->query("SELECT latitude, longitude, zoom, marker_title FROM map_location LIMIT 1");
+    
+    if ($row = $result->fetch_assoc()) {
+        return $row;
+    }
+    
+    return ['latitude' => 0, 'longitude' => 0, 'zoom' => 12, 'marker_title' => ''];
+}
+
+// Остальные функции остаются как были, но обновим advantages для отображения в две колонки
+function renderAdvantages() {
+    $advantages = getAdvantages();
+    echo '<div class="advantages-grid">';
+    foreach ($advantages as $advantage) {
+        echo '<div class="advantage-item">';
+        echo '<div class="advantage-header">';
+        echo '<div class="advantage-icon">';
+        // Здесь можно использовать иконки или текст
+        echo '<span>✓</span>';
+        echo '</div>';
+        echo '<h3 class="advantage-title">' . $advantage['title'] . '</h3>';
+        echo '</div>';
+        echo '<p class="advantage-description">' . $advantage['description'] . '</p>';
+        echo '</div>';
+    }
+    echo '</div>';
+}
+
+function renderMenu() {
+    $menuItems = getMenuItems();
+    foreach ($menuItems as $item) {
+        echo '<a href="' . $item['url'] . '" class="nav-link">' . $item['title'] . '</a>';
+    }
+}
+
+function renderFeatures() {
+    $features = getFeatures();
+    foreach ($features as $feature) {
+        echo '<div class="feature-item">' . $feature['title'] . '</div>';
+    }
+}
+
+function renderCards() {
+    $cards = getCards();
+    foreach ($cards as $card) {
+        echo '<div class="card" style="border-bottom-color: ' . $card['color'] . '">';
+        echo '<div class="card-image">';
+        echo '<img src="' . $card['image_path'] . '" alt="' . $card['title'] . '">';
+        echo '</div>';
+        echo '<div class="card-content">';
+        echo '<h3>' . $card['title'] . '</h3>';
+        echo '<p>' . $card['description'] . '</p>';
+        echo '</div>';
+        echo '</div>';
+    }
+}
+
+function renderStatistics() {
+    $stats = getStatistics();
+    foreach ($stats as $stat) {
+        echo '<div class="stat-item">';
+        echo '<div class="stat-value">' . $stat['value'] . '</div>';
+        echo '<div class="stat-title">' . $stat['title'] . '</div>';
+        echo '<div class="stat-desc">' . $stat['description'] . '</div>';
+        echo '</div>';
+    }
+}
+
+// Функция для получения меню из базы данных
+function getNavigationMenu() {
+    $conn = getDBConnection();
+    $result = $conn->query("SELECT * FROM menu_items WHERE is_active = 1 ORDER BY sort_order");
+    $items = [];
+    
+    while ($row = $result->fetch_assoc()) {
+        $items[] = $row;
+    }
+    
+    return $items;
+}
+
+// Функция для рендеринга навигации
+function renderNavigation() {
+    $menuItems = getNavigationMenu();
+    
+    // Основные элементы меню
+    $mainItems = ['О компании'];
+    $dropdownItems = ['Статьи', 'Новости', 'Продукция', 'Вопрос/ответ', 'Сотрудничество', 'Контакты'];
+    
+    echo '<nav class="main-nav">';
+    
+    // Выпадающее меню "Оставшиеся позиции"
+    echo '<div class="dropdown">';
+    echo '<a href="#" class="nav-link dropdown-toggle">Оставшиеся позиции</a>';
+    echo '<div class="dropdown-menu">';
+    foreach ($dropdownItems as $item) {
+        echo '<a href="#" class="dropdown-item">' . $item . '</a>';
+    }
+    echo '</div>';
+    echo '</div>';
+    
+    // Основной пункт меню
+    echo '<a href="#" class="nav-link">О компании</a>';
+    
+    echo '</nav>';
+}
+
+// Функция для безопасного обрезания строки с поддержкой UTF-8
+function safeSubstr($string, $start, $length = null) {
+    if (empty($string)) {
+        return '';
+    }
+    
+    if (function_exists('mb_substr')) {
+        if ($length === null) {
+            return mb_substr($string, $start, null, 'UTF-8');
+        }
+        return mb_substr($string, $start, $length, 'UTF-8');
+    } else {
+        // Используем substr с проверкой мультибайтовых символов
+        if ($length === null) {
+            return substr($string, $start);
+        }
+        
+        // Попытка сохранить целостность UTF-8 строки
+        $result = substr($string, $start, $length);
+        
+        // Если обрезали середину мультибайтового символа, исправляем
+        if (strlen($result) > 0) {
+            while (strlen($result) > 0 && ord($result[strlen($result) - 1]) > 127) {
+                $result = substr($result, 0, -1);
+            }
+        }
+        
+        return $result;
+    }
+}
+
+// Функция для безопасного обрезания строки для мета-описаний
+function truncateDescription($text, $length = 160) {
+    $text = strip_tags($text);
+    $text = html_entity_decode($text, ENT_QUOTES, 'UTF-8');
+    
+    if (function_exists('mb_strlen')) {
+        if (mb_strlen($text, 'UTF-8') > $length) {
+            $text = mb_substr($text, 0, $length, 'UTF-8') . '...';
+        }
+    } else {
+        if (strlen($text) > $length) {
+            $text = safeSubstr($text, 0, $length) . '...';
+        }
+    }
+    
+    return htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
+}
+?>
