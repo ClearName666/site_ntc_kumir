@@ -185,7 +185,7 @@ require_once __DIR__. '/includes/menu.php';
                 <div class="card-body">
                     <div class="form-row images-container"> <div class="form-group image-field-col"> <label>Логотип</label>
                             <div class="image-upload-container">
-                                <div class="drop-zone" onclick="document.getElementById('logo-input').click()">
+                                <div class="drop-zone"> <!-- onclick="document.getElementById('logo-input').click()" -->
                                     <?php if (!empty($settings['logo_path'])): ?>
                                         <img src="../<?php echo $settings['logo_path']; ?>" class="drop-zone__thumb" alt="Лого">
                                     <?php else: ?>
@@ -200,7 +200,7 @@ require_once __DIR__. '/includes/menu.php';
                         <div class="form-group image-field-col">
                             <label>Favicon</label>
                             <div class="image-upload-container">
-                                <div class="drop-zone" onclick="document.getElementById('favicon-input').click()">
+                                <div class="drop-zone" > <!-- onclick="document.getElementById('favicon-input').click()" -->
                                     <?php if (!empty($settings['favicon_path'])): ?>
                                         <img src="../<?php echo $settings['favicon_path']; ?>" class="drop-zone__thumb" style="width: 48px; height: 48px;">
                                     <?php else: ?>
@@ -215,7 +215,7 @@ require_once __DIR__. '/includes/menu.php';
                         <div class="form-group image-field-col">
                             <label>Фоновое изображение</label>
                             <div class="image-upload-container">
-                                <div class="drop-zone" onclick="document.getElementById('bg-input').click()">
+                                <div class="drop-zone" > <!-- onclick="document.getElementById('bg-input').click()" -->
                                     <?php if (!empty($settings['background_image'])): ?>
                                         <img src="../<?php echo $settings['background_image']; ?>" class="drop-zone__thumb" alt="Фон">
                                     <?php else: ?>

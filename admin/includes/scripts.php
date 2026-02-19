@@ -202,12 +202,14 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Он отвечает за визуальное отображение файла после того, как ты его перетащил
-document.querySelectorAll(".drop-zone__input").forEach((inputElement) => {
-    const dropZoneElement = inputElement.closest(".drop-zone");
+document.querySelectorAll(".drop-zone").forEach((dropZoneElement) => {
+    const inputElement = dropZoneElement.querySelector(".drop-zone__input");
 
-    // Клик по зоне открывает выбор файла
     dropZoneElement.addEventListener("click", (e) => {
-        inputElement.click();
+        // Чтобы на мобилках не было двойного срабатывания
+        if (e.target.tagName !== 'INPUT') {
+            inputElement.click();
+        }
     });
 
     inputElement.addEventListener("change", (e) => {
@@ -216,6 +218,7 @@ document.querySelectorAll(".drop-zone__input").forEach((inputElement) => {
         }
     });
 
+    // Обязательно для мобилок и перетаскивания
     dropZoneElement.addEventListener("dragover", (e) => {
         e.preventDefault();
         dropZoneElement.classList.add("drop-zone--over");
@@ -229,12 +232,10 @@ document.querySelectorAll(".drop-zone__input").forEach((inputElement) => {
 
     dropZoneElement.addEventListener("drop", (e) => {
         e.preventDefault();
-
         if (e.dataTransfer.files.length) {
             inputElement.files = e.dataTransfer.files;
             updateThumbnail(dropZoneElement, e.dataTransfer.files[0]);
         }
-
         dropZoneElement.classList.remove("drop-zone--over");
     });
 });

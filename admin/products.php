@@ -318,8 +318,7 @@ require_once __DIR__. '/includes/menu.php';
                         <div class="form-group col-md-4">
                             <label>Изображение товара</label>
                             <div class="image-upload-container">
-                                <div class="drop-zone <?php echo !empty($product['image_path']) ? 'has-image' : ''; ?>" 
-                                    onclick="document.getElementById('product-image').click()">
+                                <div class="drop-zone <?php echo !empty($product['image_path']) ? 'has-image' : ''; ?>" > <!-- onclick="document.getElementById('product-image').click()" -->
                                     
                                     <?php if (!empty($product['image_path'])): ?>
                                         <img src="../<?php echo $product['image_path']; ?>" class="drop-zone__thumb" id="preview-img">

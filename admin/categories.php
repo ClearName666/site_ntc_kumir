@@ -263,7 +263,7 @@ require_once __DIR__. '/includes/menu.php';
                         <div class="form-group">
                             <label>Изображение категории</label>
                             <div class="image-upload-container">
-                                <div class="drop-zone" onclick="document.getElementById('cat-image').click()">
+                                <div class="drop-zone" >  <!-- onclick="document.getElementById('cat-image').click()" -->
                                     <?php if (!empty($category['image_path'])): ?>
                                         <img src="../<?php echo $category['image_path']; ?>" class="drop-zone__thumb" id="preview-img">
                                     <?php else: ?>
