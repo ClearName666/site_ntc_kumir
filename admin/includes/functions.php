@@ -2,7 +2,7 @@
 session_start();
 
 // Подключаем общие функции
-require_once BASE_PATH . '/config/database.php';
+require_once __DIR__. '/../../config/database.php';
 
 // Проверка авторизации администратора
 function requireAdminAuth() {

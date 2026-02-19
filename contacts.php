@@ -1,7 +1,7 @@
 <?php
 
 // Подключаем функции
-require_once 'includes/functions.php';
+require_once __DIR__. '/includes/functions.php';
 
 // --- БЛОК ОБРАБОТКИ ФОРМЫ ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'send_feedback') {
@@ -38,8 +38,8 @@ $pageTitle = 'Контакты - ' . getSetting('site_title');
 $pageDescription = 'Контактная информация компании НТЦ КУМИР. Адреса, телефоны, email для связи.';
 
 // Определяем пути
-$headerPath = 'includes/header.php';
-$footerPath = 'includes/footer.php';
+$headerPath = __DIR__. '/includes/header.php';
+$footerPath = __DIR__. '/includes/footer.php';
 
 // Координаты для карты (основной офис)
 $mapLat = $mainOffice ? $mainOffice['latitude'] : 52.275444;

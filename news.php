@@ -1,6 +1,6 @@
 <?php
 // Подключаем функции
-require_once 'includes/functions.php';
+require_once __DIR__. '/includes/functions.php';
 
 // Настройки пагинации
 $newsPerPage = 6;
@@ -35,8 +35,8 @@ if (!$newsItem) {
 }
 
 // Определяем пути
-$headerPath = 'includes/header.php';
-$footerPath = 'includes/footer.php';
+$headerPath = __DIR__. '/includes/header.php';
+$footerPath = __DIR__. '/includes/footer.php';
 ?>
 <!DOCTYPE html>
 <html lang="ru">

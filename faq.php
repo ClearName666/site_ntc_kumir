@@ -1,7 +1,7 @@
 <?php
 
 // Подключаем функции
-require_once 'includes/functions.php';
+require_once __DIR__. '/includes/functions.php';
 
 // --- БЛОК ОБРАБОТКИ AJAX ЗАПРОСА ---
 if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest') {
@@ -36,8 +36,8 @@ $pageTitle = 'Вопрос-ответ - ' . getSetting('site_title');
 $pageDescription = 'Часто задаваемые вопросы и ответы по оборудованию и услугам НТЦ КУМИР.';
 
 // Определяем пути
-$headerPath = 'includes/header.php';
-$footerPath = 'includes/footer.php';
+$headerPath = __DIR__. '/includes/header.php';
+$footerPath = __DIR__. '/includes/footer.php';
 ?>
 <!DOCTYPE html>
 <html lang="ru">

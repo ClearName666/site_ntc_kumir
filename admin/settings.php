@@ -1,9 +1,7 @@
 <?php
-// Определяем базовый путь
-define('BASE_PATH', dirname(__DIR__));
 
 // Подключаем функции
-require_once BASE_PATH . '/admin/includes/functions.php';
+require_once __DIR__. '/includes/functions.php';
 
 // Проверяем авторизацию
 requireAdminAuth();
@@ -111,10 +109,10 @@ while ($row = $settingsResult->fetch_assoc()) {
 }
 
 // Подключаем шапку
-require_once BASE_PATH . '/admin/includes/header.php';
+require_once __DIR__. '/includes/header.php';
 
 // Подключаем меню
-require_once BASE_PATH . '/admin/includes/menu.php';
+require_once __DIR__. '/includes/menu.php';
 ?>
 
 <!-- Основной контент -->
@@ -130,7 +128,7 @@ require_once BASE_PATH . '/admin/includes/menu.php';
         
         <?php 
             // Подключаем правую шапку
-            require_once BASE_PATH . '/admin/includes/header-right.php';
+            require_once __DIR__. '/includes/header-right.php';
         ?>
     </header>
     
@@ -296,8 +294,8 @@ require_once BASE_PATH . '/admin/includes/menu.php';
 
 <?php
 // Подключаем скрипты
-require_once BASE_PATH . '/admin/includes/scripts.php';
+require_once __DIR__. '/includes/scripts.php';
 
 // Подключаем подвал
-require_once BASE_PATH . '/admin/includes/footer.php';
+require_once __DIR__. '/includes/footer.php';
 ?>

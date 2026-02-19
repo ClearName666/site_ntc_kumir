@@ -1,7 +1,7 @@
 <?php
 
 // Подключаем функции
-require_once 'includes/functions.php';
+require_once __DIR__ . '/includes/functions.php';
 
 if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest' && isset($_POST['phone'])) {
     header('Content-Type: application/json');

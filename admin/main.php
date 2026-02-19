@@ -11,7 +11,7 @@
         
         <?php 
             // Подключаем правую шапку
-            require_once BASE_PATH . '/admin/includes/header-right.php';
+            require_once __DIR__. '/includes/header-right.php';
         ?>
     </header>
     

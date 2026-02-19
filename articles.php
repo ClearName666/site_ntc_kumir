@@ -1,6 +1,6 @@
 <?php
 // Подключаем функции с правильным путем
-require_once 'includes/functions.php';
+require_once __DIR__. '/includes/functions.php';
 
 // Проверяем, запрошена ли конкретная статья
 $article = null;
@@ -31,8 +31,8 @@ if (!$article) {
 }
 
 // Определяем путь к header и footer
-$headerPath = 'includes/header.php';
-$footerPath = 'includes/footer.php';
+$headerPath = __DIR__. '/includes/header.php';
+$footerPath = __DIR__. '/includes/footer.php';
 ?>
 <!DOCTYPE html>
 <html lang="ru">
