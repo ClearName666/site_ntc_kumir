@@ -1,3 +1,13 @@
+<?php
+// Если сессия еще не запущена
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Простая проверка: если id админа есть в сессии, значит он вошел
+$isAdmin = isset($_SESSION['admin_id']);
+?>
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -102,7 +112,7 @@
             
             <!-- Кнопка входа в админку для мобильной версии -->
             <div class="mobile-admin-btn">
-                <a href="/ntc-kumir/admin/login.php" class="btn-admin">
+                <a href="/admin/login.php" class="btn-admin">
                     <span class="admin-icon">🔐</span>
                     <span class="admin-text">Вход в админку</span>
                 </a>
@@ -114,29 +124,52 @@
         // Добавляем проверку авторизации администратора
         document.addEventListener('DOMContentLoaded', function() {
             // Проверяем, авторизован ли администратор
-            fetch('/ntc-kumir/admin/check-auth.php')
-                .then(response => response.json())
-                .then(data => {
-                    if (data.isAdmin) {
-                        // Меняем кнопку "Вход" на "Админка"
-                        const adminBtn = document.querySelector('.btn-admin');
-                        if (adminBtn) {
-                            adminBtn.innerHTML = '<span class="admin-icon">👑</span><span class="admin-text">Админка</span>';
-                            adminBtn.href = '/ntc-kumir/admin/';
-                        }
-                        
-                        // Для мобильной версии
-                        const mobileAdminBtn = document.querySelector('.mobile-admin-btn .btn-admin');
-                        if (mobileAdminBtn) {
-                            mobileAdminBtn.innerHTML = '<span class="admin-icon">👑</span><span class="admin-text">Админка</span>';
-                            mobileAdminBtn.href = '/ntc-kumir/admin/';
+            const isAdmin = <?php echo $isAdmin ? 'true' : 'false'; ?>;
+            if (isAdmin) {
+                // 1. Меняем кнопку в обычном меню
+                const adminBtn = document.querySelector('.btn-admin');
+                if (adminBtn) {
+                    adminBtn.innerHTML = '<span class="admin-icon">👑</span><span class="admin-text">Админка</span>';
+                    adminBtn.href = '/admin/index.php'; // Путь к главной странице админки
+                }
+                
+                // 2. Меняем кнопку в мобильном меню
+                const mobileAdminBtn = document.querySelector('.mobile-admin-btn .btn-admin');
+                if (mobileAdminBtn) {
+                    mobileAdminBtn.innerHTML = '<span class="admin-icon">👑</span><span class="admin-text">Админка</span>';
+                    mobileAdminBtn.href = '/admin/index.php';
+                }
+            }
+            const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+            const mobileMenu = document.querySelector('.mobile-menu');
+            
+            if (mobileMenuBtn && mobileMenu) {
+                // 1. Открытие/Закрытие по клику на кнопку
+                mobileMenuBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    mobileMenu.classList.toggle('active');
+                    this.textContent = mobileMenu.classList.contains('active') ? '✕' : '☰';
+                });
+                // 2. Закрытие меню при клике вне его области
+                document.addEventListener('click', function(event) {
+                    if (!event.target.closest('.mobile-menu') && 
+                        !event.target.closest('.mobile-menu-btn')) {
+                        if (mobileMenu.classList.contains('active')) {
+                            mobileMenu.classList.remove('active');
+                            mobileMenuBtn.textContent = '☰';
                         }
                     }
-                })
-                .catch(error => {
-                    console.log('Не удалось проверить авторизацию администратора');
                 });
+                // 3. Закрытие меню при клике на любую ссылку внутри
+                mobileMenu.querySelectorAll('a').forEach(link => {
+                    link.addEventListener('click', function() {
+                        mobileMenu.classList.remove('active');
+                        mobileMenuBtn.textContent = '☰';
+                    });
+                });
+            }
         });
+
     </script>
 </body>
 </html>

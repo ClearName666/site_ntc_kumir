@@ -1,34 +1,4 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Мобильное меню
-    const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
-    const mobileMenu = document.querySelector('.mobile-menu');
-    
-    if (mobileMenuBtn) {
-        mobileMenuBtn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            mobileMenu.classList.toggle('active');
-            this.textContent = mobileMenu.classList.contains('active') ? '✕' : '☰';
-        });
-    }
-    
-    // Закрытие меню при клике вне его
-    document.addEventListener('click', function(event) {
-        if (!event.target.closest('.mobile-menu') && 
-            !event.target.closest('.mobile-menu-btn')) {
-            if (mobileMenu.classList.contains('active')) {
-                mobileMenu.classList.remove('active');
-                mobileMenuBtn.textContent = '☰';
-            }
-        }
-    });
-    
-    // Закрытие меню при клике на ссылку внутри него
-    document.querySelectorAll('.mobile-menu a').forEach(link => {
-        link.addEventListener('click', function() {
-            mobileMenu.classList.remove('active');
-            mobileMenuBtn.textContent = '☰';
-        });
-    });
     
     // Плавная прокрутка для якорных ссылок
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {

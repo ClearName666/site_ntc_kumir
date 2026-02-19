@@ -265,27 +265,6 @@ $mapLng = $mainOffice ? $mainOffice['longitude'] : 104.278817;
             });
         }
         
-        // Обработка формы
-        // document.getElementById('contactForm').addEventListener('submit', function(e) {
-        //     e.preventDefault();
-            
-        //     const formData = new FormData(this);
-        //     const submitBtn = this.querySelector('.submit-btn');
-        //     const originalText = submitBtn.textContent;
-            
-        //     submitBtn.textContent = 'Отправка...';
-        //     submitBtn.disabled = true;
-            
-        //     // Здесь должна быть AJAX отправка формы
-        //     // Для примера просто покажем сообщение
-        //     setTimeout(() => {
-        //         alert('Сообщение отправлено! Мы свяжемся с вами в ближайшее время.');
-        //         this.reset();
-        //         submitBtn.textContent = originalText;
-        //         submitBtn.disabled = false;
-        //     }, 1000);
-        // });
-        
         // Анимация появления элементов при скролле
         document.addEventListener('DOMContentLoaded', function() {
             const observer = new IntersectionObserver((entries) => {
