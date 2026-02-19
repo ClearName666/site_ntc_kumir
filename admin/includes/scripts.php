@@ -200,4 +200,71 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+// Он отвечает за визуальное отображение файла после того, как ты его перетащил
+document.querySelectorAll(".drop-zone__input").forEach((inputElement) => {
+    const dropZoneElement = inputElement.closest(".drop-zone");
+
+    // Клик по зоне открывает выбор файла
+    dropZoneElement.addEventListener("click", (e) => {
+        inputElement.click();
+    });
+
+    inputElement.addEventListener("change", (e) => {
+        if (inputElement.files.length) {
+            updateThumbnail(dropZoneElement, inputElement.files[0]);
+        }
+    });
+
+    dropZoneElement.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        dropZoneElement.classList.add("drop-zone--over");
+    });
+
+    ["dragleave", "dragend"].forEach((type) => {
+        dropZoneElement.addEventListener(type, (e) => {
+            dropZoneElement.classList.remove("drop-zone--over");
+        });
+    });
+
+    dropZoneElement.addEventListener("drop", (e) => {
+        e.preventDefault();
+
+        if (e.dataTransfer.files.length) {
+            inputElement.files = e.dataTransfer.files;
+            updateThumbnail(dropZoneElement, e.dataTransfer.files[0]);
+        }
+
+        dropZoneElement.classList.remove("drop-zone--over");
+    });
+});
+
+/**
+ * Обновляет превью изображения в зоне
+ */
+function updateThumbnail(dropZoneElement, file) {
+    let thumbnailElement = dropZoneElement.querySelector(".drop-zone__thumb");
+
+    // Удаляем текст-подсказку, если она есть
+    if (dropZoneElement.querySelector(".drop-zone__prompt")) {
+        dropZoneElement.querySelector(".drop-zone__prompt").remove();
+    }
+
+    // Если превью еще нет (первая загрузка), создаем его
+    if (!thumbnailElement) {
+        thumbnailElement = document.createElement("img");
+        thumbnailElement.classList.add("drop-zone__thumb");
+        dropZoneElement.appendChild(thumbnailElement);
+    }
+
+    // Читаем файл и вставляем в src
+    if (file.type.startsWith("image/")) {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => {
+            thumbnailElement.src = reader.result;
+        };
+    }
+}
+
 </script>

@@ -134,17 +134,10 @@ require_once BASE_PATH . '/admin/includes/menu.php';
             </h1>
         </div>
         
-        <div class="header-right">
-            <div class="user-menu">
-                <div class="user-avatar">
-                    <?php $admin = getCurrentAdmin(); echo strtoupper(substr($admin['username'], 0, 1)); ?>
-                </div>
-                <div class="user-info">
-                    <h4><?php echo htmlspecialchars($admin['full_name'] ?? $admin['username']); ?></h4>
-                    <span>Администратор</span>
-                </div>
-            </div>
-        </div>
+        <?php 
+            // Подключаем правую шапку
+            require_once BASE_PATH . '/admin/includes/header-right.php';
+        ?>
     </header>
     
     <!-- Контент -->
@@ -325,18 +318,33 @@ require_once BASE_PATH . '/admin/includes/menu.php';
                         </div>
                         
                         <div class="form-group col-md-4">
-                            <label>Изображение</label>
-                            <?php if (!empty($product['image_path'])): ?>
-                            <div class="existing-image mb-2">
-                                <img src="../<?php echo $product['image_path']; ?>" alt="Текущее изображение" style="max-width: 100px; margin-bottom: 10px;">
-                                <input type="hidden" name="existing_image" value="<?php echo $product['image_path']; ?>">
-                                <a href="javascript:void(0)" onclick="removeImage()" class="btn btn-sm btn-danger">
-                                    <i class="fas fa-trash"></i> Удалить
-                                </a>
+                            <label>Изображение товара</label>
+                            <div class="image-upload-container">
+                                <div class="drop-zone <?php echo !empty($product['image_path']) ? 'has-image' : ''; ?>" 
+                                    onclick="document.getElementById('product-image').click()">
+                                    
+                                    <?php if (!empty($product['image_path'])): ?>
+                                        <img src="../<?php echo $product['image_path']; ?>" class="drop-zone__thumb" id="preview-img">
+                                    <?php else: ?>
+                                        <span class="drop-zone__prompt">
+                                            <i class="fas fa-cloud-upload-alt"></i>
+                                            <span>Перетащите фото или кликните</span>
+                                        </span>
+                                    <?php endif; ?>
+                                    
+                                    <input type="file" id="product-image" name="image" class="drop-zone__input" accept="image/*">
+                                    <input type="hidden" name="existing_image" id="existing_image_input" value="<?php echo $product['image_path'] ?? ''; ?>">
+                                </div>
+
+                                <?php if (!empty($product['image_path'])): ?>
+                                    <div class="mt-2 text-center" id="remove-image-wrapper">
+                                        <button type="button" onclick="removeProductImage()" class="btn btn-sm btn-outline-danger">
+                                            <i class="fas fa-trash-alt"></i> Удалить фото
+                                        </button>
+                                    </div>
+                                <?php endif; ?>
+                                <small class="text-muted d-block mt-1">Рекомендуемый размер: 800×800px (JPG, PNG)</small>
                             </div>
-                            <?php endif; ?>
-                            <input type="file" id="image" name="image" class="form-control" accept="image/*">
-                            <small class="text-muted">Рекомендуемый размер: 800×800px</small>
                         </div>
                     </div>
                     

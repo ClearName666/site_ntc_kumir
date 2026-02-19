@@ -1095,6 +1095,78 @@ body {
     font-family: 'Courier New', monospace;
     font-size: 0.75rem;
 }
+
+
+/* Область для перетаскивания */
+.image-upload-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Контейнер для всех трех полей */
+.form-row.images-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 25px; /* Вот этот отступ между карточками */
+    margin-top: 15px;
+}
+
+/* Стили для каждой колонки, чтобы они не слипались */
+.image-field-col {
+    flex: 1; /* Распределяем поровну */
+    min-width: 250px; /* Чтобы на мобилках они прыгали друг под друга */
+}
+
+.drop-zone {
+    width: 100%;
+    height: 150px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border: 2px dashed #ccc;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: #f9f9f9;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.drop-zone:hover, .drop-zone--over {
+    border-color: #007bff;
+    background: #f0f7ff;
+}
+
+.drop-zone__input {
+    display: none;
+}
+
+.drop-zone__thumb {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.drop-zone__prompt {
+    font-size: 14px;
+    color: #777;
+}
+
+.drop-zone__prompt i {
+    display: block;
+    font-size: 30px;
+    margin-bottom: 10px;
+}
+
+.drop-zone:hover {
+    border-color: #4a90e2;
+    transform: translateY(-2px);
+    transition: all 0.2s ease;
+}
      </style>
 </head>
 <body>

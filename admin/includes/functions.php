@@ -244,13 +244,12 @@ function isSlugUnique($table, $slug, $excludeId = null) {
 
 // Функция для загрузки изображения (исправленная версия)
 function uploadImage($file, $targetDir = '../assets/images/uploads/') {
-    // Проверяем, существует ли файл
     if (!isset($file['error']) || $file['error'] === UPLOAD_ERR_NO_FILE) {
         return ['success' => false, 'error' => 'Файл не выбран'];
     }
 
     if ($file['error'] !== UPLOAD_ERR_OK) {
-        $errorMessages = [
+                $errorMessages = [
             UPLOAD_ERR_INI_SIZE => 'Файл превышает допустимый размер (upload_max_filesize в php.ini)',
             UPLOAD_ERR_FORM_SIZE => 'Файл превышает размер указанный в форме',
             UPLOAD_ERR_PARTIAL => 'Файл был загружен только частично',
@@ -262,141 +261,67 @@ function uploadImage($file, $targetDir = '../assets/images/uploads/') {
         
         $errorCode = $file['error'];
         $errorMessage = $errorMessages[$errorCode] ?? "Неизвестная ошибка (код: $errorCode)";
-        return ['success' => false, 'error' => $errorMessage];
+        return ['success' => false, 'error' => 'Ошибка загрузки: ' . $file['error']];
     }
     
-    // Проверка типа файла по расширению
-    $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+    // 1. РАЗРЕШАЕМ SVG И ЛЮБОЙ РЕГИСТР
     $fileName = $file['name'];
     $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+    $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'];
     
     if (!in_array($fileExtension, $allowedExtensions)) {
-        return ['success' => false, 'error' => 'Недопустимый тип файла. Разрешены: JPG, JPEG, PNG, GIF, WebP'];
+        return ['success' => false, 'error' => 'Недопустимый тип: ' . $fileExtension];
     }
     
-    // Проверка размера файла (макс 10MB)
-    $maxSize = 10 * 1024 * 1024;
-    if ($file['size'] > $maxSize) {
-        return ['success' => false, 'error' => 'Файл слишком большой (максимум 10MB)'];
-    }
-    
-    // Проверяем, является ли файл изображением
-    $imageInfo = @getimagesize($file['tmp_name']);
-    if (!$imageInfo) {
-        return ['success' => false, 'error' => 'Файл не является изображением'];
-    }
-    
-    // Проверяем MIME тип
-    $allowedMimeTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
-    if (!in_array($imageInfo['mime'], $allowedMimeTypes)) {
-        return ['success' => false, 'error' => 'Недопустимый MIME тип файла: ' . $imageInfo['mime']];
-    }
-    
-    // ОПРЕДЕЛЯЕМ КОРНЕВУЮ ПАПКУ ПРОЕКТА ПРАВИЛЬНО
-    // Вместо dirname(__DIR__) используем абсолютный путь к папке проекта
-    $scriptPath = realpath($_SERVER['SCRIPT_FILENAME']);
-    $projectRoot = dirname(dirname($scriptPath)); // Поднимаемся на 2 уровня вверх от текущего скрипта
-    
-    // Но лучше использовать константу BASE_PATH, если она определена
-    if (defined('BASE_PATH')) {
-        $projectRoot = BASE_PATH;
+    // 2. ОБРАБОТКА SVG (getimagesize для них не работает)
+    $isSvg = ($fileExtension === 'svg');
+    $imageInfo = [0, 0, 'mime' => 'image/svg+xml']; // Значения по умолчанию для SVG
+
+    if (!$isSvg) {
+        $imageInfo = @getimagesize($file['tmp_name']);
+        if (!$imageInfo) {
+            return ['success' => false, 'error' => 'Файл не является корректным изображением'];
+        }
+        
+        $allowedMimeTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+        if (!in_array($imageInfo['mime'], $allowedMimeTypes)) {
+            return ['success' => false, 'error' => 'Недопустимый MIME тип: ' . $imageInfo['mime']];
+        }
     } else {
-        // Или определяем ее здесь
-        define('BASE_PATH', dirname(dirname(__FILE__)));
-        $projectRoot = BASE_PATH;
-    }
-    
-    // Логируем для отладки
-    error_log("Project root: $projectRoot");
-    error_log("TargetDir: $targetDir");
-    
-    // Преобразуем относительный путь в абсолютный
-    $absolutePath = '';
-    
-    if (strpos($targetDir, '../') === 0) {
-        // Относительный путь вверх - неверно для нашего случая
-        // Вместо этого создаем путь внутри проекта
-        $absolutePath = $projectRoot . '/assets/images/uploads/';
-    } else if (strpos($targetDir, './') === 0) {
-        // Текущая директория
-        $relativePath = substr($targetDir, 2);
-        $absolutePath = $projectRoot . '/' . $relativePath;
-    } else if (!preg_match('/^[a-zA-Z]:\\\\/', $targetDir) && strpos($targetDir, '/') !== 0) {
-        // Если это относительный путь без префикса
-        $absolutePath = $projectRoot . '/' . $targetDir;
-    } else {
-        // Уже абсолютный путь
-        $absolutePath = $targetDir;
-    }
-    
-    // Убедимся, что путь заканчивается на /
-    if (substr($absolutePath, -1) !== '/' && substr($absolutePath, -1) !== '\\') {
-        $absolutePath .= '/';
-    }
-    
-    // Проверяем, что путь находится внутри проекта
-    if (strpos($absolutePath, $projectRoot) !== 0) {
-        // Если путь не внутри проекта, создаем правильный путь
-        $absolutePath = $projectRoot . '/assets/images/uploads/';
-    }
-    
-    error_log("Absolute path after processing: $absolutePath");
-    
-    // Создание директории если не существует
-    if (!file_exists($absolutePath)) {
-        if (!mkdir($absolutePath, 0755, true)) {
-            return ['success' => false, 'error' => 'Не удалось создать папку для загрузки: ' . $absolutePath];
+        // Простая проверка безопасности для SVG (что это действительно XML/SVG)
+        $svgContent = file_get_contents($file['tmp_name']);
+        if (strpos($svgContent, '<svg') === false) {
+            return ['success' => false, 'error' => 'Файл SVG поврежден или не валиден'];
         }
     }
-    
-    // Проверяем права доступа
-    if (!is_writable($absolutePath)) {
-        return ['success' => false, 'error' => 'Папка недоступна для записи: ' . $absolutePath];
+
+    // 3. ОПРЕДЕЛЯЕМ ПУТИ (используем твою логику с BASE_PATH)
+    $projectRoot = defined('BASE_PATH') ? BASE_PATH : dirname(dirname(__FILE__));
+    $absolutePath = $projectRoot . '/assets/images/uploads/';
+
+    if (!file_exists($absolutePath)) {
+        mkdir($absolutePath, 0755, true);
     }
     
-    // Генерация уникального имени файла
+    // 4. ГЕНЕРАЦИЯ ИМЕНИ
     $safeFileName = preg_replace('/[^a-zA-Z0-9._-]/', '_', basename($file['name']));
     $newFileName = uniqid() . '_' . time() . '_' . $safeFileName;
     $targetPath = $absolutePath . $newFileName;
     
-    // Проверяем, нет ли файла с таким именем
-    if (file_exists($targetPath)) {
-        $newFileName = uniqid() . '_' . time() . '_' . $safeFileName;
-        $targetPath = $absolutePath . $newFileName;
-    }
-    
-    // Перемещение файла
     if (move_uploaded_file($file['tmp_name'], $targetPath)) {
-        // Устанавливаем права на файл
         chmod($targetPath, 0644);
-        
-        // Возвращаем относительный путь от корня сайта для БД
-        $relativePathForDb = str_replace($projectRoot . '/', '', $targetPath);
-        
-        error_log("File uploaded successfully: $targetPath");
-        error_log("DB path: $relativePathForDb");
+        $relativePathForDb = 'assets/images/uploads/' . $newFileName;
         
         return [
             'success' => true, 
             'path' => $relativePathForDb,
-            'full_path' => $targetPath,
-            'filename' => $newFileName,
-            'width' => $imageInfo[0],
-            'height' => $imageInfo[1],
-            'mime' => $imageInfo['mime'],
-            'size' => $file['size']
+            'width' => $imageInfo[0] ?? 0,
+            'height' => $imageInfo[1] ?? 0,
+            'mime' => $isSvg ? 'image/svg+xml' : $imageInfo['mime']
         ];
     }
     
-    // Если не удалось переместить файл
-    $lastError = error_get_last();
-    $errorMessage = 'Ошибка при сохранении файла';
-    if ($lastError) {
-        $errorMessage .= ': ' . $lastError['message'];
-    }
-    
-    error_log("Upload failed: $errorMessage");
-    return ['success' => false, 'error' => $errorMessage];
+    return ['success' => false, 'error' => 'Не удалось сохранить файл на сервере'];
 }
 
 // Функция для безопасного обрезания строки с поддержкой UTF-8

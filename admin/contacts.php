@@ -92,17 +92,10 @@ require_once BASE_PATH . '/admin/includes/menu.php';
             </h1>
         </div>
         
-        <div class="header-right">
-            <div class="user-menu">
-                <div class="user-avatar">
-                    <?php $admin = getCurrentAdmin(); echo strtoupper(substr($admin['username'], 0, 1)); ?>
-                </div>
-                <div class="user-info">
-                    <h4><?php echo htmlspecialchars($admin['full_name'] ?? $admin['username']); ?></h4>
-                    <span>Администратор</span>
-                </div>
-            </div>
-        </div>
+        <?php 
+            // Подключаем правую шапку
+            require_once BASE_PATH . '/admin/includes/header-right.php';
+        ?>
     </header>
     
     <!-- Контент -->

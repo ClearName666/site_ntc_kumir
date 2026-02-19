@@ -111,17 +111,10 @@ require_once BASE_PATH . '/admin/includes/menu.php';
             </h1>
         </div>
         
-        <div class="header-right">
-            <div class="user-menu">
-                <div class="user-avatar">
-                    <?php $admin = getCurrentAdmin(); echo strtoupper(substr($admin['username'], 0, 1)); ?>
-                </div>
-                <div class="user-info">
-                    <h4><?php echo htmlspecialchars($admin['full_name'] ?? $admin['username']); ?></h4>
-                    <span>Администратор</span>
-                </div>
-            </div>
-        </div>
+        <?php 
+            // Подключаем правую шапку
+            require_once BASE_PATH . '/admin/includes/header-right.php';
+        ?>
     </header>
     
     <!-- Контент -->
@@ -280,18 +273,31 @@ require_once BASE_PATH . '/admin/includes/menu.php';
                     </div>
                     
                     <div class="form-group">
-                        <label>Изображение</label>
-                        <?php if (!empty($article['image_path'])): ?>
-                        <div class="existing-image">
-                            <img src="../<?php echo $article['image_path']; ?>" alt="Текущее изображение" style="max-width: 200px; margin-bottom: 10px;">
-                            <input type="hidden" name="existing_image" value="<?php echo $article['image_path']; ?>">
-                            <a href="javascript:void(0)" onclick="removeImage()" class="btn btn-sm btn-danger">
-                                <i class="fas fa-trash"></i> Удалить изображение
-                            </a>
+                        <label>Обложка статьи</label>
+                        <div class="image-upload-container">
+                            <div class="drop-zone" onclick="document.getElementById('article-image').click()">
+                                <?php if (!empty($article['image_path'])): ?>
+                                    <img src="../<?php echo $article['image_path']; ?>" class="drop-zone__thumb" id="preview-img" alt="Обложка">
+                                <?php else: ?>
+                                    <span class="drop-zone__prompt">
+                                        <i class="fas fa-cloud-upload-alt"></i>
+                                        Перетащите обложку статьи или кликните для выбора
+                                    </span>
+                                <?php endif; ?>
+                                <input type="file" id="article-image" name="image" class="drop-zone__input" accept="image/*">
+                                <input type="hidden" name="existing_image" id="existing_image_input" value="<?php echo $article['image_path'] ?? ''; ?>">
+                            </div>
+
+                            <?php if (!empty($article['image_path'])): ?>
+                                <div class="mt-2" id="remove-image-btn">
+                                    <button type="button" onclick="removeArticleImage()" class="btn btn-sm btn-outline-danger">
+                                        <i class="fas fa-trash"></i> Удалить текущую обложку
+                                    </button>
+                                </div>
+                            <?php endif; ?>
+                            
+                            <small class="text-muted">Рекомендуемый размер: 1200×600px (16:9), форматы: JPG, PNG, WebP, SVG</small>
                         </div>
-                        <?php endif; ?>
-                        <input type="file" id="image" name="image" accept="image/*">
-                        <small>Рекомендуемый размер: 1200×600px, форматы: JPG, PNG, WebP</small>
                     </div>
                     
                     <div class="form-group">

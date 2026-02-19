@@ -70,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_password'])) {
 }
 
 // Получаем статистику администратора
-$stats = [
+$stats_admin = [
     'logins' => $conn->query("SELECT COUNT(*) as count FROM admin_logs WHERE admin_id = {$admin['id']} AND action LIKE '%login%'")->fetch_assoc()['count'],
     'actions' => $conn->query("SELECT COUNT(*) as count FROM admin_logs WHERE admin_id = {$admin['id']}")->fetch_assoc()['count'],
     'last_login' => $conn->query("SELECT created_at FROM admin_logs WHERE admin_id = {$admin['id']} AND action = 'login' ORDER BY created_at DESC LIMIT 1")->fetch_assoc()['created_at'] ?? null,
@@ -94,17 +94,10 @@ require_once BASE_PATH . '/admin/includes/menu.php';
             <h1 class="header-title">Мой профиль</h1>
         </div>
         
-        <div class="header-right">
-            <div class="user-menu">
-                <div class="user-avatar">
-                    <?php echo strtoupper(substr($admin['username'], 0, 1)); ?>
-                </div>
-                <div class="user-info">
-                    <h4><?php echo htmlspecialchars($admin['full_name'] ?? $admin['username']); ?></h4>
-                    <span><?php echo $admin['role'] === 'superadmin' ? 'Супер-администратор' : 'Администратор'; ?></span>
-                </div>
-            </div>
-        </div>
+        <?php 
+            // Подключаем правую шапку
+            require_once BASE_PATH . '/admin/includes/header-right.php';
+        ?>
     </header>
     
     <!-- Контент -->
@@ -151,10 +144,10 @@ require_once BASE_PATH . '/admin/includes/menu.php';
                                 <span>Регистрация: <?php echo date('d.m.Y', strtotime($admin['created_at'])); ?></span>
                             </div>
                             
-                            <?php if ($stats['last_login']): ?>
+                            <?php if ($stats_admin['last_login']): ?>
                             <div class="info-item">
                                 <i class="fas fa-sign-in-alt"></i>
-                                <span>Последний вход: <?php echo date('d.m.Y H:i', strtotime($stats['last_login'])); ?></span>
+                                <span>Последний вход: <?php echo date('d.m.Y H:i', strtotime($stats_admin['last_login'])); ?></span>
                             </div>
                             <?php endif; ?>
                         </div>
@@ -169,12 +162,12 @@ require_once BASE_PATH . '/admin/includes/menu.php';
                     <div class="card-body">
                         <div class="stats-list">
                             <div class="stat-item">
-                                <div class="stat-value"><?php echo $stats['actions']; ?></div>
+                                <div class="stat-value"><?php echo $stats_admin['actions']; ?></div>
                                 <div class="stat-label">Всего действий</div>
                             </div>
                             
                             <div class="stat-item">
-                                <div class="stat-value"><?php echo $stats['logins']; ?></div>
+                                <div class="stat-value"><?php echo $stats_admin['logins']; ?></div>
                                 <div class="stat-label">Входов в систему</div>
                             </div>
                             

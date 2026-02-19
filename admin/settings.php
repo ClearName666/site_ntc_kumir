@@ -98,25 +98,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
     }
-
-
-    // Обработка загрузки изображений
-    // $imageFields = ['logo', 'favicon', 'background'];
-    
-    // foreach ($imageFields as $field) {
-    //     if (isset($_FILES[$field]) && $_FILES[$field]['error'] === UPLOAD_ERR_OK) {
-    //         $uploadResult = uploadImage($_FILES[$field]);
-            
-    //         if ($uploadResult['success']) {
-    //             $settingKey = $field === 'background' ? 'background_image' : $field . '_path';
-    //             $settingValue = $uploadResult['path'];
-                
-    //             $updateStmt = $conn->prepare("UPDATE settings SET setting_value = ?, updated_at = NOW() WHERE setting_key = ?");
-    //             $updateStmt->bind_param("ss", $settingValue, $settingKey);
-    //             $updateStmt->execute();
-    //         }
-    //     }
-    // }
     
     logAdminAction('settings_update', 'Обновлены настройки сайта');
     redirectWithNotification('settings.php', 'Настройки успешно сохранены', 'success');
@@ -147,17 +128,10 @@ require_once BASE_PATH . '/admin/includes/menu.php';
             <h1 class="header-title">Настройки сайта</h1>
         </div>
         
-        <div class="header-right">
-            <div class="user-menu">
-                <div class="user-avatar">
-                    <?php $admin = getCurrentAdmin(); echo strtoupper(substr($admin['username'], 0, 1)); ?>
-                </div>
-                <div class="user-info">
-                    <h4><?php echo htmlspecialchars($admin['full_name'] ?? $admin['username']); ?></h4>
-                    <span>Администратор</span>
-                </div>
-            </div>
-        </div>
+        <?php 
+            // Подключаем правую шапку
+            require_once BASE_PATH . '/admin/includes/header-right.php';
+        ?>
     </header>
     
     <!-- Контент -->
@@ -211,48 +185,50 @@ require_once BASE_PATH . '/admin/includes/menu.php';
                     <h3><i class="fas fa-images"></i> Изображения</h3>
                 </div>
                 <div class="card-body">
-                    <div class="form-row">
-                        <div class="form-group col-md-4">
-                            <label>Логотип</label>
-                            <?php if (!empty($settings['logo_path'])): ?>
-                            <div class="mb-2">
-                                <img src="../<?php echo $settings['logo_path']; ?>" alt="Логотип" style="max-width: 150px; max-height: 50px;">
-                                <div class="mt-1">
-                                    <small>Текущий: <?php echo basename($settings['logo_path']); ?></small>
+                    <div class="form-row images-container"> <div class="form-group image-field-col"> <label>Логотип</label>
+                            <div class="image-upload-container">
+                                <div class="drop-zone" onclick="document.getElementById('logo-input').click()">
+                                    <?php if (!empty($settings['logo_path'])): ?>
+                                        <img src="../<?php echo $settings['logo_path']; ?>" class="drop-zone__thumb" alt="Лого">
+                                    <?php else: ?>
+                                        <span class="drop-zone__prompt"><i class="fas fa-cloud-upload-alt"></i>Перетащите лого</span>
+                                    <?php endif; ?>
+                                    <input type="file" name="logo" id="logo-input" class="drop-zone__input" accept="image/*">
                                 </div>
+                                <small class="text-muted">200×60px, SVG/PNG</small>
                             </div>
-                            <?php endif; ?>
-                            <input type="file" name="logo" accept="image/*">
-                            <small>Рекомендуемый размер: 200×60px, формат: SVG, PNG</small>
                         </div>
-                        
-                        <div class="form-group col-md-4">
+
+                        <div class="form-group image-field-col">
                             <label>Favicon</label>
-                            <?php if (!empty($settings['favicon_path'])): ?>
-                            <div class="mb-2">
-                                <img src="../<?php echo $settings['favicon_path']; ?>" alt="Favicon" style="width: 32px; height: 32px;">
-                                <div class="mt-1">
-                                    <small>Текущий: <?php echo basename($settings['favicon_path']); ?></small>
+                            <div class="image-upload-container">
+                                <div class="drop-zone" onclick="document.getElementById('favicon-input').click()">
+                                    <?php if (!empty($settings['favicon_path'])): ?>
+                                        <img src="../<?php echo $settings['favicon_path']; ?>" class="drop-zone__thumb" style="width: 48px; height: 48px;">
+                                    <?php else: ?>
+                                        <span class="drop-zone__prompt"><i class="fas fa-upload"></i>Favicon</span>
+                                    <?php endif; ?>
+                                    <input type="file" name="favicon" id="favicon-input" class="drop-zone__input" accept="image/*">
                                 </div>
+                                <small class="text-muted">ICO, PNG</small>
                             </div>
-                            <?php endif; ?>
-                            <input type="file" name="favicon" accept="image/*">
-                            <small>Размер: 32×32px или 64×64px, формат: ICO, PNG</small>
+                        </div>
+
+                        <div class="form-group image-field-col">
+                            <label>Фоновое изображение</label>
+                            <div class="image-upload-container">
+                                <div class="drop-zone" onclick="document.getElementById('bg-input').click()">
+                                    <?php if (!empty($settings['background_image'])): ?>
+                                        <img src="../<?php echo $settings['background_image']; ?>" class="drop-zone__thumb" alt="Фон">
+                                    <?php else: ?>
+                                        <span class="drop-zone__prompt"><i class="fas fa-image"></i>Фон HD</span>
+                                    <?php endif; ?>
+                                    <input type="file" name="background" id="bg-input" class="drop-zone__input" accept="image/*">
+                                </div>
+                                <small class="text-muted">Рекомендуемый размер: HD</small>
+                            </div>
                         </div>
                         
-                        <div class="form-group col-md-4">
-                            <label>Фоновое изображение</label>
-                            <?php if (!empty($settings['background_image'])): ?>
-                            <div class="mb-2">
-                                <img src="../<?php echo $settings['background_image']; ?>" alt="Фон" style="max-width: 150px; max-height: 100px; object-fit: cover;">
-                                <div class="mt-1">
-                                    <small>Текущий: <?php echo basename($settings['background_image']); ?></small>
-                                </div>
-                            </div>
-                            <?php endif; ?>
-                            <input type="file" name="background" accept="image/*">
-                            <small>Рекомендуемый размер: 1920×1080px</small>
-                        </div>
                     </div>
                 </div>
             </div>

@@ -120,17 +120,10 @@ require_once BASE_PATH . '/admin/includes/menu.php';
             </h1>
         </div>
         
-        <div class="header-right">
-            <div class="user-menu">
-                <div class="user-avatar">
-                    <?php $admin = getCurrentAdmin(); echo strtoupper(substr($admin['username'], 0, 1)); ?>
-                </div>
-                <div class="user-info">
-                    <h4><?php echo htmlspecialchars($admin['full_name'] ?? $admin['username']); ?></h4>
-                    <span>Администратор</span>
-                </div>
-            </div>
-        </div>
+        <?php 
+            // Подключаем правую шапку
+            require_once BASE_PATH . '/admin/includes/header-right.php';
+        ?>
     </header>
     
     <!-- Контент -->
@@ -269,19 +262,31 @@ require_once BASE_PATH . '/admin/includes/menu.php';
                             <input type="number" id="sort_order" name="sort_order" class="form-control" value="<?php echo $category['sort_order'] ?? 0; ?>">
                         </div>
                         
-                        <div class="form-group col-md-6">
-                            <label>Изображение</label>
-                            <?php if (!empty($category['image_path'])): ?>
-                            <div class="existing-image mb-2">
-                                <img src="../<?php echo $category['image_path']; ?>" alt="Текущее изображение" style="max-width: 100px; margin-bottom: 10px;">
-                                <input type="hidden" name="existing_image" value="<?php echo $category['image_path']; ?>">
-                                <a href="javascript:void(0)" onclick="removeImage()" class="btn btn-sm btn-danger">
-                                    <i class="fas fa-trash"></i> Удалить
-                                </a>
+                        <div class="form-group">
+                            <label>Изображение категории</label>
+                            <div class="image-upload-container">
+                                <div class="drop-zone" onclick="document.getElementById('cat-image').click()">
+                                    <?php if (!empty($category['image_path'])): ?>
+                                        <img src="../<?php echo $category['image_path']; ?>" class="drop-zone__thumb" id="preview-img">
+                                    <?php else: ?>
+                                        <span class="drop-zone__prompt">
+                                            <i class="fas fa-image"></i>
+                                            Кликните или перетащите иконку категории
+                                        </span>
+                                    <?php endif; ?>
+                                    <input type="file" id="cat-image" name="image" class="drop-zone__input" accept="image/*">
+                                    <input type="hidden" name="existing_image" id="existing_image_input" value="<?php echo $category['image_path'] ?? ''; ?>">
+                                </div>
+
+                                <?php if (!empty($category['image_path'])): ?>
+                                    <div class="mt-2" id="remove-image-wrapper">
+                                        <button type="button" onclick="removeCategoryImage()" class="btn btn-sm btn-outline-danger">
+                                            <i class="fas fa-times"></i> Удалить изображение
+                                        </button>
+                                    </div>
+                                <?php endif; ?>
+                                <small class="text-muted">Рекомендуемый размер: 400×400px (квадрат)</small>
                             </div>
-                            <?php endif; ?>
-                            <input type="file" id="image" name="image" class="form-control" accept="image/*">
-                            <small class="text-muted">Рекомендуемый размер: 400×400px</small>
                         </div>
                     </div>
                     
@@ -302,27 +307,7 @@ require_once BASE_PATH . '/admin/includes/menu.php';
             </div>
         </div>
         
-        <script>
-            // Автоматическая генерация слага
-            document.getElementById('name').addEventListener('input', function() {
-                const name = this.value;
-                const slug = name.toLowerCase()
-                    .replace(/[^\w\u0400-\u04FF\s]/g, '')
-                    .replace(/\s+/g, '-')
-                    .replace(/^-+|-+$/g, '');
-                document.getElementById('slug').value = slug;
-            });
-            
-            // Удаление изображения
-            function removeImage() {
-                if (confirm('Удалить текущее изображение?')) {
-                    const existingImage = document.querySelector('.existing-image');
-                    if (existingImage) {
-                        existingImage.remove();
-                    }
-                }
-            }
-        </script>
+        <script src="assets/js/categories.js"></script>
         <?php endif; ?>
     </div>
 </div>
