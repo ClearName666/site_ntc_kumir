@@ -1,6 +1,10 @@
 <?php
-session_start();
-require_once __DIR__ . '/../includes/functions.php';
+// session_start();
+
+// Определяем базовый путь
+define('BASE_PATH', dirname(__DIR__));
+
+require_once BASE_PATH . '/admin/includes/functions.php';
 
 // Если пользователь уже авторизован, перенаправляем в админку
 if (isset($_SESSION['admin_id'])) {
