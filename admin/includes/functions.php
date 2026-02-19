@@ -1,8 +1,15 @@
 <?php
 session_start();
 
-// Подключаем общие функции
-require_once __DIR__. '/../../config/database.php';
+session_start();
+
+// Определяем корень сайта относительно этого файла
+if (!defined('BASE_PATH')) {
+    define('BASE_PATH', realpath(__DIR__ . '/../../'));
+}
+
+// Подключаем базу данных уже через константу
+require_once BASE_PATH . '/config/database.php';
 
 // Проверка авторизации администратора
 function requireAdminAuth() {
@@ -296,7 +303,7 @@ function uploadImage($file, $targetDir = '../assets/images/uploads/') {
     }
 
     // 3. ОПРЕДЕЛЯЕМ ПУТИ (используем твою логику с BASE_PATH)
-    $projectRoot = defined('BASE_PATH') ? BASE_PATH : dirname(dirname(__FILE__));
+    $projectRoot = defined('BASE_PATH') ? BASE_PATH : realpath(__DIR__ . '/../../');
     $absolutePath = $projectRoot . '/assets/images/uploads/';
 
     if (!file_exists($absolutePath)) {
