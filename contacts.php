@@ -3,6 +3,9 @@
 // Подключаем функции
 require_once __DIR__. '/includes/functions.php';
 
+// подключаемся к базе 
+$conn = getDBConnection();
+
 // --- БЛОК ОБРАБОТКИ ФОРМЫ ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'send_feedback') {
     header('Content-Type: application/json');
@@ -19,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     }
 
     // Используем функцию saveFeedback, которую ты добавил в includes/functions.php
-    if (saveFeedback($name, $email, $phone, $subject, $message)) {
+    if (saveFeedback($conn, $name, $email, $phone, $subject, $message)) {
         echo json_encode(['status' => 'success', 'message' => 'Сообщение успешно отправлено!']);
     } else {
         echo json_encode(['status' => 'error', 'message' => 'Ошибка при сохранении в базу данных.']);
@@ -29,12 +32,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
 
 // Получаем данные
-$contacts = getContactsByType();
-$offices = getOffices();
-$mainOffice = getMainOffice();
+$contacts = getContactsByType($conn);
+$offices = getOffices($conn);
+$mainOffice = getMainOffice($conn);
 
 // Устанавливаем мета-данные
-$pageTitle = 'Контакты - ' . getSetting('site_title');
+$pageTitle = 'Контакты - ' . getSetting($conn, 'site_title');
 $pageDescription = 'Контактная информация компании НТЦ КУМИР. Адреса, телефоны, email для связи.';
 
 // Определяем пути
@@ -56,14 +59,14 @@ $mapLng = $mainOffice ? $mainOffice['longitude'] : 104.278817;
     <!-- Open Graph -->
     <meta property="og:title" content="<?= $pageTitle ?>">
     <meta property="og:description" content="<?= $pageDescription ?>">
-    <meta property="og:image" content="<?= getSetting('logo_path') ?>">
+    <meta property="og:image" content="<?= getSetting($conn, 'logo_path') ?>">
     <meta property="og:type" content="website">
     
     <!-- Yandex Maps API -->
     <script src="https://api-maps.yandex.ru/2.1/?apikey=942369a1-f9ea-437f-a44a-460ac101ca32&lang=ru_RU" type="text/javascript"></script>
     
     <!-- Favicon -->
-    <link rel="icon" href="<?= getSetting('favicon_path') ?>" type="image/x-icon">
+    <link rel="icon" href="<?= getSetting($conn, 'favicon_path') ?>" type="image/x-icon">
     
     <!-- Стили -->
     <link rel="stylesheet" href="assets/css/style.css">

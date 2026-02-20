@@ -3,103 +3,54 @@
 // Подключаем функции
 require_once __DIR__. '/includes/functions.php';
 
+// подключаемся к базе 
+$conn = getDBConnection();
+
 // Проверяем авторизацию
-requireAdminAuth();
+requireAdminAuth($conn);
 
 // Проверяем права доступа
-if (!hasPermission('admin')) {
+if (!hasPermission($conn, 'admin')) {
     redirectWithNotification('index.php', 'Недостаточно прав для доступа к этой странице', 'error');
 }
 
-$conn = getDBConnection();
-
 // Обработка сохранения настроек
+// ОБРАБОТКА POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // 1. Обработка текстовых настроек
     foreach ($_POST as $key => $value) {
         if (strpos($key, 'setting_') === 0) {
-            $settingKey = substr($key, 8); // Убираем префикс "setting_"
-            $settingValue = cleanInput($value);
-            
-            // Проверяем, существует ли настройка
-            $stmt = $conn->prepare("SELECT id FROM settings WHERE setting_key = ?");
-            $stmt->bind_param("s", $settingKey);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            
-            if ($result->num_rows > 0) {
-                // Обновляем существующую настройку
-                $updateStmt = $conn->prepare("UPDATE settings SET setting_value = ?, updated_at = NOW() WHERE setting_key = ?");
-                $updateStmt->bind_param("ss", $settingValue, $settingKey);
-                $updateStmt->execute();
-            } else {
-                // Добавляем новую настройку
-                $insertStmt = $conn->prepare("INSERT INTO settings (setting_key, setting_value) VALUES (?, ?)");
-                $insertStmt->bind_param("ss", $settingKey, $settingValue);
-                $insertStmt->execute();
-            }
+            $settingKey = substr($key, 8);
+            updateOrInsertSetting($conn, $settingKey, cleanInput($value));
         }
     }
-    
 
-    // Обработка загрузки изображений
+    // 2. Обработка изображений
     $imageFields = [
         'logo' => 'logo',
         'favicon' => 'favicon',
-        'background' => 'main_background' // ключ в таблице images
+        'background' => 'main_background'
     ];
 
     foreach ($imageFields as $field => $imageKey) {
         if (isset($_FILES[$field]) && $_FILES[$field]['error'] === UPLOAD_ERR_OK) {
             $uploadResult = uploadImage($_FILES[$field]);
-
             if ($uploadResult['success']) {
                 $path = $uploadResult['path'];
-
-                // ---------- SETTINGS ----------
-                $settingKey = $field === 'background' ? 'background_image' : $field . '_path';
-
-                $updateStmt = $conn->prepare("
-                    UPDATE settings 
-                    SET setting_value = ?, updated_at = NOW() 
-                    WHERE setting_key = ?
-                ");
-                $updateStmt->bind_param("ss", $path, $settingKey);
-                $updateStmt->execute();
-
-                // ---------- IMAGES ----------
-                // Проверяем есть ли запись
-                $checkStmt = $conn->prepare("SELECT id FROM images WHERE image_key = ?");
-                $checkStmt->bind_param("s", $imageKey);
-                $checkStmt->execute();
-                $checkResult = $checkStmt->get_result();
-
-                if ($checkResult->num_rows > 0) {
-                    // Обновляем существующую
-                    $imgStmt = $conn->prepare("
-                        UPDATE images 
-                        SET image_path = ?, created_at = NOW() 
-                        WHERE image_key = ?
-                    ");
-                    $imgStmt->bind_param("ss", $path, $imageKey);
-                    $imgStmt->execute();
-                } else {
-                    // Вставляем новую
-                    $altText = ucfirst($imageKey);
-
-                    $insertStmt = $conn->prepare("
-                        INSERT INTO images (image_key, image_path, alt_text, category, sort_order, created_at)
-                        VALUES (?, ?, ?, 'content', 0, NOW())
-                    ");
-                    $insertStmt->bind_param("sss", $imageKey, $path, $altText);
-                    $insertStmt->execute();
-                }
+                $settingKey = ($field === 'background') ? 'background_image' : $field . '_path';
+                
+                // Используем нашу новую функцию
+                updateImageSettings($conn, $imageKey, $settingKey, $path);
             }
         }
     }
-    
-    logAdminAction('settings_update', 'Обновлены настройки сайта');
+
+    logAdminAction($conn, 'settings_update', 'Обновлены настройки сайта');
     redirectWithNotification('settings.php', 'Настройки успешно сохранены', 'success');
 }
+
+// ПОЛУЧЕНИЕ ДАННЫХ (вместо ручного цикла)
+$settings = getAllSettings($conn);
 
 // Получаем все настройки
 $settingsResult = $conn->query("SELECT * FROM settings ORDER BY setting_key");

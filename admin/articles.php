@@ -3,89 +3,63 @@
 // Подключаем функции
 require_once __DIR__. '/includes/functions.php';
 
+// подключаемся к базе 
+$conn = getDBConnection();
+
 // Проверяем авторизацию
-requireAdminAuth();
+requireAdminAuth($conn);
 
 // Проверяем права доступа
-if (!hasPermission('editor')) {
+if (!hasPermission($conn, 'editor')) {
     redirectWithNotification('index.php', 'Недостаточно прав для доступа к этой странице', 'error');
 }
 
-$conn = getDBConnection();
+
 $action = $_GET['action'] ?? 'list';
 $id = $_GET['id'] ?? 0;
 
 // Обработка добавления/редактирования
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = cleanInput($_POST['title'] ?? '');
-    $excerpt = cleanInput($_POST['excerpt'] ?? '');
-    $content = $_POST['content'] ?? '';
-    $author = cleanInput($_POST['author'] ?? '');
-    $isPublished = isset($_POST['is_published']) ? 1 : 0;
-    $publishedAt = !empty($_POST['published_at']) ? $_POST['published_at'] : null;
     $imagePath = $_POST['existing_image'] ?? '';
-    
-    // Генерация слага
-    $slug = createSlug($title);
-    $counter = 1;
-    $originalSlug = $slug;
-    
-    while (!isSlugUnique('articles', $slug, $id)) {
-        $slug = $originalSlug . '-' . $counter;
-        $counter++;
-    }
-    
-    // Загрузка изображения
+
+    // Картинка
     if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
         $uploadResult = uploadImage($_FILES['image']);
-        if ($uploadResult['success']) {
-            $imagePath = $uploadResult['path'];
-        }
+        if ($uploadResult['success']) $imagePath = $uploadResult['path'];
     }
-    
-    if ($action === 'add' || ($action === 'edit' && $id)) {
-        if ($action === 'add') {
-            $stmt = $conn->prepare("INSERT INTO articles (title, slug, excerpt, content, author, image_path, is_published, published_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("ssssssis", $title, $slug, $excerpt, $content, $author, $imagePath, $isPublished, $publishedAt);
-            
-            if ($stmt->execute()) {
-                $newId = $stmt->insert_id;
-                logAdminAction('article_add', "Добавлена статья: $title");
-                redirectWithNotification('articles.php', 'Статья успешно добавлена', 'success');
-            } else {
-                redirectWithNotification('articles.php?action=add', 'Ошибка при добавлении статьи', 'error');
-            }
-        } else {
-            $stmt = $conn->prepare("UPDATE articles SET title = ?, slug = ?, excerpt = ?, content = ?, author = ?, image_path = ?, is_published = ?, published_at = ?, updated_at = NOW() WHERE id = ?");
-            $stmt->bind_param("ssssssisi", $title, $slug, $excerpt, $content, $author, $imagePath, $isPublished, $publishedAt, $id);
-            
-            if ($stmt->execute()) {
-                logAdminAction('article_edit', "Отредактирована статья: $title");
-                redirectWithNotification('articles.php', 'Статья успешно обновлена', 'success');
-            } else {
-                redirectWithNotification('articles.php?action=edit&id=' . $id, 'Ошибка при обновлении статьи', 'error');
-            }
+
+    // Собираем данные
+    $data = [
+        'title'        => $title,
+        'slug'         => generateUniqueArticleSlug($conn, $title, $id),
+        'excerpt'      => cleanInput($_POST['excerpt'] ?? ''),
+        'content'      => $_POST['content'] ?? '',
+        'author'       => cleanInput($_POST['author'] ?? ''),
+        'is_published' => isset($_POST['is_published']) ? 1 : 0,
+        'published_at' => !empty($_POST['published_at']) ? $_POST['published_at'] : null,
+        'image_path'   => $imagePath
+    ];
+
+    if ($action === 'add') {
+        if (addArticle($conn, $data)) {
+            logAdminAction($conn, 'article_add', "Добавлена статья: $title");
+            redirectWithNotification('articles.php', 'Успешно добавлена', 'success');
+        }
+    } elseif ($action === 'edit' && $id) {
+        if (updateArticle($conn, $id, $data)) {
+            logAdminAction($conn, 'article_edit', "Отредактирована: $title");
+            redirectWithNotification('articles.php', 'Успешно обновлена', 'success');
         }
     }
 }
 
 // Обработка удаления
 if ($action === 'delete' && $id) {
-    // Получаем информацию о статье для лога
-    $stmt = $conn->prepare("SELECT title FROM articles WHERE id = ?");
-    $stmt->bind_param("i", $id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $article = $result->fetch_assoc();
-    
-    $stmt = $conn->prepare("DELETE FROM articles WHERE id = ?");
-    $stmt->bind_param("i", $id);
-    
-    if ($stmt->execute()) {
-        logAdminAction('article_delete', "Удалена статья: " . ($article['title'] ?? 'ID ' . $id));
-        redirectWithNotification('articles.php', 'Статья успешно удалена', 'success');
-    } else {
-        redirectWithNotification('articles.php', 'Ошибка при удалении статьи', 'error');
+    $article = getArticleById($conn, $id);
+    if (deleteArticle($conn, $id)) {
+        logAdminAction($conn, 'article_delete', "Удалена: " . ($article['title'] ?? $id));
+        redirectWithNotification('articles.php', 'Удалено', 'success');
     }
 }
 
@@ -147,12 +121,9 @@ require_once __DIR__. '/includes/menu.php';
                         </thead>
                         <tbody>
                             <?php
-                            $pagination = getPagination('articles', 10);
-                            $stmt = $conn->prepare("SELECT * FROM articles ORDER BY created_at DESC LIMIT ? OFFSET ?");
-                            $stmt->bind_param("ii", $pagination['perPage'], $pagination['offset']);
-                            $stmt->execute();
-                            $result = $stmt->get_result();
-                            
+                            $pagination = getPagination($conn, 'articles', 10);
+                            $result = getArticlesList($conn, $pagination['perPage'], $pagination['offset']);
+
                             while ($row = $result->fetch_assoc()):
                             ?>
                             <tr>
@@ -197,15 +168,8 @@ require_once __DIR__. '/includes/menu.php';
         <?php
         $article = [];
         if ($action === 'edit' && $id) {
-            $stmt = $conn->prepare("SELECT * FROM articles WHERE id = ?");
-            $stmt->bind_param("i", $id);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            $article = $result->fetch_assoc();
-            
-            if (!$article) {
-                redirectWithNotification('articles.php', 'Статья не найдена', 'error');
-            }
+            $article = getArticleById($conn, $id);
+            if (!$article) redirectWithNotification('articles.php', 'Не найдено', 'error');
         }
         ?>
         

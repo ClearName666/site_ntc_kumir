@@ -3,8 +3,8 @@
 require_once __DIR__ . '/../config/database.php';
 
 // Функция для получения всех активных категорий
-function getProductCategories() {
-    $conn = getDBConnection();
+function getProductCategories($conn) {
+    // $conn = getDBConnection();
     $result = $conn->query("SELECT * FROM product_categories WHERE is_active = 1 ORDER BY sort_order");
     $categories = [];
     
@@ -16,8 +16,8 @@ function getProductCategories() {
 }
 
 // Функция для получения категории по slug
-function getCategoryBySlug($slug) {
-    $conn = getDBConnection();
+function getCategoryBySlug($conn, $slug) {
+    // $conn = getDBConnection();
     $stmt = $conn->prepare("SELECT * FROM product_categories WHERE slug = ? AND is_active = 1");
     $stmt->bind_param("s", $slug);
     $stmt->execute();
@@ -31,8 +31,8 @@ function getCategoryBySlug($slug) {
 }
 
 // Функция для получения товаров категории
-function getProductsByCategory($categoryId, $limit = null) {
-    $conn = getDBConnection();
+function getProductsByCategory($conn, $categoryId, $limit = null) {
+    // $conn = getDBConnection();
     
     $sql = "SELECT p.*, c.name as category_name, c.slug as category_slug 
             FROM products p 
@@ -58,8 +58,8 @@ function getProductsByCategory($categoryId, $limit = null) {
 }
 
 // Функция для получения товара по slug
-function getProductBySlug($slug) {
-    $conn = getDBConnection();
+function getProductBySlug($conn, $slug) {
+    // $conn = getDBConnection();
     $stmt = $conn->prepare("SELECT p.*, c.name as category_name, c.slug as category_slug 
                            FROM products p 
                            JOIN product_categories c ON p.category_id = c.id 
@@ -151,8 +151,8 @@ function renderProductsGrid($products, $columns = 3) {
 }
 
 // Функция для получения похожих товаров
-function getRelatedProducts($productId, $categoryId, $limit = 3) {
-    $conn = getDBConnection();
+function getRelatedProducts($conn, $productId, $categoryId, $limit = 3) {
+    // $conn = getDBConnection();
     $stmt = $conn->prepare("SELECT * FROM products 
                            WHERE category_id = ? AND id != ? AND is_active = 1 
                            ORDER BY sort_order LIMIT ?");
@@ -168,8 +168,8 @@ function getRelatedProducts($productId, $categoryId, $limit = 3) {
     return $products;
 }
 
-function addProductRequest($data) {
-    $conn = getDBConnection();
+function addProductRequest($conn, $data) {
+    // $conn = getDBConnection();
     
     $product_name = cleanInput($data['product_name']);
     $name = cleanInput($data['name']);

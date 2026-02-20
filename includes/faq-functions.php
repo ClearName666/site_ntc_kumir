@@ -3,8 +3,8 @@
 require_once __DIR__ . '/../config/database.php';
 
 // Функция для получения FAQ по категории
-function getFAQ($category = null, $limit = null) {
-    $conn = getDBConnection();
+function getFAQ($conn, $category = null, $limit = null) {
+    // $conn = getDBConnection();
     
     $sql = "SELECT * FROM faq WHERE is_active = 1";
     
@@ -29,8 +29,8 @@ function getFAQ($category = null, $limit = null) {
 }
 
 // Функция для получения категорий FAQ
-function getFAQCategories() {
-    $conn = getDBConnection();
+function getFAQCategories($conn) {
+    // $conn = getDBConnection();
     $result = $conn->query("SELECT DISTINCT category FROM faq WHERE category IS NOT NULL AND is_active = 1 ORDER BY category");
     
     $categories = [];
@@ -41,8 +41,8 @@ function getFAQCategories() {
     return $categories;
 }
 
-function addFAQQuestion($name, $email, $category, $question) {
-    $conn = getDBConnection();
+function addFAQQuestion($conn, $name, $email, $category, $question) {
+    // $conn = getDBConnection();
     
     // Формируем текст вопроса, включая имя и почту, 
     // чтобы админ знал, кому отвечать (так как в faq нет полей name/email)

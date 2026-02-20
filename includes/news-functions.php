@@ -3,8 +3,8 @@
 require_once __DIR__ . '/../config/database.php';
 
 // Функция для получения всех опубликованных новостей
-function getNews($limit = null, $offset = 0) {
-    $conn = getDBConnection();
+function getNews($conn, $limit = null, $offset = 0) {
+    // $conn = getDBConnection();
     
     $sql = "SELECT * FROM news WHERE is_published = 1 ORDER BY published_at DESC";
     
@@ -23,8 +23,8 @@ function getNews($limit = null, $offset = 0) {
 }
 
 // Функция для получения одной новости по slug
-function getNewsBySlug($slug) {
-    $conn = getDBConnection();
+function getNewsBySlug($conn, $slug) {
+    // $conn = getDBConnection();
     $stmt = $conn->prepare("SELECT * FROM news WHERE slug = ? AND is_published = 1");
     $stmt->bind_param("s", $slug);
     $stmt->execute();
@@ -40,16 +40,16 @@ function getNewsBySlug($slug) {
 }
 
 // Функция для получения количества новостей
-function getNewsCount() {
-    $conn = getDBConnection();
+function getNewsCount($conn) {
+    // $conn = getDBConnection();
     $result = $conn->query("SELECT COUNT(*) as count FROM news WHERE is_published = 1");
     $row = $result->fetch_assoc();
     return $row['count'];
 }
 
 // Функция для получения последних новостей
-function getLatestNews($limit = 3) {
-    $conn = getDBConnection();
+function getLatestNews($conn, $limit = 3) {
+    // $conn = getDBConnection();
     $stmt = $conn->prepare("SELECT * FROM news WHERE is_published = 1 ORDER BY published_at DESC LIMIT ?");
     $stmt->bind_param("i", $limit);
     $stmt->execute();

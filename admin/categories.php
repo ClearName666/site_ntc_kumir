@@ -1,102 +1,67 @@
 <?php
-
-// Подключаем функции
 require_once __DIR__. '/includes/functions.php';
 
-// Проверяем авторизацию
-requireAdminAuth();
+$conn = getDBConnection();
+requireAdminAuth($conn);
 
-// Проверяем права доступа
-if (!hasPermission('editor')) {
-    redirectWithNotification('index.php', 'Недостаточно прав для доступа к этой странице', 'error');
+if (!hasPermission($conn, 'editor')) {
+    redirectWithNotification('index.php', 'Недостаточно прав', 'error');
 }
 
-$conn = getDBConnection();
 $action = $_GET['action'] ?? 'list';
-$id = $_GET['id'] ?? 0;
+$id = intval($_GET['id'] ?? 0);
 
-// Обработка добавления/редактирования
+// --- ОБРАБОТКА POST ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = cleanInput($_POST['name'] ?? '');
-    $description = cleanInput($_POST['description'] ?? '');
-    $sortOrder = intval($_POST['sort_order'] ?? 0);
-    $isActive = isset($_POST['is_active']) ? 1 : 0;
     $imagePath = $_POST['existing_image'] ?? '';
     
-    // Генерация слага
-    $slug = createSlug($name);
-    $counter = 1;
-    $originalSlug = $slug;
-    
-    while (!isSlugUnique('product_categories', $slug, $id)) {
-        $slug = $originalSlug . '-' . $counter;
-        $counter++;
-    }
-    
-    // Загрузка изображения
+    // 1. Работа с изображением
     if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
         $uploadResult = uploadImage($_FILES['image']);
-        if ($uploadResult['success']) {
-            $imagePath = $uploadResult['path'];
-        }
+        if ($uploadResult['success']) $imagePath = $uploadResult['path'];
     }
     
-    if ($action === 'add' || ($action === 'edit' && $id)) {
-        if ($action === 'add') {
-            $stmt = $conn->prepare("INSERT INTO product_categories (name, slug, description, image_path, sort_order, is_active) VALUES (?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("ssssii", $name, $slug, $description, $imagePath, $sortOrder, $isActive);
-            
-            if ($stmt->execute()) {
-                $newId = $stmt->insert_id;
-                logAdminAction('category_add', "Добавлена категория: " . safeSubstr($name, 0, 50));
-                redirectWithNotification('categories.php', 'Категория успешно добавлена', 'success');
-            } else {
-                redirectWithNotification('categories.php?action=add', 'Ошибка при добавлении категории', 'error');
-            }
-        } else {
-            $stmt = $conn->prepare("UPDATE product_categories SET name = ?, slug = ?, description = ?, image_path = ?, sort_order = ?, is_active = ? WHERE id = ?");
-            $stmt->bind_param("ssssiii", $name, $slug, $description, $imagePath, $sortOrder, $isActive, $id);
-            
-            if ($stmt->execute()) {
-                logAdminAction('category_edit', "Отредактирована категория: " . safeSubstr($name, 0, 50));
-                redirectWithNotification('categories.php', 'Категория успешно обновлена', 'success');
-            } else {
-                redirectWithNotification('categories.php?action=edit&id=' . $id, 'Ошибка при обновлении категории', 'error');
-            }
+    // 2. Подготовка данных
+    $data = [
+        'name'        => $name,
+        'slug'        => generateUniqueCategorySlug($conn, $name, $id),
+        'description' => cleanInput($_POST['description'] ?? ''),
+        'sort_order'  => intval($_POST['sort_order'] ?? 0),
+        'is_active'   => isset($_POST['is_active']) ? 1 : 0,
+        'image_path'  => $imagePath
+    ];
+    
+    if ($action === 'add') {
+        if (addCategory($conn, $data)) {
+            logAdminAction($conn, 'category_add', "Добавлена категория: $name");
+            redirectWithNotification('categories.php', 'Успешно добавлена', 'success');
+        }
+    } elseif ($action === 'edit' && $id) {
+        if (updateCategory($conn, $id, $data)) {
+            logAdminAction($conn, 'category_edit', "Изменена категория: $name");
+            redirectWithNotification('categories.php', 'Успешно обновлена', 'success');
         }
     }
 }
 
-// Обработка удаления
+// --- ОБРАБОТКА УДАЛЕНИЯ ---
 if ($action === 'delete' && $id) {
-    // Проверяем, есть ли товары в категории
-    $checkStmt = $conn->prepare("SELECT COUNT(*) as count FROM products WHERE category_id = ?");
-    $checkStmt->bind_param("i", $id);
-    $checkStmt->execute();
-    $checkResult = $checkStmt->get_result();
-    $count = $checkResult->fetch_assoc()['count'];
-    
-    if ($count > 0) {
-        redirectWithNotification('categories.php', 'Нельзя удалить категорию, в которой есть товары', 'error');
+    if (getCategoryProductCount($conn, $id) > 0) {
+        redirectWithNotification('categories.php', 'Нельзя удалить категорию с товарами', 'error');
     }
     
-    // Получаем информацию о категории для лога
-    $stmt = $conn->prepare("SELECT name FROM product_categories WHERE id = ?");
-    $stmt->bind_param("i", $id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $category = $result->fetch_assoc();
+    $category = getCategoryById($conn, $id);
     
-    $stmt = $conn->prepare("DELETE FROM product_categories WHERE id = ?");
-    $stmt->bind_param("i", $id);
-    
-    if ($stmt->execute()) {
-        logAdminAction('category_delete', "Удалена категория: " . safeSubstr($category['name'] ?? '', 0, 50));
+    // ВЫНОСИМ ЗАПРОС:
+    if (deleteCategory($conn, $id)) {
+        logAdminAction($conn, 'category_delete', "Удалена категория: " . ($category['name'] ?? $id));
         redirectWithNotification('categories.php', 'Категория успешно удалена', 'success');
     } else {
-        redirectWithNotification('categories.php', 'Ошибка при удалении категории', 'error');
+        redirectWithNotification('categories.php', 'Ошибка при удалении', 'error');
     }
 }
+
 
 // Подключаем шапку
 require_once __DIR__. '/includes/header.php';
@@ -157,13 +122,8 @@ require_once __DIR__. '/includes/menu.php';
                         </thead>
                         <tbody>
                             <?php
-                            $categories = $conn->query("
-                                SELECT pc.*, COUNT(p.id) as product_count 
-                                FROM product_categories pc 
-                                LEFT JOIN products p ON pc.id = p.category_id 
-                                GROUP BY pc.id 
-                                ORDER BY pc.sort_order, pc.name
-                            ")->fetch_all(MYSQLI_ASSOC);
+                            // ПОЛУЧАЕМ ДАННЫЕ ЧЕРЕЗ ФУНКЦИЮ:
+                            $categories = getAllCategoriesWithCount($conn);
                             
                             foreach ($categories as $category):
                             ?>
@@ -220,11 +180,8 @@ require_once __DIR__. '/includes/menu.php';
         <?php
         $category = [];
         if ($action === 'edit' && $id) {
-            $stmt = $conn->prepare("SELECT * FROM product_categories WHERE id = ?");
-            $stmt->bind_param("i", $id);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            $category = $result->fetch_assoc();
+            // ИСПОЛЬЗУЕМ ФУНКЦИЮ:
+            $category = getCategoryById($conn, $id);
             
             if (!$category) {
                 redirectWithNotification('categories.php', 'Категория не найдена', 'error');

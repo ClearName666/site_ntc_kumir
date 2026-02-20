@@ -1,19 +1,7 @@
 <?php
-// Получаем статистику если переменная не определена
+// загружаем ее через нашу новую функцию
 if (!isset($stats)) {
-    $conn = getDBConnection();
-    $stats = [
-        'articles' => $conn->query("SELECT COUNT(*) as count FROM articles")->fetch_assoc()['count'],
-        'news' => $conn->query("SELECT COUNT(*) as count FROM news")->fetch_assoc()['count'],
-        'products' => $conn->query("SELECT COUNT(*) as count FROM products")->fetch_assoc()['count'],
-        'faq' => $conn->query("SELECT COUNT(*) as count FROM faq")->fetch_assoc()['count'],
-        'categories' => $conn->query("SELECT COUNT(*) as count FROM product_categories")->fetch_assoc()['count'],
-        'admins' => $conn->query("SELECT COUNT(*) as count FROM admins WHERE is_active = 1")->fetch_assoc()['count'],
-        'feedback' => $conn->query("SELECT COUNT(*) as count FROM feedback")->fetch_assoc()['count'],
-        'feedback_new' => $conn->query("SELECT COUNT(*) as count FROM feedback WHERE is_read = 0")->fetch_assoc()['count'],
-        'requests' => $conn->query("SELECT COUNT(*) as count FROM product_requests")->fetch_assoc()['count'],
-        'requests_new' => $conn->query("SELECT COUNT(*) as count FROM product_requests WHERE status = 'new'")->fetch_assoc()['count'],
-    ];
+    $stats = getDashboardStats($conn);
 }
 
 
@@ -25,7 +13,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
         <a href="/" class="sidebar-logo">
-            <img src="../<?php echo getSetting('logo_path'); ?>" alt="Логотип">
+            <img src="../<?php echo getSetting($conn, 'logo_path'); ?>" alt="Логотип">
             <div class="logo-text">
                 <h2>НТЦ КУМИР</h2>
                 <span>Админ-панель</span>

@@ -1,78 +1,50 @@
 <?php
-
-// Подключаем функции
 require_once __DIR__. '/includes/functions.php';
 
-// Проверяем авторизацию
-requireAdminAuth();
+$conn = getDBConnection();
+requireAdminAuth($conn);
 
-// Проверяем права доступа
-if (!hasPermission('editor')) {
-    redirectWithNotification('index.php', 'Недостаточно прав для доступа к этой странице', 'error');
+if (!hasPermission($conn, 'editor')) {
+    redirectWithNotification('index.php', 'Недостаточно прав', 'error');
 }
 
-$conn = getDBConnection();
 $action = $_GET['action'] ?? 'list';
-$id = $_GET['id'] ?? 0;
+$id = intval($_GET['id'] ?? 0);
 
-// Обработка добавления/редактирования
+// --- ОБРАБОТКА POST (Добавление/Редактирование) ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $question = cleanInput($_POST['question'] ?? '');
-    $answer = $_POST['answer'] ?? '';
-    $category = cleanInput($_POST['category'] ?? 'Общие вопросы');
-    $sortOrder = intval($_POST['sort_order'] ?? 0);
-    $isActive = isset($_POST['is_active']) ? 1 : 0;
+    $formData = [
+        'question'   => cleanInput($_POST['question'] ?? ''),
+        'answer'     => $_POST['answer'] ?? '', // Текст ответа обычно не чистят через cleanInput, если там HTML
+        'category'   => cleanInput($_POST['category'] ?? 'Общие вопросы'),
+        'sort_order' => intval($_POST['sort_order'] ?? 0),
+        'is_active'  => isset($_POST['is_active']) ? 1 : 0
+    ];
     
-    if ($action === 'add' || ($action === 'edit' && $id)) {
-        if ($action === 'add') {
-            $stmt = $conn->prepare("INSERT INTO faq (question, answer, category, sort_order, is_active) VALUES (?, ?, ?, ?, ?)");
-            $stmt->bind_param("sssii", $question, $answer, $category, $sortOrder, $isActive);
-            
-            if ($stmt->execute()) {
-                $newId = $stmt->insert_id;
-                logAdminAction('faq_add', "Добавлен FAQ: " . safeSubstr($question, 0, 50));
-                redirectWithNotification('faq.php', 'Вопрос успешно добавлен', 'success');
-            } else {
-                redirectWithNotification('faq.php?action=add', 'Ошибка при добавлении вопроса', 'error');
-            }
-        } else {
-            $stmt = $conn->prepare("UPDATE faq SET question = ?, answer = ?, category = ?, sort_order = ?, is_active = ? WHERE id = ?");
-            $stmt->bind_param("sssiii", $question, $answer, $category, $sortOrder, $isActive, $id);
-            
-            if ($stmt->execute()) {
-                logAdminAction('faq_edit', "Отредактирован FAQ: " . safeSubstr($question, 0, 50));
-                redirectWithNotification('faq.php', 'Вопрос успешно обновлен', 'success');
-            } else {
-                redirectWithNotification('faq.php?action=edit&id=' . $id, 'Ошибка при обновлении вопроса', 'error');
-            }
+    if ($action === 'add') {
+        if (addFaq($conn, $formData)) {
+            logAdminAction($conn, 'faq_add', "Добавлен FAQ: " . safeSubstr($formData['question'], 0, 50));
+            redirectWithNotification('faq.php', 'Вопрос добавлен', 'success');
+        }
+    } elseif ($action === 'edit' && $id) {
+        if (updateFaq($conn, $id, $formData)) {
+            logAdminAction($conn, 'faq_edit', "Изменен FAQ: " . safeSubstr($formData['question'], 0, 50));
+            redirectWithNotification('faq.php', 'Вопрос обновлен', 'success');
         }
     }
 }
 
-// Обработка удаления
+// --- ОБРАБОТКА УДАЛЕНИЯ ---
 if ($action === 'delete' && $id) {
-    // Получаем информацию о вопросе для лога
-    $stmt = $conn->prepare("SELECT question FROM faq WHERE id = ?");
-    $stmt->bind_param("i", $id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $faq = $result->fetch_assoc();
-    
-    $stmt = $conn->prepare("DELETE FROM faq WHERE id = ?");
-    $stmt->bind_param("i", $id);
-    
-    if ($stmt->execute()) {
-        logAdminAction('faq_delete', "Удален FAQ: " . safeSubstr($faq['question'] ?? '', 0, 50));
-        redirectWithNotification('faq.php', 'Вопрос успешно удален', 'success');
-    } else {
-        redirectWithNotification('faq.php', 'Ошибка при удалении вопроса', 'error');
+    $faq = getFaqById($conn, $id);
+    if ($faq && deleteFaq($conn, $id)) {
+        logAdminAction($conn, 'faq_delete', "Удален FAQ: " . safeSubstr($faq['question'], 0, 50));
+        redirectWithNotification('faq.php', 'Вопрос удален', 'success');
     }
 }
 
-// Подключаем шапку
+// Подключаем шапку и меню
 require_once __DIR__. '/includes/header.php';
-
-// Подключаем меню
 require_once __DIR__. '/includes/menu.php';
 ?>
 
@@ -127,13 +99,10 @@ require_once __DIR__. '/includes/menu.php';
                         </thead>
                         <tbody>
                             <?php
-                            $pagination = getPagination('faq', 10);
-                            $stmt = $conn->prepare("SELECT * FROM faq ORDER BY category, sort_order, id DESC LIMIT ? OFFSET ?");
-                            $stmt->bind_param("ii", $pagination['perPage'], $pagination['offset']);
-                            $stmt->execute();
-                            $result = $stmt->get_result();
+                            $pagination = getPagination($conn, 'faq', 10);
+                            $faqs = getFaqList($conn, $pagination['perPage'], $pagination['offset']);
                             
-                            while ($row = $result->fetch_assoc()):
+                            foreach ($faqs as $row):
                             ?>
                             <tr>
                                 <td><?php echo $row['id']; ?></td>
@@ -161,7 +130,7 @@ require_once __DIR__. '/includes/menu.php';
                                     </div>
                                 </td>
                             </tr>
-                            <?php endwhile; ?>
+                            <?php endforeach; ?>
                         </tbody>
                     </table>
                 </div>
@@ -172,19 +141,9 @@ require_once __DIR__. '/includes/menu.php';
         
         <?php elseif ($action === 'add' || $action === 'edit'): ?>
         <!-- Форма добавления/редактирования -->
-        <?php
-        $faq = [];
-        if ($action === 'edit' && $id) {
-            $stmt = $conn->prepare("SELECT * FROM faq WHERE id = ?");
-            $stmt->bind_param("i", $id);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            $faq = $result->fetch_assoc();
-            
-            if (!$faq) {
-                redirectWithNotification('faq.php', 'Вопрос не найден', 'error');
-            }
-        }
+        <?php 
+            $faqData = ($action === 'edit') ? getFaqById($conn, $id) : []; 
+            if ($action === 'edit' && !$faqData) redirectWithNotification('faq.php', 'Не найден', 'error');
         ?>
         
         <div class="card">

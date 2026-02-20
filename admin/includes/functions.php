@@ -1,8 +1,6 @@
 <?php
 session_start();
 
-session_start();
-
 // Определяем корень сайта относительно этого файла
 if (!defined('BASE_PATH')) {
     define('BASE_PATH', realpath(__DIR__ . '/../../'));
@@ -12,14 +10,14 @@ if (!defined('BASE_PATH')) {
 require_once BASE_PATH . '/config/database.php';
 
 // Проверка авторизации администратора
-function requireAdminAuth() {
+function requireAdminAuth($conn) {
     if (!isset($_SESSION['admin_id']) || !isset($_SESSION['admin_token'])) {
         header('Location: login.php');
         exit();
     }
     
     // Проверка валидности токена
-    $conn = getDBConnection();
+    // $conn = getDBConnection();
     $stmt = $conn->prepare("SELECT id FROM admins WHERE id = ? AND is_active = 1");
     $stmt->bind_param("i", $_SESSION['admin_id']);
     $stmt->execute();
@@ -33,12 +31,12 @@ function requireAdminAuth() {
 }
 
 // Получение информации о текущем администраторе
-function getCurrentAdmin() {
+function getCurrentAdmin($conn) {
     if (!isset($_SESSION['admin_id'])) {
         return null;
     }
     
-    $conn = getDBConnection();
+    // $conn = getDBConnection();
     $stmt = $conn->prepare("SELECT * FROM admins WHERE id = ?");
     $stmt->bind_param("i", $_SESSION['admin_id']);
     $stmt->execute();
@@ -48,8 +46,8 @@ function getCurrentAdmin() {
 }
 
 // Проверка прав администратора
-function hasPermission($requiredRole = 'admin') {
-    $admin = getCurrentAdmin();
+function hasPermission($conn, $requiredRole = 'admin') {
+    $admin = getCurrentAdmin($conn);
     
     if (!$admin) {
         return false;
@@ -93,8 +91,8 @@ function redirectWithNotification($url, $message, $type = 'info') {
 }
 
 // Функция для получения пагинации
-function getPagination($table, $perPage = 10, $where = '') {
-    $conn = getDBConnection();
+function getPagination($conn, $table, $perPage = 10, $where = '') {
+    // $conn = getDBConnection();
     
     if ($where) {
         $countQuery = "SELECT COUNT(*) as total FROM $table WHERE $where";
@@ -157,8 +155,8 @@ function generatePaginationLinks($pagination, $urlParams = '') {
 }
 
 // Функция для логирования действий администратора
-function logAdminAction($action, $description = null, $adminId = null) {
-    $conn = getDBConnection();
+function logAdminAction($conn, $action, $description = null, $adminId = null) {
+    // $conn = getDBConnection();
     
     if ($adminId === null && isset($_SESSION['admin_id'])) {
         $adminId = $_SESSION['admin_id'];
@@ -231,8 +229,8 @@ function createSlug($string) {
 }
 
 // Функция для проверки уникальности слага
-function isSlugUnique($table, $slug, $excludeId = null) {
-    $conn = getDBConnection();
+function isSlugUnique($conn, $table, $slug, $excludeId = null) {
+    // $conn = getDBConnection();
     
     if ($excludeId) {
         $stmt = $conn->prepare("SELECT COUNT(*) as count FROM $table WHERE slug = ? AND id != ?");
@@ -351,8 +349,8 @@ function safeSubstr($string, $start, $length = null) {
 }
 
 // Получить все обращения
-function getAllFeedback() {
-    $conn = getDBConnection();
+function getAllFeedback($conn) {
+    // $conn = getDBConnection();
     // Сортируем: сначала новые (непрочитанные), затем по дате
     $result = $conn->query("SELECT * FROM feedback ORDER BY is_read ASC, created_at DESC");
     $items = [];
@@ -363,15 +361,15 @@ function getAllFeedback() {
 }
 
 // Пометить как прочитанное
-function markFeedbackAsRead($id) {
-    $conn = getDBConnection();
+function markFeedbackAsRead($conn, $id) {
+    // $conn = getDBConnection();
     $id = intval($id);
     return $conn->query("UPDATE feedback SET is_read = 1 WHERE id = $id");
 }
 
 // Удалить обращение
-function deleteFeedback($id) {
-    $conn = getDBConnection();
+function deleteFeedback($conn, $id) {
+    // $conn = getDBConnection();
     $id = intval($id);
     return $conn->query("DELETE FROM feedback WHERE id = $id");
 }
@@ -379,25 +377,18 @@ function deleteFeedback($id) {
 /**
  * Получает все запросы на КП из базы данных
  */
-function getAllProductRequests() {
-    $conn = getDBConnection();
-    $sql = "SELECT * FROM product_requests ORDER BY created_at DESC";
-    $result = $conn->query($sql);
-    
-    $requests = [];
-    if ($result && $result->num_rows > 0) {
-        while($row = $result->fetch_assoc()) {
-            $requests[] = $row;
-        }
-    }
-    return $requests;
+function getProductRequests($conn, $perPage, $offset) {
+    $stmt = $conn->prepare("SELECT * FROM product_requests ORDER BY created_at DESC LIMIT ? OFFSET ?");
+    $stmt->bind_param("ii", $perPage, $offset);
+    $stmt->execute();
+    return $stmt->get_result();
 }
 
 /**
  * Удаляет заявку на КП и записывает действие в лог
  */
-function deleteProductRequest($id) {
-    $conn = getDBConnection();
+function deleteProductRequest($conn, $id) {
+    // $conn = getDBConnection();
     
     // 1. Получаем данные для лога перед удалением
     $stmt = $conn->prepare("SELECT product_name, name FROM product_requests WHERE id = ?");
@@ -416,10 +407,866 @@ function deleteProductRequest($id) {
     
     if ($stmt->execute()) {
         // 3. Логируем действие, как в твоем FAQ
-        logAdminAction('request_delete', "Удалена заявка на " . $requestData['product_name'] . " от " . $requestData['name']);
+        logAdminAction($conn, 'request_delete', "Удалена заявка на " . $requestData['product_name'] . " от " . $requestData['name']);
         return true;
     }
     
     return false;
 }
+
+
+
+
+
+
+
+// SETTINGS
+
+/**
+ * Получить все настройки из базы в виде ассоциативного массива
+ */
+function getAllSettings($conn) {
+    $result = $conn->query("SELECT setting_key, setting_value FROM settings ORDER BY setting_key");
+    $settings = [];
+    while ($row = $result->fetch_assoc()) {
+        $settings[$row['setting_key']] = $row['setting_value'];
+    }
+    return $settings;
+}
+
+/**
+ * Сохранить или обновить текстовую настройку
+ */
+function updateOrInsertSetting($conn, $key, $value) {
+    $stmt = $conn->prepare("SELECT id FROM settings WHERE setting_key = ?");
+    $stmt->bind_param("s", $key);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        $updateStmt = $conn->prepare("UPDATE settings SET setting_value = ?, updated_at = NOW() WHERE setting_key = ?");
+        $updateStmt->bind_param("ss", $value, $key);
+        return $updateStmt->execute();
+    } else {
+        $insertStmt = $conn->prepare("INSERT INTO settings (setting_key, setting_value) VALUES (?, ?)");
+        $insertStmt->bind_param("ss", $key, $value);
+        return $insertStmt->execute();
+    }
+}
+
+/**
+ * Специальная функция для обновления путей к изображениям (в две таблицы сразу)
+ */
+function updateImageSettings($conn, $imageKey, $settingKey, $path) {
+    // 1. Обновляем таблицу settings
+    $stmt1 = $conn->prepare("UPDATE settings SET setting_value = ?, updated_at = NOW() WHERE setting_key = ?");
+    $stmt1->bind_param("ss", $path, $settingKey);
+    $stmt1->execute();
+
+    // 2. Обновляем или вставляем в таблицу images
+    $checkStmt = $conn->prepare("SELECT id FROM images WHERE image_key = ?");
+    $checkStmt->bind_param("s", $imageKey);
+    $checkStmt->execute();
+    
+    if ($checkStmt->get_result()->num_rows > 0) {
+        $stmt2 = $conn->prepare("UPDATE images SET image_path = ?, created_at = NOW() WHERE image_key = ?");
+        $stmt2->bind_param("ss", $path, $imageKey);
+    } else {
+        $altText = ucfirst($imageKey);
+        $stmt2 = $conn->prepare("INSERT INTO images (image_key, image_path, alt_text, category, sort_order, created_at) VALUES (?, ?, ?, 'content', 0, NOW())");
+        $stmt2->bind_param("sss", $imageKey, $path, $altText);
+    }
+    return $stmt2->execute();
+}
+
+
+
+
+
+// PROFILE
+
+/**
+ * Проверка уникальности email для администратора
+ */
+function isEmailTaken($conn, $email, $excludeId) {
+    $stmt = $conn->prepare("SELECT id FROM admins WHERE email = ? AND id != ?");
+    $stmt->bind_param("si", $email, $excludeId);
+    $stmt->execute();
+    return $stmt->get_result()->num_rows > 0;
+}
+
+/**
+ * Обновление основных данных профиля
+ */
+function updateAdminProfile($conn, $id, $fullName, $email) {
+    $stmt = $conn->prepare("UPDATE admins SET full_name = ?, email = ? WHERE id = ?");
+    $stmt->bind_param("ssi", $fullName, $email, $id);
+    return $stmt->execute();
+}
+
+/**
+ * Обновление пароля администратора
+ */
+function updateAdminPassword($conn, $id, $newPassword) {
+    $hash = password_hash($newPassword, PASSWORD_DEFAULT);
+    $stmt = $conn->prepare("UPDATE admins SET password_hash = ? WHERE id = ?");
+    $stmt->bind_param("si", $hash, $id);
+    return $stmt->execute();
+}
+
+/**
+ * Получение расширенной статистики администратора
+ */
+function getAdminStats($conn, $adminId) {
+    return [
+        'logins' => $conn->query("SELECT COUNT(*) as count FROM admin_logs WHERE admin_id = $adminId AND action LIKE '%login%'")->fetch_assoc()['count'],
+        'actions' => $conn->query("SELECT COUNT(*) as count FROM admin_logs WHERE admin_id = $adminId")->fetch_assoc()['count'],
+        'last_login' => $conn->query("SELECT created_at FROM admin_logs WHERE admin_id = $adminId AND action = 'login' ORDER BY created_at DESC LIMIT 1")->fetch_assoc()['created_at'] ?? null,
+    ];
+}
+
+
+
+
+// PRODUCTS
+
+
+/**
+ * Получить список активных категорий
+ */
+function getActiveCategories($conn) {
+    return $conn->query("SELECT id, name FROM product_categories WHERE is_active = 1 ORDER BY sort_order")->fetch_all(MYSQLI_ASSOC);
+}
+
+/**
+ * Получить один товар по ID
+ */
+function getProductById($conn, $id) {
+    $stmt = $conn->prepare("SELECT * FROM products WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_assoc();
+}
+
+/**
+ * Получить список товаров с пагинацией и названием категории
+ */
+function getProductsList($conn, $limit, $offset) {
+    $stmt = $conn->prepare("
+        SELECT p.*, pc.name as category_name 
+        FROM products p 
+        LEFT JOIN product_categories pc ON p.category_id = pc.id 
+        ORDER BY p.sort_order, p.created_at DESC 
+        LIMIT ? OFFSET ?
+    ");
+    $stmt->bind_param("ii", $limit, $offset);
+    $stmt->execute();
+    return $stmt->get_result();
+}
+
+/**
+ * Добавить новый товар
+ */
+function addProduct($conn, $data) {
+    $stmt = $conn->prepare("INSERT INTO products (category_id, name, slug, description, full_description, image_path, price, specifications, is_available, sort_order, is_active) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("isssssdsiii", 
+        $data['category_id'], $data['name'], $data['slug'], 
+        $data['description'], $data['full_description'], 
+        $data['image_path'], $data['price'], $data['specifications'], 
+        $data['is_available'], $data['sort_order'], $data['is_active']
+    );
+    return $stmt->execute() ? $conn->insert_id : false;
+}
+
+/**
+ * Обновить существующий товар
+ */
+function updateProduct($conn, $id, $data) {
+    $stmt = $conn->prepare("UPDATE products SET category_id = ?, name = ?, slug = ?, description = ?, full_description = ?, image_path = ?, price = ?, specifications = ?, is_available = ?, sort_order = ?, is_active = ?, updated_at = NOW() WHERE id = ?");
+    $stmt->bind_param("isssssdsiiii", 
+        $data['category_id'], $data['name'], $data['slug'], 
+        $data['description'], $data['full_description'], 
+        $data['image_path'], $data['price'], $data['specifications'], 
+        $data['is_available'], $data['sort_order'], $data['is_active'], $id
+    );
+    return $stmt->execute();
+}
+
+/**
+ * Удалить товар
+ */
+function deleteProduct($conn, $id) {
+    $stmt = $conn->prepare("DELETE FROM products WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    return $stmt->execute();
+}
+
+
+// NEWS
+
+
+
+/**
+ * Получить список новостей с пагинацией
+ */
+function getNewsList($conn, $perPage, $offset) {
+    $stmt = $conn->prepare("SELECT * FROM news ORDER BY created_at DESC LIMIT ? OFFSET ?");
+    $stmt->bind_param("ii", $perPage, $offset);
+    $stmt->execute();
+    return $stmt->get_result();
+}
+
+/**
+ * Получить одну новость по ID
+ */
+function getNewsById($conn, $id) {
+    $stmt = $conn->prepare("SELECT * FROM news WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_assoc();
+}
+
+/**
+ * Добавить новую новость
+ */
+function addNews($conn, $data) {
+    $stmt = $conn->prepare("INSERT INTO news (title, slug, excerpt, content, author, image_path, is_published, published_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("ssssssis", 
+        $data['title'], 
+        $data['slug'], 
+        $data['excerpt'], 
+        $data['content'], 
+        $data['author'], 
+        $data['image_path'], 
+        $data['is_published'], 
+        $data['published_at']
+    );
+    return $stmt->execute();
+}
+
+/**
+ * Обновить существующую новость
+ */
+function updateNews($conn, $id, $data) {
+    $stmt = $conn->prepare("UPDATE news SET title = ?, slug = ?, excerpt = ?, content = ?, author = ?, image_path = ?, is_published = ?, published_at = ?, updated_at = NOW() WHERE id = ?");
+    $stmt->bind_param("ssssssisi", 
+        $data['title'], 
+        $data['slug'], 
+        $data['excerpt'], 
+        $data['content'], 
+        $data['author'], 
+        $data['image_path'], 
+        $data['is_published'], 
+        $data['published_at'], 
+        $id
+    );
+    return $stmt->execute();
+}
+
+/**
+ * Удалить новость
+ */
+function deleteNews($conn, $id) {
+    $stmt = $conn->prepare("DELETE FROM news WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    return $stmt->execute();
+}
+
+
+
+// MENU
+
+/**
+ * Получить все пункты меню из базы
+ */
+function getAllMenuItems($conn) {
+    $result = $conn->query("SELECT * FROM menu_items ORDER BY parent_id, sort_order, title");
+    return $result->fetch_all(MYSQLI_ASSOC);
+}
+
+/**
+ * Получить данные одного пункта меню
+ */
+function getMenuItemById($conn, $id) {
+    $stmt = $conn->prepare("SELECT * FROM menu_items WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_assoc();
+}
+
+/**
+ * Добавить новый пункт
+ */
+function addMenuItem($conn, $data) {
+    $stmt = $conn->prepare("INSERT INTO menu_items (title, url, parent_id, sort_order, is_active) VALUES (?, ?, ?, ?, ?)");
+    $stmt->bind_param("ssiii", $data['title'], $data['url'], $data['parent_id'], $data['sort_order'], $data['is_active']);
+    return $stmt->execute() ? $conn->insert_id : false;
+}
+
+/**
+ * Обновить существующий пункт
+ */
+function updateMenuItem($conn, $id, $data) {
+    $stmt = $conn->prepare("UPDATE menu_items SET title = ?, url = ?, parent_id = ?, sort_order = ?, is_active = ? WHERE id = ?");
+    $stmt->bind_param("ssiiii", $data['title'], $data['url'], $data['parent_id'], $data['sort_order'], $data['is_active'], $id);
+    return $stmt->execute();
+}
+
+/**
+ * Удалить пункт меню
+ */
+function deleteMenuItem($conn, $id) {
+    $stmt = $conn->prepare("DELETE FROM menu_items WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    return $stmt->execute();
+}
+
+/**
+ * Проверить наличие подпунктов перед удалением
+ */
+function hasChildMenu($conn, $id) {
+    $stmt = $conn->prepare("SELECT COUNT(*) as count FROM menu_items WHERE parent_id = ?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $row = $stmt->get_result()->fetch_assoc();
+    return $row['count'] > 0;
+}
+
+/**
+ * Рекурсивное построение дерева меню
+ */
+function buildMenuTree($items, $parentId = 0) {
+    $tree = [];
+    foreach ($items as $item) {
+        if ($item['parent_id'] == $parentId) {
+            $children = buildMenuTree($items, $item['id']);
+            if ($children) {
+                $item['children'] = $children;
+            }
+            $tree[] = $item;
+        }
+    }
+    return $tree;
+}
+
+/**
+ * Получить список потенциальных родителей (только верхний уровень)
+ * Исключаем текущий ID, чтобы не зациклить дерево
+ */
+function getPotentialParents($conn, $excludeId = 0) {
+    $excludeId = intval($excludeId);
+    $sql = "SELECT id, title FROM menu_items WHERE parent_id = 0";
+    if ($excludeId > 0) {
+        $sql .= " AND id != $excludeId";
+    }
+    $sql .= " ORDER BY title";
+    
+    return $conn->query($sql)->fetch_all(MYSQLI_ASSOC);
+}
+
+
+
+// LOGS
+
+
+/**
+ * Получить список логов с учетом фильтров
+ */
+function getAdminLogs($conn, $filters = [], $limit = 100) {
+    $where = "1=1";
+    $params = [];
+    $types = "";
+
+    if (!empty($filters['admin_id'])) {
+        $where .= " AND al.admin_id = ?";
+        $params[] = intval($filters['admin_id']);
+        $types .= "i";
+    }
+
+    if (!empty($filters['action'])) {
+        $where .= " AND al.action LIKE ?";
+        $params[] = "%" . $filters['action'] . "%";
+        $types .= "s";
+    }
+
+    if (!empty($filters['date_from'])) {
+        $where .= " AND DATE(al.created_at) >= ?";
+        $params[] = $filters['date_from'];
+        $types .= "s";
+    }
+
+    if (!empty($filters['date_to'])) {
+        $where .= " AND DATE(al.created_at) <= ?";
+        $params[] = $filters['date_to'];
+        $types .= "s";
+    }
+
+    $query = "SELECT al.*, a.username 
+              FROM admin_logs al 
+              LEFT JOIN admins a ON al.admin_id = a.id 
+              WHERE $where 
+              ORDER BY al.created_at DESC 
+              LIMIT ?";
+    
+    $params[] = intval($limit);
+    $types .= "i";
+
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param($types, ...$params);
+    $stmt->execute();
+    return $stmt->get_result();
+}
+
+/**
+ * Очистить старые логи
+ */
+function clearOldLogs($conn, $days) {
+    $days = intval($days);
+    $date = date('Y-m-d H:i:s', strtotime("-$days days"));
+    $stmt = $conn->prepare("DELETE FROM admin_logs WHERE created_at < ?");
+    $stmt->bind_param("s", $date);
+    return $stmt->execute();
+}
+
+/**
+ * Список всех админов для выпадающего списка
+ */
+function getAdminsList($conn) {
+    return $conn->query("SELECT id, username FROM admins ORDER BY username")->fetch_all(MYSQLI_ASSOC);
+}
+
+
+
+
+
+
+// INDEX 
+
+
+/**
+ * Получить общую статистику сайта для дашборда
+ */
+function getDashboardStats($conn) {
+    // Вспомогательная функция внутри для сокращения кода
+    $getCount = function($table, $where = "") use ($conn) {
+        $sql = "SELECT COUNT(*) as count FROM " . $table . ($where ? " WHERE $where" : "");
+        $result = $conn->query($sql);
+        return $result ? $result->fetch_assoc()['count'] : 0;
+    };
+
+    return [
+        'articles'     => $getCount('articles'),
+        'news'         => $getCount('news'),
+        'products'     => $getCount('products'),
+        'faq'          => $getCount('faq'),
+        'categories'   => $getCount('product_categories'),
+        'admins'       => $getCount('admins', 'is_active = 1'),
+        'feedback'     => $getCount('feedback'),
+        'feedback_new' => $getCount('feedback', 'is_read = 0'),
+        'requests'     => $getCount('product_requests'),
+        'requests_new' => $getCount('product_requests', "status = 'new'"),
+    ];
+}
+
+/**
+ * Получить список последних действий администраторов
+ */
+function getRecentAdminLogs($conn, $limit = 10) {
+    $limit = intval($limit);
+    $sql = "SELECT al.*, a.username 
+            FROM admin_logs al 
+            LEFT JOIN admins a ON al.admin_id = a.id 
+            ORDER BY al.created_at DESC 
+            LIMIT $limit";
+    
+    $result = $conn->query($sql);
+    return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
+}
+
+/**
+ * Определяет иконку для типа действия (для верстки)
+ */
+function getLogIcon($action) {
+    if (strpos($action, 'login') !== false) return 'fa-sign-in-alt';
+    if (strpos($action, 'logout') !== false) return 'fa-sign-out-alt';
+    if (strpos($action, 'add') !== false) return 'fa-plus';
+    if (strpos($action, 'edit') !== false) return 'fa-edit';
+    if (strpos($action, 'delete') !== false) return 'fa-trash';
+    return 'fa-user';
+}
+
+
+
+// FAQ
+
+/**
+ * Получить список FAQ с пагинацией
+ */
+function getFaqList($conn, $limit, $offset) {
+    $stmt = $conn->prepare("SELECT * FROM faq ORDER BY category, sort_order, id DESC LIMIT ? OFFSET ?");
+    $stmt->bind_param("ii", $limit, $offset);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+}
+
+/**
+ * Получить один вопрос по ID
+ */
+function getFaqById($conn, $id) {
+    $stmt = $conn->prepare("SELECT * FROM faq WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_assoc();
+}
+
+/**
+ * Добавить новый вопрос
+ */
+function addFaq($conn, $data) {
+    $stmt = $conn->prepare("INSERT INTO faq (question, answer, category, sort_order, is_active) VALUES (?, ?, ?, ?, ?)");
+    $stmt->bind_param("sssii", $data['question'], $data['answer'], $data['category'], $data['sort_order'], $data['is_active']);
+    return $stmt->execute();
+}
+
+/**
+ * Обновить существующий вопрос
+ */
+function updateFaq($conn, $id, $data) {
+    $stmt = $conn->prepare("UPDATE faq SET question = ?, answer = ?, category = ?, sort_order = ?, is_active = ? WHERE id = ?");
+    $stmt->bind_param("sssiii", $data['question'], $data['answer'], $data['category'], $data['sort_order'], $data['is_active'], $id);
+    return $stmt->execute();
+}
+
+/**
+ * Удалить вопрос
+ */
+function deleteFaq($conn, $id) {
+    $stmt = $conn->prepare("DELETE FROM faq WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    return $stmt->execute();
+}
+
+
+
+
+// CONTANT
+
+/**
+ * Получить все контент-блоки
+ */
+function getAllContentBlocks($conn) {
+    $result = $conn->query("SELECT * FROM content_blocks ORDER BY block_key");
+    return $result->fetch_all(MYSQLI_ASSOC);
+}
+
+/**
+ * Получить конкретный блок по ID
+ */
+function getContentBlockById($conn, $id) {
+    $stmt = $conn->prepare("SELECT * FROM content_blocks WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_assoc();
+}
+
+/**
+ * Обновить контент-блок
+ */
+function updateContentBlock($conn, $id, $title, $content) {
+    $stmt = $conn->prepare("UPDATE content_blocks SET title = ?, content = ?, updated_at = NOW() WHERE id = ?");
+    $stmt->bind_param("ssi", $title, $content, $id);
+    return $stmt->execute();
+}
+
+/**
+ * Вспомогательная функция для обрезки текста (превью)
+ */
+function getContentPreview($text, $limit = 100) {
+    $text = htmlspecialchars($text);
+    if (function_exists('mb_substr')) {
+        return mb_strlen($text) > $limit ? mb_substr($text, 0, $limit) . '...' : $text;
+    }
+    return strlen($text) > $limit ? substr($text, 0, $limit) . '...' : $text;
+}
+
+
+
+
+// CONTACTS
+
+
+/**
+ * Получить список всех контактов с учетом пагинации
+ */
+function getContactsList($conn, $perPage, $offset) {
+    $stmt = $conn->prepare("SELECT * FROM contacts ORDER BY contact_type, sort_order, title LIMIT ? OFFSET ?");
+    $stmt->bind_param("ii", $perPage, $offset);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+}
+
+/**
+ * Получить данные одного контакта
+ */
+function getContactById($conn, $id) {
+    $stmt = $conn->prepare("SELECT * FROM contacts WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_assoc();
+}
+
+/**
+ * Добавить контакт
+ */
+function addContact($conn, $data) {
+    $stmt = $conn->prepare("INSERT INTO contacts (contact_type, title, value, icon, sort_order, is_active) VALUES (?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("ssssii", 
+        $data['contact_type'], 
+        $data['title'], 
+        $data['value'], 
+        $data['icon'], 
+        $data['sort_order'], 
+        $data['is_active']
+    );
+    return $stmt->execute();
+}
+
+/**
+ * Обновить контакт
+ */
+function updateContact($conn, $id, $data) {
+    $stmt = $conn->prepare("UPDATE contacts SET contact_type = ?, title = ?, value = ?, icon = ?, sort_order = ?, is_active = ? WHERE id = ?");
+    $stmt->bind_param("ssssiii", 
+        $data['contact_type'], 
+        $data['title'], 
+        $data['value'], 
+        $data['icon'], 
+        $data['sort_order'], 
+        $data['is_active'], 
+        $id
+    );
+    return $stmt->execute();
+}
+
+/**
+ * Удалить контакт
+ */
+function deleteContact($conn, $id) {
+    $stmt = $conn->prepare("DELETE FROM contacts WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    return $stmt->execute();
+}
+
+
+
+// CATEGORIES
+
+/**
+ * Получить все категории с подсчетом товаров
+ */
+function getAllCategoriesWithCount($conn) {
+    $sql = "SELECT pc.*, COUNT(p.id) as product_count 
+            FROM product_categories pc 
+            LEFT JOIN products p ON pc.id = p.category_id 
+            GROUP BY pc.id 
+            ORDER BY pc.sort_order, pc.name";
+    return $conn->query($sql)->fetch_all(MYSQLI_ASSOC);
+}
+
+/**
+ * Получить данные одной категории
+ */
+function getCategoryById($conn, $id) {
+    $stmt = $conn->prepare("SELECT * FROM product_categories WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_assoc();
+}
+
+/**
+ * Добавить категорию
+ */
+function addCategory($conn, $data) {
+    $stmt = $conn->prepare("INSERT INTO product_categories (name, slug, description, image_path, sort_order, is_active) VALUES (?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("ssssii", $data['name'], $data['slug'], $data['description'], $data['image_path'], $data['sort_order'], $data['is_active']);
+    return $stmt->execute();
+}
+
+/**
+ * Обновить категорию
+ */
+function updateCategory($conn, $id, $data) {
+    $stmt = $conn->prepare("UPDATE product_categories SET name = ?, slug = ?, description = ?, image_path = ?, sort_order = ?, is_active = ? WHERE id = ?");
+    $stmt->bind_param("ssssiii", $data['name'], $data['slug'], $data['description'], $data['image_path'], $data['sort_order'], $data['is_active'], $id);
+    return $stmt->execute();
+}
+
+/**
+ * Проверить, есть ли товары в категории перед удалением
+ */
+function getCategoryProductCount($conn, $categoryId) {
+    $stmt = $conn->prepare("SELECT COUNT(*) as count FROM products WHERE category_id = ?");
+    $stmt->bind_param("i", $categoryId);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_assoc()['count'] ?? 0;
+}
+
+/**
+ * Генерация уникального слага
+ */
+function generateUniqueCategorySlug($conn, $name, $currentId = 0) {
+    $slug = createSlug($name);
+    $originalSlug = $slug;
+    $counter = 1;
+    
+    while (!isSlugUnique($conn, 'product_categories', $slug, $currentId)) {
+        $slug = $originalSlug . '-' . $counter;
+        $counter++;
+    }
+    return $slug;
+}
+
+/**
+ * Полное удаление категории
+ */
+function deleteCategory($conn, $id) {
+    $stmt = $conn->prepare("DELETE FROM product_categories WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    return $stmt->execute();
+}
+
+
+
+// ARTICLES
+
+
+/**
+ * Получить список статей с пагинацией
+ */
+function getArticlesList($conn, $perPage, $offset) {
+    $stmt = $conn->prepare("SELECT * FROM articles ORDER BY created_at DESC LIMIT ? OFFSET ?");
+    $stmt->bind_param("ii", $perPage, $offset);
+    $stmt->execute();
+    return $stmt->get_result();
+}
+
+/**
+ * Получить данные одной статьи
+ */
+function getArticleById($conn, $id) {
+    $stmt = $conn->prepare("SELECT * FROM articles WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_assoc();
+}
+
+/**
+ * Добавить статью
+ */
+function addArticle($conn, $data) {
+    $stmt = $conn->prepare("INSERT INTO articles (title, slug, excerpt, content, author, image_path, is_published, published_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("ssssssis", $data['title'], $data['slug'], $data['excerpt'], $data['content'], $data['author'], $data['image_path'], $data['is_published'], $data['published_at']);
+    return $stmt->execute();
+}
+
+/**
+ * Обновить статью
+ */
+function updateArticle($conn, $id, $data) {
+    $stmt = $conn->prepare("UPDATE articles SET title = ?, slug = ?, excerpt = ?, content = ?, author = ?, image_path = ?, is_published = ?, published_at = ?, updated_at = NOW() WHERE id = ?");
+    $stmt->bind_param("ssssssisi", $data['title'], $data['slug'], $data['excerpt'], $data['content'], $data['author'], $data['image_path'], $data['is_published'], $data['published_at'], $id);
+    return $stmt->execute();
+}
+
+/**
+ * Удалить статью
+ */
+function deleteArticle($conn, $id) {
+    $stmt = $conn->prepare("DELETE FROM articles WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    return $stmt->execute();
+}
+
+/**
+ * Генерация уникального слага для статьи
+ */
+function generateUniqueArticleSlug($conn, $title, $currentId = 0) {
+    $slug = createSlug($title);
+    $originalSlug = $slug;
+    $counter = 1;
+    while (!isSlugUnique($conn, 'articles', $slug, $currentId)) {
+        $slug = $originalSlug . '-' . $counter;
+        $counter++;
+    }
+    return $slug;
+}
+
+
+
+// ADMINS
+
+/**
+ * Получить список всех администраторов
+ */
+function getAllAdmins($conn) {
+    return $conn->query("SELECT * FROM admins ORDER BY role, username")->fetch_all(MYSQLI_ASSOC);
+}
+
+/**
+ * Получить данные одного админа
+ */
+function getAdminById($conn, $id) {
+    $stmt = $conn->prepare("SELECT * FROM admins WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_assoc();
+}
+
+/**
+ * Проверка уникальности username или email
+ */
+function isAdminUnique($conn, $username, $email, $excludeId = 0) {
+    $stmt = $conn->prepare("SELECT id FROM admins WHERE (username = ? OR email = ?) AND id != ?");
+    $stmt->bind_param("ssi", $username, $email, $excludeId);
+    $stmt->execute();
+    return $stmt->get_result()->num_rows === 0;
+}
+
+/**
+ * Добавить нового администратора
+ */
+function addAdmin($conn, $data) {
+    $passwordHash = password_hash($data['password'], PASSWORD_DEFAULT);
+    $stmt = $conn->prepare("INSERT INTO admins (username, email, password_hash, full_name, role, is_active) VALUES (?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("sssssi", $data['username'], $data['email'], $passwordHash, $data['full_name'], $data['role'], $data['is_active']);
+    return $stmt->execute();
+}
+
+/**
+ * Обновить данные администратора
+ */
+function updateAdmin($conn, $id, $data) {
+    if (!empty($data['password'])) {
+        // Если пароль меняется
+        $passwordHash = password_hash($data['password'], PASSWORD_DEFAULT);
+        $stmt = $conn->prepare("UPDATE admins SET username = ?, email = ?, password_hash = ?, full_name = ?, role = ?, is_active = ? WHERE id = ?");
+        $stmt->bind_param("sssssii", $data['username'], $data['email'], $passwordHash, $data['full_name'], $data['role'], $data['is_active'], $id);
+    } else {
+        // Если пароль НЕ меняется
+        $stmt = $conn->prepare("UPDATE admins SET username = ?, email = ?, full_name = ?, role = ?, is_active = ? WHERE id = ?");
+        $stmt->bind_param("ssssii", $data['username'], $data['email'], $data['full_name'], $data['role'], $data['is_active'], $id);
+    }
+    return $stmt->execute();
+}
+
+/**
+ * Удалить администратора
+ */
+function deleteAdmin($conn, $id) {
+    $stmt = $conn->prepare("DELETE FROM admins WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    return $stmt->execute();
+}
+
+
 ?>

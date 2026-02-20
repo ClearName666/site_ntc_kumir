@@ -3,11 +3,14 @@
 // Подключаем функции
 require_once __DIR__. '/includes/functions.php';
 
+// подключаемся к базе 
+$conn = getDBConnection();
+
 // Проверяем авторизацию
-requireAdminAuth();
+requireAdminAuth($conn);
 
 // Проверяем права доступа (используем тот же уровень, что и для FAQ)
-if (!hasPermission('editor')) {
+if (!hasPermission($conn, 'editor')) {
     redirectWithNotification('index.php', 'Недостаточно прав для доступа к этой странице', 'error');
 }
 
@@ -16,7 +19,7 @@ $id = $_GET['id'] ?? 0;
 
 // Обработка удаления через вынесенную функцию
 if ($action === 'delete' && $id > 0) {
-    if (deleteProductRequest($id)) {
+    if (deleteProductRequest($conn, $id)) {
         redirectWithNotification('requests.php', 'Заявка успешно удалена', 'success');
     } else {
         redirectWithNotification('requests.php', 'Ошибка при удалении или заявка не найдена', 'error');
@@ -67,11 +70,8 @@ require_once __DIR__. '/includes/menu.php';
                         <tbody>
                             <?php
                             // Используем твою стандартную функцию пагинации
-                            $pagination = getPagination('product_requests', 10);
-                            $stmt = $conn->prepare("SELECT * FROM product_requests ORDER BY created_at DESC LIMIT ? OFFSET ?");
-                            $stmt->bind_param("ii", $pagination['perPage'], $pagination['offset']);
-                            $stmt->execute();
-                            $result = $stmt->get_result();
+                            $pagination = getPagination($conn, 'product_requests', 10);
+                            $result = getProductRequests($conn, $pagination['perPage'], $pagination['offset']);
                             
                             if ($result->num_rows === 0): ?>
                                 <tr>

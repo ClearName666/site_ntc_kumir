@@ -3,6 +3,9 @@
 // Подключаем функции
 require_once __DIR__. '/includes/functions.php';
 
+// подключаемся к базе 
+$conn = getDBConnection();
+
 // --- БЛОК ОБРАБОТКИ AJAX ЗАПРОСА ---
 if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest') {
     header('Content-Type: application/json');
@@ -18,7 +21,7 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'
     }
 
     // Используем функцию, которую мы добавили в functions.php
-    if (addFAQQuestion($name, $email, $category, $question)) {
+    if (addFAQQuestion($conn, $name, $email, $category, $question)) {
         echo json_encode(['status' => 'success', 'message' => 'Вопрос отправлен и появится после модерации!']);
     } else {
         echo json_encode(['status' => 'error', 'message' => 'Ошибка базы данных.']);
@@ -27,12 +30,12 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'
 }
 
 // Получаем данные
-$categories = getFAQCategories();
+$categories = getFAQCategories($conn);
 $selectedCategory = isset($_GET['category']) ? $_GET['category'] : null;
-$faqItems = getFAQ($selectedCategory);
+$faqItems = getFAQ($conn, $selectedCategory);
 
 // Устанавливаем мета-данные
-$pageTitle = 'Вопрос-ответ - ' . getSetting('site_title');
+$pageTitle = 'Вопрос-ответ - ' . getSetting($conn, 'site_title');
 $pageDescription = 'Часто задаваемые вопросы и ответы по оборудованию и услугам НТЦ КУМИР.';
 
 // Определяем пути
@@ -50,11 +53,11 @@ $footerPath = __DIR__. '/includes/footer.php';
     <!-- Open Graph -->
     <meta property="og:title" content="<?= $pageTitle ?>">
     <meta property="og:description" content="<?= $pageDescription ?>">
-    <meta property="og:image" content="<?= getSetting('logo_path') ?>">
+    <meta property="og:image" content="<?= getSetting($conn, 'logo_path') ?>">
     <meta property="og:type" content="website">
     
     <!-- Favicon -->
-    <link rel="icon" href="<?= getSetting('favicon_path') ?>" type="image/x-icon">
+    <link rel="icon" href="<?= getSetting($conn, 'favicon_path') ?>" type="image/x-icon">
     
     <!-- Стили -->
     <link rel="stylesheet" href="assets/css/style.css">

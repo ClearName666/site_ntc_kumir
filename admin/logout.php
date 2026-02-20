@@ -4,11 +4,14 @@
 
 require_once __DIR__. '/includes/functions.php';
 
+// подключаемся к базе 
+$conn = getDBConnection();
+
 if (isset($_SESSION['admin_id'])) {
     $adminId = $_SESSION['admin_id'];
     
     // Логируем выход
-    logAdminAction('logout', 'Выход из системы', $adminId);
+    logAdminAction($conn, 'logout', 'Выход из системы', $adminId);
     
     // Удаляем все переменные сессии
     $_SESSION = array();

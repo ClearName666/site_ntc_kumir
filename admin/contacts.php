@@ -1,80 +1,51 @@
 <?php
-
-
-// Подключаем функции
 require_once __DIR__. '/includes/functions.php';
 
-// Проверяем авторизацию
-requireAdminAuth();
+$conn = getDBConnection();
+requireAdminAuth($conn);
 
-// Проверяем права доступа
-if (!hasPermission('editor')) {
-    redirectWithNotification('index.php', 'Недостаточно прав для доступа к этой странице', 'error');
+if (!hasPermission($conn, 'editor')) {
+    redirectWithNotification('index.php', 'Недостаточно прав', 'error');
 }
 
-$conn = getDBConnection();
 $action = $_GET['action'] ?? 'list';
-$id = $_GET['id'] ?? 0;
+$id = intval($_GET['id'] ?? 0);
 
-// Обработка добавления/редактирования
+// --- ОБРАБОТКА POST ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $contactType = cleanInput($_POST['contact_type'] ?? '');
-    $title = cleanInput($_POST['title'] ?? '');
-    $value = cleanInput($_POST['value'] ?? '');
-    $icon = cleanInput($_POST['icon'] ?? '');
-    $sortOrder = intval($_POST['sort_order'] ?? 0);
-    $isActive = isset($_POST['is_active']) ? 1 : 0;
+    $formData = [
+        'contact_type' => cleanInput($_POST['contact_type'] ?? ''),
+        'title'        => cleanInput($_POST['title'] ?? ''),
+        'value'        => cleanInput($_POST['value'] ?? ''),
+        'icon'         => cleanInput($_POST['icon'] ?? ''),
+        'sort_order'   => intval($_POST['sort_order'] ?? 0),
+        'is_active'    => isset($_POST['is_active']) ? 1 : 0
+    ];
     
-    if ($action === 'add' || ($action === 'edit' && $id)) {
-        if ($action === 'add') {
-            $stmt = $conn->prepare("INSERT INTO contacts (contact_type, title, value, icon, sort_order, is_active) VALUES (?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("ssssii", $contactType, $title, $value, $icon, $sortOrder, $isActive);
-            
-            if ($stmt->execute()) {
-                $newId = $stmt->insert_id;
-                logAdminAction('contact_add', "Добавлен контакт: $title");
-                redirectWithNotification('contacts.php', 'Контакт успешно добавлен', 'success');
-            } else {
-                redirectWithNotification('contacts.php?action=add', 'Ошибка при добавлении контакта', 'error');
-            }
-        } else {
-            $stmt = $conn->prepare("UPDATE contacts SET contact_type = ?, title = ?, value = ?, icon = ?, sort_order = ?, is_active = ? WHERE id = ?");
-            $stmt->bind_param("ssssiii", $contactType, $title, $value, $icon, $sortOrder, $isActive, $id);
-            
-            if ($stmt->execute()) {
-                logAdminAction('contact_edit', "Отредактирован контакт: $title");
-                redirectWithNotification('contacts.php', 'Контакт успешно обновлен', 'success');
-            } else {
-                redirectWithNotification('contacts.php?action=edit&id=' . $id, 'Ошибка при обновлении контакта', 'error');
-            }
+    if ($action === 'add') {
+        if (addContact($conn, $formData)) {
+            logAdminAction($conn, 'contact_add', "Добавлен контакт: " . $formData['title']);
+            redirectWithNotification('contacts.php', 'Контакт добавлен', 'success');
+        }
+    } elseif ($action === 'edit' && $id) {
+        if (updateContact($conn, $id, $formData)) {
+            logAdminAction($conn, 'contact_edit', "Изменен контакт: " . $formData['title']);
+            redirectWithNotification('contacts.php', 'Контакт обновлен', 'success');
         }
     }
 }
 
-// Обработка удаления
+// --- УДАЛЕНИЕ ---
 if ($action === 'delete' && $id) {
-    // Получаем информацию о контакте для лога
-    $stmt = $conn->prepare("SELECT title FROM contacts WHERE id = ?");
-    $stmt->bind_param("i", $id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $contact = $result->fetch_assoc();
-    
-    $stmt = $conn->prepare("DELETE FROM contacts WHERE id = ?");
-    $stmt->bind_param("i", $id);
-    
-    if ($stmt->execute()) {
-        logAdminAction('contact_delete', "Удален контакт: " . ($contact['title'] ?? 'ID ' . $id));
-        redirectWithNotification('contacts.php', 'Контакт успешно удален', 'success');
-    } else {
-        redirectWithNotification('contacts.php', 'Ошибка при удалении контакта', 'error');
+    $contact = getContactById($conn, $id);
+    if (deleteContact($conn, $id)) {
+        logAdminAction($conn, 'contact_delete', "Удален: " . ($contact['title'] ?? $id));
+        redirectWithNotification('contacts.php', 'Контакт удален', 'success');
     }
 }
 
-// Подключаем шапку
+// Подключаем шапку и меню...
 require_once __DIR__. '/includes/header.php';
-
-// Подключаем меню
 require_once __DIR__. '/includes/menu.php';
 ?>
 
@@ -130,13 +101,10 @@ require_once __DIR__. '/includes/menu.php';
                         </thead>
                         <tbody>
                             <?php
-                            $pagination = getPagination('contacts', 10);
-                            $stmt = $conn->prepare("SELECT * FROM contacts ORDER BY contact_type, sort_order, title LIMIT ? OFFSET ?");
-                            $stmt->bind_param("ii", $pagination['perPage'], $pagination['offset']);
-                            $stmt->execute();
-                            $result = $stmt->get_result();
+                            $pagination = getPagination($conn, 'contacts', 10);
+                            $contacts = getContactsList($conn, $pagination['perPage'], $pagination['offset']);
                             
-                            while ($row = $result->fetch_assoc()):
+                            foreach ($contacts as $row):
                             ?>
                             <tr>
                                 <td><?php echo $row['id']; ?></td>
@@ -181,7 +149,7 @@ require_once __DIR__. '/includes/menu.php';
                                     </div>
                                 </td>
                             </tr>
-                            <?php endwhile; ?>
+                            <?php endforeach; ?>
                         </tbody>
                     </table>
                 </div>
@@ -192,18 +160,10 @@ require_once __DIR__. '/includes/menu.php';
         
         <?php elseif ($action === 'add' || $action === 'edit'): ?>
         <!-- Форма добавления/редактирования -->
-        <?php
-        $contact = [];
+        <?php 
         if ($action === 'edit' && $id) {
-            $stmt = $conn->prepare("SELECT * FROM contacts WHERE id = ?");
-            $stmt->bind_param("i", $id);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            $contact = $result->fetch_assoc();
-            
-            if (!$contact) {
-                redirectWithNotification('contacts.php', 'Контакт не найден', 'error');
-            }
+            $contact = getContactById($conn, $id);
+            if (!$contact) redirectWithNotification('contacts.php', 'Не найден', 'error');
         }
         ?>
         

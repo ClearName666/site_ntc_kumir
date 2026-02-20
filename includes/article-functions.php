@@ -2,8 +2,8 @@
 require_once __DIR__ . '/../config/database.php';
 
 // Функция для получения всех статей
-function getArticles($limit = null, $offset = 0) {
-    $conn = getDBConnection();
+function getArticles($conn, $limit = null, $offset = 0) {
+    // $conn = getDBConnection();
     
     $sql = "SELECT * FROM articles WHERE is_published = 1 ";
     $sql .= "AND (published_at IS NULL OR published_at <= NOW()) ";
@@ -29,8 +29,8 @@ function getArticles($limit = null, $offset = 0) {
 
 
 // Функция для получения статьи по слагу
-function getArticleBySlug($slug) {
-    $conn = getDBConnection();
+function getArticleBySlug($conn, $slug) {
+    // $conn = getDBConnection();
     
     // Увеличиваем счетчик просмотров
     $conn->query("UPDATE articles SET views = views + 1 WHERE slug = '$slug'");
@@ -45,8 +45,8 @@ function getArticleBySlug($slug) {
 
 
 // Функция для получения количества статей
-function getArticlesCount() {
-    $conn = getDBConnection();
+function getArticlesCount($conn) {
+    // $conn = getDBConnection();
     
     $result = $conn->query("SELECT COUNT(*) as count FROM articles WHERE is_published = 1");
     $row = $result->fetch_assoc();
@@ -55,8 +55,8 @@ function getArticlesCount() {
 }
 
 // Функция для получения популярных статей
-function getPopularArticles($limit = 3) {
-    $conn = getDBConnection();
+function getPopularArticles($conn, $limit = 3) {
+    // $conn = getDBConnection();
     $stmt = $conn->prepare("SELECT * FROM articles WHERE is_published = 1 ORDER BY views DESC LIMIT ?");
     $stmt->bind_param("i", $limit);
     $stmt->execute();
@@ -112,16 +112,16 @@ function renderArticleCards($articles, $columns = 3) {
 }
 
 // Функция для увеличения счетчика просмотров
-function incrementArticleViews($articleId) {
-    $conn = getDBConnection();
+function incrementArticleViews($conn, $articleId) {
+    // $conn = getDBConnection();
     $stmt = $conn->prepare("UPDATE articles SET views = views + 1 WHERE id = ?");
     $stmt->bind_param("i", $articleId);
     $stmt->execute();
 }
 
 // Функция для проверки существования статьи
-function articleExists($slug) {
-    $conn = getDBConnection();
+function articleExists($conn, $slug) {
+    // $conn = getDBConnection();
     $stmt = $conn->prepare("SELECT COUNT(*) as count FROM articles WHERE slug = ? AND is_published = 1");
     $stmt->bind_param("s", $slug);
     $stmt->execute();

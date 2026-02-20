@@ -3,10 +3,13 @@
 // Подключаем функции
 require_once __DIR__ . '/includes/functions.php';
 
+// подключаемся к базе 
+$conn = getDBConnection();
+
 if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest' && isset($_POST['phone'])) {
     header('Content-Type: application/json');
     
-    if (addProductRequest($_POST)) {
+    if (addProductRequest($conn, $_POST)) {
         echo json_encode(['status' => 'success', 'message' => 'Заявка успешно отправлена! Менеджер свяжется с вами.']);
     } else {
         echo json_encode(['status' => 'error', 'message' => 'Ошибка при сохранении заявки.']);
@@ -25,35 +28,35 @@ $productsList = [];
 
 if ($product) {
     // Режим просмотра товара
-    $productData = getProductBySlug($product);
+    $productData = getProductBySlug($conn, $product);
     if ($productData) {
-        $categoryData = getCategoryBySlug($productData['category_slug']);
-        $relatedProducts = getRelatedProducts($productData['id'], $productData['category_id'], 3);
+        $categoryData = getCategoryBySlug($conn, $productData['category_slug']);
+        $relatedProducts = getRelatedProducts($conn, $productData['id'], $productData['category_id'], 3);
     }
 } elseif ($category) {
     // Режим просмотра категории
-    $categoryData = getCategoryBySlug($category);
+    $categoryData = getCategoryBySlug($conn, $category);
     if ($categoryData) {
-        $productsList = getProductsByCategory($categoryData['id']);
+        $productsList = getProductsByCategory($conn, $categoryData['id']);
     }
 } else {
     // Режим просмотра всех категорий
-    $allCategories = getProductCategories();
+    $allCategories = getProductCategories($conn);
 }
 
 // Устанавливаем мета-данные страницы
 if ($productData) {
-    $pageTitle = htmlspecialchars($productData['name']) . ' - ' . getSetting('site_title');
+    $pageTitle = htmlspecialchars($productData['name']) . ' - ' . getSetting($conn, 'site_title');
     $pageDescription = htmlspecialchars(strip_tags($productData['description']));
-    $pageImage = !empty($productData['image_path']) ? $productData['image_path'] : getSetting('logo_path');
+    $pageImage = !empty($productData['image_path']) ? $productData['image_path'] : getSetting($conn, 'logo_path');
 } elseif ($categoryData) {
-    $pageTitle = htmlspecialchars($categoryData['name']) . ' - Продукция - ' . getSetting('site_title');
+    $pageTitle = htmlspecialchars($categoryData['name']) . ' - Продукция - ' . getSetting($conn, 'site_title');
     $pageDescription = htmlspecialchars($categoryData['description'] ?? 'Оборудование категории ' . $categoryData['name']);
-    $pageImage = !empty($categoryData['image_path']) ? $categoryData['image_path'] : getSetting('logo_path');
+    $pageImage = !empty($categoryData['image_path']) ? $categoryData['image_path'] : getSetting($conn, 'logo_path');
 } else {
-    $pageTitle = 'Продукция - ' . getSetting('site_title');
+    $pageTitle = 'Продукция - ' . getSetting($conn, 'site_title');
     $pageDescription = 'Оборудование и решения для автоматизации учета энергоресурсов';
-    $pageImage = getSetting('logo_path');
+    $pageImage = getSetting($conn, 'logo_path');
 }
 
 // Определяем пути
@@ -75,7 +78,7 @@ $footerPath = 'includes/footer.php';
     <meta property="og:type" content="website">
     
     <!-- Favicon -->
-    <link rel="icon" href="<?= getSetting('favicon_path') ?>" type="image/x-icon">
+    <link rel="icon" href="<?= getSetting($conn, 'favicon_path') ?>" type="image/x-icon">
     
     <!-- Стили -->
     <link rel="stylesheet" href="assets/css/style.css">

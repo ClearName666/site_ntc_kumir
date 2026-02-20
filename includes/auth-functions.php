@@ -13,12 +13,12 @@ function isAdminLoggedIn() {
 }
 
 // Функция для получения текущего администратора
-function getCurrentAdmin() {
+function getCurrentAdmin($conn) {
     if (!isAdminLoggedIn()) {
         return null;
     }
     
-    $conn = getDBConnection();
+    // $conn = getDBConnection();
     $stmt = $conn->prepare("SELECT * FROM admins WHERE id = ? AND is_active = 1");
     $stmt->bind_param("i", $_SESSION['admin_id']);
     $stmt->execute();
@@ -28,8 +28,8 @@ function getCurrentAdmin() {
 }
 
 // Функция для логина администратора
-function adminLogin($username, $password) {
-    $conn = getDBConnection();
+function adminLogin($conn, $username, $password) {
+    // $conn = getDBConnection();
     
     // Ищем администратора по username или email
     $stmt = $conn->prepare("SELECT * FROM admins WHERE (username = ? OR email = ?) AND is_active = 1");
@@ -87,8 +87,8 @@ function adminLogout() {
 }
 
 // Функция для логирования действий
-function logAdminAction($action, $description = null, $adminId = null) {
-    $conn = getDBConnection();
+function logAdminAction($conn, $action, $description = null, $adminId = null) {
+    // $conn = getDBConnection();
     $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
 
     if ($adminId === null && isset($_SESSION['admin_id'])) {

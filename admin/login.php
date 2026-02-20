@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $updateStmt->execute();
                 
                 // Логируем вход
-                logAdminAction('login', 'Успешный вход в систему', $admin['id']);
+                logAdminAction($conn, 'login', 'Успешный вход в систему', $admin['id']);
                 
                 header('Location: index.php');
                 exit();
@@ -57,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Вход в админ-панель - <?php echo getSetting('site_title'); ?></title>
+    <title>Вход в админ-панель - <?php echo getSetting($conn, 'site_title'); ?></title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="assets/css/login.css">
 </head>
@@ -68,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <i class="fas fa-lock"></i>
             </div>
             <h1>Админ-панель</h1>
-            <p><?php echo getSetting('site_title'); ?></p>
+            <p><?php echo getSetting($conn, 'site_title'); ?></p>
         </div>
         
         <?php if ($error): ?>
@@ -101,7 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </form>
         
         <div class="login-footer">
-            <p>© <?php echo date('Y'); ?> <?php echo getSetting('site_title'); ?></p>
+            <p>© <?php echo date('Y'); ?> <?php echo getSetting($conn, 'site_title'); ?></p>
             <p>Вернуться на <a href="../">главную</a></p>
         </div>
     </div>

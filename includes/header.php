@@ -13,10 +13,10 @@ $isAdmin = isset($_SESSION['admin_id']);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo getSetting('site_title'); ?></title>
+    <title><?php echo getSetting($conn, 'site_title'); ?></title>
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="assets/css/responsive.css">
-    <link rel="icon" href="<?php echo getSetting('favicon_path'); ?>" type="image/x-icon">
+    <link rel="icon" href="<?php echo getSetting($conn, 'favicon_path'); ?>" type="image/x-icon">
     <style>
 
     </style>
@@ -27,14 +27,14 @@ $isAdmin = isset($_SESSION['admin_id']);
             <div class="header-content">
                 <!-- Логотип -->
                 <a href="/index.php" class="logo">
-                    <img src="<?php echo getSetting('logo_path'); ?>" alt="<?php echo getSetting('company_name'); ?>">
+                    <img src="<?php echo getSetting($conn, 'logo_path'); ?>" alt="<?php echo getSetting($conn, 'company_name'); ?>">
                 </a>
                 
                 <!-- Основная навигация -->
                 <nav class="main-nav">
                     <?php
                     // Получаем все пункты меню из БД
-                    $menuItems = getMenuItems();
+                    $menuItems = getMenuItems($conn);
                     
                     // Первый пункт меню (О компании) отображаем отдельно
                     $firstItem = array_shift($menuItems);
@@ -63,9 +63,9 @@ $isAdmin = isset($_SESSION['admin_id']);
                 <!-- Правая часть -->
                 <div class="header-right">
                     <!-- Телефон -->
-                    <a href="tel:<?php echo preg_replace('/[^0-9+]/', '', getSetting('phone')); ?>" class="header-phone">
+                    <a href="tel:<?php echo preg_replace('/[^0-9+]/', '', getSetting($conn, 'phone')); ?>" class="header-phone">
                         <span class="phone-icon">📞</span>
-                        <span><?php echo getSetting('phone'); ?></span>
+                        <span><?php echo getSetting($conn, 'phone'); ?></span>
                     </a>
                     
                     <!-- Личный кабинет -->
@@ -92,7 +92,7 @@ $isAdmin = isset($_SESSION['admin_id']);
         <nav class="mobile-nav">
             <?php
             // Получаем все пункты меню для мобильной версии
-            $allMenuItems = getNavigationMenu();
+            $allMenuItems = getNavigationMenu($conn);
             foreach ($allMenuItems as $item) {
                 echo '<a href="' . $item['url'] . '" class="nav-link">' . $item['title'] . '</a>';
             }
@@ -100,9 +100,9 @@ $isAdmin = isset($_SESSION['admin_id']);
         </nav>
         
         <div class="mobile-contact">
-            <a href="tel:<?php echo preg_replace('/[^0-9+]/', '', getSetting('phone')); ?>" class="header-phone">
+            <a href="tel:<?php echo preg_replace('/[^0-9+]/', '', getSetting($conn, 'phone')); ?>" class="header-phone">
                 <span class="phone-icon">📞</span>
-                <span><?php echo getSetting('phone'); ?></span>
+                <span><?php echo getSetting($conn, 'phone'); ?></span>
             </a>
             
             <a href="https://v4.ntckumir.ru/" class="btn-personal">

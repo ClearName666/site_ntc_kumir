@@ -3,8 +3,8 @@
 require_once __DIR__ . '/../config/database.php';
 
 // Функция для получения контактов по типу
-function getContactsByType($type = null) {
-    $conn = getDBConnection();
+function getContactsByType($conn, $type = null) {
+    // $conn = getDBConnection();
     
     if ($type) {
         $stmt = $conn->prepare("SELECT * FROM contacts WHERE contact_type = ? AND is_active = 1 ORDER BY sort_order");
@@ -24,8 +24,8 @@ function getContactsByType($type = null) {
 }
 
 // Функция для получения всех офисов
-function getOffices() {
-    $conn = getDBConnection();
+function getOffices($conn) {
+    // $conn = getDBConnection();
     $result = $conn->query("SELECT * FROM offices ORDER BY is_main DESC, sort_order");
     
     $offices = [];
@@ -37,8 +37,8 @@ function getOffices() {
 }
 
 // Функция для получения основного офиса
-function getMainOffice() {
-    $conn = getDBConnection();
+function getMainOffice($conn) {
+    // $conn = getDBConnection();
     $result = $conn->query("SELECT * FROM offices WHERE is_main = 1 LIMIT 1");
     
     return $result->fetch_assoc();
@@ -171,8 +171,8 @@ function renderFAQ($faqItems, $collapsible = true) {
 }
 
 // Функция для сохранения сообщения из формы обратной связи
-function saveFeedback($name, $email, $phone, $subject, $message) {
-    $conn = getDBConnection();
+function saveFeedback($conn, $name, $email, $phone, $subject, $message) {
+    // $conn = getDBConnection();
     
     $stmt = $conn->prepare("INSERT INTO feedback (name, email, phone, subject, message) VALUES (?, ?, ?, ?, ?)");
     

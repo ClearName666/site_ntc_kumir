@@ -2,32 +2,35 @@
 // Подключаем функции с правильным путем
 require_once __DIR__. '/includes/functions.php';
 
+// подключаемся к базе 
+$conn = getDBConnection();
+
 // Проверяем, запрошена ли конкретная статья
 $article = null;
 if (isset($_GET['article']) && !empty($_GET['article'])) {
-    $article = getArticleBySlug($_GET['article']);
+    $article = getArticleBySlug($conn, $_GET['article']);
     
     // Увеличиваем счетчик просмотров если статья найдена
     if ($article) {
-        incrementArticleViews($article['id']);
+        incrementArticleViews($conn, $article['id']);
     }
 }
 
 // Устанавливаем мета-данные страницы
 if ($article) {
-    $pageTitle = htmlspecialchars($article['title']) . ' - ' . getSetting('site_title');
+    $pageTitle = htmlspecialchars($article['title']) . ' - ' . getSetting($conn, 'site_title');
     $pageDescription = htmlspecialchars(strip_tags($article['excerpt'] ?? $article['content']));
     $pageDescription = safeSubstr($pageDescription, 0, 160);
-    $pageImage = !empty($article['image_path']) ? $article['image_path'] : getSetting('logo_path');
+    $pageImage = !empty($article['image_path']) ? $article['image_path'] : getSetting($conn, 'logo_path');
 } else {
-    $pageTitle = 'Статьи - ' . getSetting('site_title');
+    $pageTitle = 'Статьи - ' . getSetting($conn, 'site_title');
     $pageDescription = 'Полезные материалы и новости о современных технологиях учета энергоресурсов';
-    $pageImage = getSetting('logo_path');
+    $pageImage = getSetting($conn, 'logo_path');
 }
 
 // Подготавливаем данные для страницы со статьями
 if (!$article) {
-    $articles = getArticles();
+    $articles = getArticles($conn);
 }
 
 // Определяем путь к header и footer
@@ -53,7 +56,7 @@ $footerPath = __DIR__. '/includes/footer.php';
     <?php endif; ?>
     
     <!-- Favicon -->
-    <link rel="icon" href="<?= getSetting('favicon_path') ?>" type="image/x-icon">
+    <link rel="icon" href="<?= getSetting($conn, 'favicon_path') ?>" type="image/x-icon">
     
     <!-- Стили -->
     <link rel="stylesheet" href="assets/css/style.css">

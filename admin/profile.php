@@ -1,37 +1,21 @@
 <?php
-// Определяем базовый путь
-define('BASE_PATH', dirname(__DIR__));
-
-// Подключаем функции
 require_once __DIR__. '/includes/functions.php';
 
-// Проверяем авторизацию
-requireAdminAuth();
-
 $conn = getDBConnection();
-$admin = getCurrentAdmin();
+requireAdminAuth($conn);
+$admin = getCurrentAdmin($conn);
 
 // Обработка обновления профиля
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['change_password'])) {
     $fullName = cleanInput($_POST['full_name'] ?? '');
     $email = cleanInput($_POST['email'] ?? '');
     
-    // Проверка уникальности email
-    $checkStmt = $conn->prepare("SELECT id FROM admins WHERE email = ? AND id != ?");
-    $checkStmt->bind_param("si", $email, $admin['id']);
-    $checkStmt->execute();
-    $checkResult = $checkStmt->get_result();
-    
-    if ($checkResult->num_rows > 0) {
+    if (isEmailTaken($conn, $email, $admin['id'])) {
         redirectWithNotification('profile.php', 'Пользователь с таким email уже существует', 'error');
     }
     
-    // Обновление данных
-    $stmt = $conn->prepare("UPDATE admins SET full_name = ?, email = ? WHERE id = ?");
-    $stmt->bind_param("ssi", $fullName, $email, $admin['id']);
-    
-    if ($stmt->execute()) {
-        logAdminAction('profile_update', 'Обновлен профиль администратора');
+    if (updateAdminProfile($conn, $admin['id'], $fullName, $email)) {
+        logAdminAction($conn, 'profile_update', 'Обновлен профиль администратора');
         redirectWithNotification('profile.php', 'Профиль успешно обновлен', 'success');
     } else {
         redirectWithNotification('profile.php', 'Ошибка при обновлении профиля', 'error');
@@ -44,42 +28,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_password'])) {
     $newPassword = $_POST['new_password'] ?? '';
     $confirmPassword = $_POST['confirm_password'] ?? '';
     
-    // Проверка текущего пароля
     if (!password_verify($currentPassword, $admin['password_hash'])) {
         redirectWithNotification('profile.php', 'Неверный текущий пароль', 'error');
     }
     
-    if ($newPassword !== $confirmPassword) {
-        redirectWithNotification('profile.php', 'Новые пароли не совпадают', 'error');
+    if ($newPassword !== $confirmPassword || strlen($newPassword) < 6) {
+        redirectWithNotification('profile.php', 'Ошибка в новом пароле или его подтверждении', 'error');
     }
     
-    if (strlen($newPassword) < 6) {
-        redirectWithNotification('profile.php', 'Пароль должен быть не менее 6 символов', 'error');
-    }
-    
-    $newPasswordHash = password_hash($newPassword, PASSWORD_DEFAULT);
-    $stmt = $conn->prepare("UPDATE admins SET password_hash = ? WHERE id = ?");
-    $stmt->bind_param("si", $newPasswordHash, $admin['id']);
-    
-    if ($stmt->execute()) {
-        logAdminAction('password_change', 'Изменен пароль администратора');
+    if (updateAdminPassword($conn, $admin['id'], $newPassword)) {
+        logAdminAction($conn, 'password_change', 'Изменен пароль администратора');
         redirectWithNotification('profile.php', 'Пароль успешно изменен', 'success');
-    } else {
-        redirectWithNotification('profile.php', 'Ошибка при изменении пароля', 'error');
     }
 }
 
-// Получаем статистику администратора
-$stats_admin = [
-    'logins' => $conn->query("SELECT COUNT(*) as count FROM admin_logs WHERE admin_id = {$admin['id']} AND action LIKE '%login%'")->fetch_assoc()['count'],
-    'actions' => $conn->query("SELECT COUNT(*) as count FROM admin_logs WHERE admin_id = {$admin['id']}")->fetch_assoc()['count'],
-    'last_login' => $conn->query("SELECT created_at FROM admin_logs WHERE admin_id = {$admin['id']} AND action = 'login' ORDER BY created_at DESC LIMIT 1")->fetch_assoc()['created_at'] ?? null,
-];
+// Получаем статистику через одну функцию
+$stats_admin = getAdminStats($conn, $admin['id']);
 
-// Подключаем шапку
+// Подключаем шапку и меню...
 require_once __DIR__. '/includes/header.php';
-
-// Подключаем меню
 require_once __DIR__. '/includes/menu.php';
 ?>
 

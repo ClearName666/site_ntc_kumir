@@ -1,77 +1,35 @@
 <?php
-
-// Подключаем функции
 require_once __DIR__. '/includes/functions.php';
 
-// Проверяем авторизацию
-requireAdminAuth();
+$conn = getDBConnection();
+requireAdminAuth($conn);
 
-// Проверяем права доступа
-if (!hasPermission('admin')) {
-    redirectWithNotification('index.php', 'Недостаточно прав для доступа к этой странице', 'error');
+if (!hasPermission($conn, 'admin')) {
+    redirectWithNotification('index.php', 'Недостаточно прав', 'error');
 }
 
-$conn = getDBConnection();
-
-// Обработка очистки логов
+// 1. Обработка очистки (POST)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_logs'])) {
     $days = intval($_POST['days'] ?? 0);
-    
-    if ($days > 0) {
-        $date = date('Y-m-d H:i:s', strtotime("-$days days"));
-        $stmt = $conn->prepare("DELETE FROM admin_logs WHERE created_at < ?");
-        $stmt->bind_param("s", $date);
-        
-        if ($stmt->execute()) {
-            logAdminAction('logs_clear', "Очищены логи старше $days дней");
-            redirectWithNotification('logs.php', 'Логи успешно очищены', 'success');
-        } else {
-            redirectWithNotification('logs.php', 'Ошибка при очистке логов', 'error');
-        }
+    if ($days > 0 && clearOldLogs($conn, $days)) {
+        logAdminAction($conn, 'logs_clear', "Очищены логи старше $days дней");
+        redirectWithNotification('logs.php', 'Логи успешно очищены', 'success');
     }
 }
 
-// Фильтрация логов
-$filter = [];
-$where = "1=1";
-$params = [];
-$types = "";
+// 2. Сбор фильтров из GET
+$filters = [
+    'admin_id'  => $_GET['admin_id'] ?? null,
+    'action'    => $_GET['action'] ?? null,
+    'date_from' => $_GET['date_from'] ?? null,
+    'date_to'   => $_GET['date_to'] ?? null
+];
 
-if (!empty($_GET['admin_id'])) {
-    $filter['admin_id'] = intval($_GET['admin_id']);
-    $where .= " AND al.admin_id = ?";
-    $params[] = $filter['admin_id'];
-    $types .= "i";
-}
+// 3. Получение данных
+$admins = getAdminsList($conn);
+$logsResult = getAdminLogs($conn, $filters);
 
-if (!empty($_GET['action'])) {
-    $filter['action'] = cleanInput($_GET['action']);
-    $where .= " AND al.action LIKE ?";
-    $params[] = "%" . $filter['action'] . "%";
-    $types .= "s";
-}
-
-if (!empty($_GET['date_from'])) {
-    $filter['date_from'] = $_GET['date_from'];
-    $where .= " AND DATE(al.created_at) >= ?";
-    $params[] = $filter['date_from'];
-    $types .= "s";
-}
-
-if (!empty($_GET['date_to'])) {
-    $filter['date_to'] = $_GET['date_to'];
-    $where .= " AND DATE(al.created_at) <= ?";
-    $params[] = $filter['date_to'];
-    $types .= "s";
-}
-
-// Получаем список администраторов для фильтра
-$admins = $conn->query("SELECT id, username FROM admins ORDER BY username")->fetch_all(MYSQLI_ASSOC);
-
-// Подключаем шапку
 require_once __DIR__. '/includes/header.php';
-
-// Подключаем меню
 require_once __DIR__. '/includes/menu.php';
 ?>
 
@@ -164,26 +122,7 @@ require_once __DIR__. '/includes/menu.php';
                             </tr>
                         </thead>
                         <tbody>
-                            <?php
-                            // Подготовка запроса с фильтрами
-                            $query = "SELECT al.*, a.username 
-                                     FROM admin_logs al 
-                                     LEFT JOIN admins a ON al.admin_id = a.id 
-                                     WHERE $where 
-                                     ORDER BY al.created_at DESC 
-                                     LIMIT 100";
-                            
-                            if (!empty($params)) {
-                                $stmt = $conn->prepare($query);
-                                $stmt->bind_param($types, ...$params);
-                                $stmt->execute();
-                                $result = $stmt->get_result();
-                            } else {
-                                $result = $conn->query($query);
-                            }
-                            
-                            while ($row = $result->fetch_assoc()):
-                            ?>
+                            <?php while ($row = $logsResult->fetch_assoc()): ?>
                             <tr>
                                 <td><?php echo $row['id']; ?></td>
                                 <td>
@@ -192,9 +131,9 @@ require_once __DIR__. '/includes/menu.php';
                                 </td>
                                 <td>
                                     <?php if ($row['username']): ?>
-                                    <strong><?php echo htmlspecialchars($row['username']); ?></strong>
+                                        <strong><?php echo htmlspecialchars($row['username']); ?></strong>
                                     <?php else: ?>
-                                    <span class="text-muted">Система</span>
+                                        <span class="text-muted">Система</span>
                                     <?php endif; ?>
                                 </td>
                                 <td>
@@ -203,9 +142,7 @@ require_once __DIR__. '/includes/menu.php';
                                     </span>
                                 </td>
                                 <td><?php echo htmlspecialchars($row['description'] ?? '—'); ?></td>
-                                <td>
-                                    <code><?php echo htmlspecialchars($row['ip_address']); ?></code>
-                                </td>
+                                <td><code><?php echo htmlspecialchars($row['ip_address']); ?></code></td>
                             </tr>
                             <?php endwhile; ?>
                         </tbody>

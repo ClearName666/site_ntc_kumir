@@ -3,29 +3,31 @@
 // Подключаем функции
 require_once __DIR__. '/includes/functions.php';
 
+// подключаемся к базе 
+$conn = getDBConnection();
+
 // Проверяем авторизацию
-requireAdminAuth();
+requireAdminAuth($conn);
 
 // Проверяем права доступа
-if (!hasPermission('admin')) {
+if (!hasPermission($conn, 'admin')) {
     redirectWithNotification('index.php', 'Недостаточно прав для доступа к этой странице', 'error');
 }
 
-$conn = getDBConnection();
 $action = $_GET['action'] ?? 'list';
 $id = intval($_GET['id'] ?? 0);
 
 // Обработка действий (Прочитать/Удалить)
 if ($action === 'read' && $id) {
-    if (markFeedbackAsRead($id)) {
-        logAdminAction('feedback_read', "Обращение ID $id помечено как прочитанное");
+    if (markFeedbackAsRead($conn, $id)) {
+        logAdminAction($conn, 'feedback_read', "Обращение ID $id помечено как прочитанное");
         redirectWithNotification('feedback.php', 'Обращение помечено как прочитанное', 'success');
     }
 }
 
 if ($action === 'delete' && $id) {
-    if (deleteFeedback($id)) {
-        logAdminAction('feedback_delete', "Удалено обращение ID $id");
+    if (deleteFeedback($conn, $id)) {
+        logAdminAction($conn, 'feedback_delete', "Удалено обращение ID $id");
         redirectWithNotification('feedback.php', 'Обращение успешно удалено', 'success');
     } else {
         redirectWithNotification('feedback.php', 'Ошибка при удалении', 'error');
@@ -33,7 +35,7 @@ if ($action === 'delete' && $id) {
 }
 
 // Получаем список обращений через функцию, которую мы добавили ранее
-$feedbacks = getAllFeedback();
+$feedbacks = getAllFeedback($conn);
 
 // Подключаем шапку и меню
 require_once __DIR__. '/includes/header.php';

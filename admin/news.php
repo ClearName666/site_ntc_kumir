@@ -1,91 +1,66 @@
 <?php
 
-// Подключаем функции
 require_once __DIR__. '/includes/functions.php';
 
-// Проверяем авторизацию
-requireAdminAuth();
+$conn = getDBConnection();
+requireAdminAuth($conn);
 
-// Проверяем права доступа
-if (!hasPermission('editor')) {
-    redirectWithNotification('index.php', 'Недостаточно прав для доступа к этой странице', 'error');
+if (!hasPermission($conn, 'editor')) {
+    redirectWithNotification('index.php', 'Недостаточно прав', 'error');
 }
 
-$conn = getDBConnection();
 $action = $_GET['action'] ?? 'list';
-$id = $_GET['id'] ?? 0;
+$id = (int)($_GET['id'] ?? 0);
 
-// Обработка добавления/редактирования
+// Обработка POST (Добавление и Редактирование)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = cleanInput($_POST['title'] ?? '');
-    $excerpt = cleanInput($_POST['excerpt'] ?? '');
-    $content = $_POST['content'] ?? '';
-    $author = cleanInput($_POST['author'] ?? '');
-    $isPublished = isset($_POST['is_published']) ? 1 : 0;
-    $publishedAt = !empty($_POST['published_at']) ? $_POST['published_at'] : null;
-    $imagePath = $_POST['existing_image'] ?? '';
     
-    // Генерация слага
-    $slug = createSlug($title);
+    // Подготовка данных в массив
+    $data = [
+        'title'        => $title,
+        'excerpt'      => cleanInput($_POST['excerpt'] ?? ''),
+        'content'      => $_POST['content'] ?? '',
+        'author'       => cleanInput($_POST['author'] ?? ''),
+        'is_published' => isset($_POST['is_published']) ? 1 : 0,
+        'published_at' => !empty($_POST['published_at']) ? $_POST['published_at'] : null,
+        'image_path'   => $_POST['existing_image'] ?? '',
+        'slug'         => createSlug($title)
+    ];
+
+    // Уникализация слага
     $counter = 1;
-    $originalSlug = $slug;
-    
-    while (!isSlugUnique('news', $slug, $id)) {
-        $slug = $originalSlug . '-' . $counter;
-        $counter++;
+    $originalSlug = $data['slug'];
+    while (!isSlugUnique($conn, 'news', $data['slug'], $id)) {
+        $data['slug'] = $originalSlug . '-' . $counter++;
     }
-    
-    // Загрузка изображения
+
+    // Загрузка фото
     if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
         $uploadResult = uploadImage($_FILES['image']);
-        if ($uploadResult['success']) {
-            $imagePath = $uploadResult['path'];
-        }
+        if ($uploadResult['success']) $data['image_path'] = $uploadResult['path'];
     }
-    
-    if ($action === 'add' || ($action === 'edit' && $id)) {
-        if ($action === 'add') {
-            $stmt = $conn->prepare("INSERT INTO news (title, slug, excerpt, content, author, image_path, is_published, published_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("ssssssis", $title, $slug, $excerpt, $content, $author, $imagePath, $isPublished, $publishedAt);
-            
-            if ($stmt->execute()) {
-                $newId = $stmt->insert_id;
-                logAdminAction('news_add', "Добавлена новость: $title");
-                redirectWithNotification('news.php', 'Новость успешно добавлена', 'success');
-            } else {
-                redirectWithNotification('news.php?action=add', 'Ошибка при добавлении новости', 'error');
-            }
-        } else {
-            $stmt = $conn->prepare("UPDATE news SET title = ?, slug = ?, excerpt = ?, content = ?, author = ?, image_path = ?, is_published = ?, published_at = ?, updated_at = NOW() WHERE id = ?");
-            $stmt->bind_param("ssssssisi", $title, $slug, $excerpt, $content, $author, $imagePath, $isPublished, $publishedAt, $id);
-            
-            if ($stmt->execute()) {
-                logAdminAction('news_edit', "Отредактирована новость: $title");
-                redirectWithNotification('news.php', 'Новость успешно обновлена', 'success');
-            } else {
-                redirectWithNotification('news.php?action=edit&id=' . $id, 'Ошибка при обновлении новости', 'error');
-            }
+
+    // Вызов функций сохранения
+    if ($action === 'add') {
+        if (addNews($conn, $data)) {
+            logAdminAction($conn, 'news_add', "Добавлена новость: $title");
+            redirectWithNotification('news.php', 'Новость успешно добавлена', 'success');
+        }
+    } elseif ($action === 'edit' && $id) {
+        if (updateNews($conn, $id, $data)) {
+            logAdminAction($conn, 'news_edit', "Отредактирована новость: $title");
+            redirectWithNotification('news.php', 'Новость успешно обновлена', 'success');
         }
     }
 }
 
 // Обработка удаления
 if ($action === 'delete' && $id) {
-    // Получаем информацию о новости для лога
-    $stmt = $conn->prepare("SELECT title FROM news WHERE id = ?");
-    $stmt->bind_param("i", $id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $news = $result->fetch_assoc();
-    
-    $stmt = $conn->prepare("DELETE FROM news WHERE id = ?");
-    $stmt->bind_param("i", $id);
-    
-    if ($stmt->execute()) {
-        logAdminAction('news_delete', "Удалена новость: " . ($news['title'] ?? 'ID ' . $id));
+    $news = getNewsById($conn, $id);
+    if ($news && deleteNews($conn, $id)) {
+        logAdminAction($conn, 'news_delete', "Удалена новость: " . $news['title']);
         redirectWithNotification('news.php', 'Новость успешно удалена', 'success');
-    } else {
-        redirectWithNotification('news.php', 'Ошибка при удалении новости', 'error');
     }
 }
 
@@ -147,11 +122,8 @@ require_once __DIR__. '/includes/menu.php';
                         </thead>
                         <tbody>
                             <?php
-                            $pagination = getPagination('news', 10);
-                            $stmt = $conn->prepare("SELECT * FROM news ORDER BY created_at DESC LIMIT ? OFFSET ?");
-                            $stmt->bind_param("ii", $pagination['perPage'], $pagination['offset']);
-                            $stmt->execute();
-                            $result = $stmt->get_result();
+                            $pagination = getPagination($conn, 'news', 10);
+                            $result = getNewsList($conn, $pagination['perPage'], $pagination['offset']);
                             
                             while ($row = $result->fetch_assoc()):
                             ?>
@@ -197,12 +169,7 @@ require_once __DIR__. '/includes/menu.php';
         <?php
         $news = [];
         if ($action === 'edit' && $id) {
-            $stmt = $conn->prepare("SELECT * FROM news WHERE id = ?");
-            $stmt->bind_param("i", $id);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            $news = $result->fetch_assoc();
-            
+            $news = getNewsById($conn, $id);
             if (!$news) {
                 redirectWithNotification('news.php', 'Новость не найдена', 'error');
             }

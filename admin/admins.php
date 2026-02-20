@@ -3,15 +3,18 @@
 // Подключаем функции
 require_once __DIR__. '/includes/functions.php';
 
+// подключаемся к базе 
+$conn = getDBConnection();
+
 // Проверяем авторизацию
-requireAdminAuth();
+requireAdminAuth($conn);
 
 // Проверяем права доступа (только superadmin)
-if (!hasPermission('superadmin')) {
+if (!hasPermission($conn, 'superadmin')) {
     redirectWithNotification('index.php', 'Недостаточно прав для доступа к этой странице', 'error');
 }
 
-$conn = getDBConnection();
+
 $action = $_GET['action'] ?? 'list';
 $id = $_GET['id'] ?? 0;
 
@@ -19,97 +22,53 @@ $id = $_GET['id'] ?? 0;
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = cleanInput($_POST['username'] ?? '');
     $email = cleanInput($_POST['email'] ?? '');
-    $fullName = cleanInput($_POST['full_name'] ?? '');
-    $role = cleanInput($_POST['role'] ?? 'admin');
-    $isActive = isset($_POST['is_active']) ? 1 : 0;
+    $password = $_POST['password'] ?? '';
+    $passwordConfirm = $_POST['password_confirm'] ?? '';
     
-    // Проверка уникальности username и email
-    $checkStmt = $conn->prepare("SELECT id FROM admins WHERE (username = ? OR email = ?) AND id != ?");
-    $checkStmt->bind_param("ssi", $username, $email, $id);
-    $checkStmt->execute();
-    $checkResult = $checkStmt->get_result();
-    
-    if ($checkResult->num_rows > 0) {
-        redirectWithNotification('admins.php?action=' . $action . ($id ? '&id=' . $id : ''), 
-                               'Пользователь с таким именем или email уже существует', 'error');
+    // Проверка уникальности через функцию
+    if (!isAdminUnique($conn, $username, $email, $id)) {
+        redirectWithNotification("admins.php?action=$action&id=$id", 'Пользователь уже существует', 'error');
     }
     
-    if ($action === 'add' || ($action === 'edit' && $id)) {
-        if ($action === 'add') {
-            $password = $_POST['password'] ?? '';
-            $passwordConfirm = $_POST['password_confirm'] ?? '';
-            
-            if (empty($password)) {
-                redirectWithNotification('admins.php?action=add', 'Пароль обязателен', 'error');
-            }
-            
-            if ($password !== $passwordConfirm) {
-                redirectWithNotification('admins.php?action=add', 'Пароли не совпадают', 'error');
-            }
-            
-            $passwordHash = password_hash($password, PASSWORD_DEFAULT);
-            
-            $stmt = $conn->prepare("INSERT INTO admins (username, email, password_hash, full_name, role, is_active) VALUES (?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("sssssi", $username, $email, $passwordHash, $fullName, $role, $isActive);
-            
-            if ($stmt->execute()) {
-                $newId = $stmt->insert_id;
-                logAdminAction('admin_add', "Добавлен администратор: $username");
-                redirectWithNotification('admins.php', 'Администратор успешно добавлен', 'success');
-            } else {
-                redirectWithNotification('admins.php?action=add', 'Ошибка при добавлении администратора', 'error');
-            }
-        } else {
-            $updatePassword = !empty($_POST['password']);
-            
-            if ($updatePassword) {
-                $password = $_POST['password'] ?? '';
-                $passwordConfirm = $_POST['password_confirm'] ?? '';
-                
-                if ($password !== $passwordConfirm) {
-                    redirectWithNotification('admins.php?action=edit&id=' . $id, 'Пароли не совпадают', 'error');
-                }
-                
-                $passwordHash = password_hash($password, PASSWORD_DEFAULT);
-                $stmt = $conn->prepare("UPDATE admins SET username = ?, email = ?, password_hash = ?, full_name = ?, role = ?, is_active = ? WHERE id = ?");
-                $stmt->bind_param("sssssii", $username, $email, $passwordHash, $fullName, $role, $isActive, $id);
-            } else {
-                $stmt = $conn->prepare("UPDATE admins SET username = ?, email = ?, full_name = ?, role = ?, is_active = ? WHERE id = ?");
-                $stmt->bind_param("ssssii", $username, $email, $fullName, $role, $isActive, $id);
-            }
-            
-            if ($stmt->execute()) {
-                logAdminAction('admin_edit', "Отредактирован администратор: $username");
-                redirectWithNotification('admins.php', 'Администратор успешно обновлен', 'success');
-            } else {
-                redirectWithNotification('admins.php?action=edit&id=' . $id, 'Ошибка при обновлении администратора', 'error');
-            }
+    // Подготовка данных
+    $data = [
+        'username'  => $username,
+        'email'     => $email,
+        'full_name' => cleanInput($_POST['full_name'] ?? ''),
+        'role'      => cleanInput($_POST['role'] ?? 'admin'),
+        'is_active' => isset($_POST['is_active']) ? 1 : 0,
+        'password'  => $password
+    ];
+
+    if ($action === 'add') {
+        if (empty($password) || $password !== $passwordConfirm) {
+            redirectWithNotification('admins.php?action=add', 'Ошибка в паролях', 'error');
+        }
+        if (addAdmin($conn, $data)) {
+            logAdminAction($conn, 'admin_add', "Добавлен: $username");
+            redirectWithNotification('admins.php', 'Админ добавлен', 'success');
+        }
+    } else {
+        if (!empty($password) && $password !== $passwordConfirm) {
+            redirectWithNotification("admins.php?action=edit&id=$id", 'Пароли не совпадают', 'error');
+        }
+        if (updateAdmin($conn, $id, $data)) {
+            logAdminAction($conn, 'admin_edit', "Обновлен: $username");
+            redirectWithNotification('admins.php', 'Данные обновлены', 'success');
         }
     }
 }
 
 // Обработка удаления
 if ($action === 'delete' && $id) {
-    // Нельзя удалить самого себя
     if ($id == $_SESSION['admin_id']) {
-        redirectWithNotification('admins.php', 'Нельзя удалить самого себя', 'error');
+        redirectWithNotification('admins.php', 'Нельзя удалить себя', 'error');
     }
     
-    // Получаем информацию об администраторе для лога
-    $stmt = $conn->prepare("SELECT username FROM admins WHERE id = ?");
-    $stmt->bind_param("i", $id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $admin = $result->fetch_assoc();
-    
-    $stmt = $conn->prepare("DELETE FROM admins WHERE id = ?");
-    $stmt->bind_param("i", $id);
-    
-    if ($stmt->execute()) {
-        logAdminAction('admin_delete', "Удален администратор: " . ($admin['username'] ?? 'ID ' . $id));
-        redirectWithNotification('admins.php', 'Администратор успешно удален', 'success');
-    } else {
-        redirectWithNotification('admins.php', 'Ошибка при удалении администратора', 'error');
+    $adminInfo = getAdminById($conn, $id);
+    if (deleteAdmin($conn, $id)) {
+        logAdminAction($conn, 'admin_delete', "Удален: " . ($adminInfo['username'] ?? $id));
+        redirectWithNotification('admins.php', 'Удалено', 'success');
     }
 }
 
@@ -172,8 +131,7 @@ require_once __DIR__. '/includes/menu.php';
                         </thead>
                         <tbody>
                             <?php
-                            $admins = $conn->query("SELECT * FROM admins ORDER BY role, username")->fetch_all(MYSQLI_ASSOC);
-                            
+                            $admins = getAllAdmins($conn);
                             foreach ($admins as $admin):
                             ?>
                             <tr>
@@ -233,12 +191,7 @@ require_once __DIR__. '/includes/menu.php';
         <?php
         $adminData = [];
         if ($action === 'edit' && $id) {
-            $stmt = $conn->prepare("SELECT * FROM admins WHERE id = ?");
-            $stmt->bind_param("i", $id);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            $adminData = $result->fetch_assoc();
-            
+            $adminData = getAdminById($conn, $id);
             if (!$adminData) {
                 redirectWithNotification('admins.php', 'Администратор не найден', 'error');
             }

@@ -23,8 +23,8 @@ require_once __DIR__ . '/auth-functions.php';
 
 
 // Функция для получения изображения
-function getImage($key) {
-    $conn = getDBConnection();
+function getImage($conn, $key) {
+    // $conn = getDBConnection();
     $stmt = $conn->prepare("SELECT image_path, alt_text FROM images WHERE image_key = ?");
     $stmt->bind_param("s", $key);
     $stmt->execute();
@@ -38,8 +38,8 @@ function getImage($key) {
 }
 
 // Функция для получения координат карты
-function getMapLocation() {
-    $conn = getDBConnection();
+function getMapLocation($conn) {
+    // $conn = getDBConnection();
     $result = $conn->query("SELECT latitude, longitude, zoom, marker_title FROM map_location LIMIT 1");
     
     if ($row = $result->fetch_assoc()) {
@@ -50,8 +50,8 @@ function getMapLocation() {
 }
 
 // Остальные функции остаются как были, но обновим advantages для отображения в две колонки
-function renderAdvantages() {
-    $advantages = getAdvantages();
+function renderAdvantages($conn) {
+    $advantages = getAdvantages($conn);
     echo '<div class="advantages-grid">';
     foreach ($advantages as $advantage) {
         echo '<div class="advantage-item">';
@@ -68,22 +68,22 @@ function renderAdvantages() {
     echo '</div>';
 }
 
-function renderMenu() {
-    $menuItems = getMenuItems();
+function renderMenu($conn) {
+    $menuItems = getMenuItems($conn);
     foreach ($menuItems as $item) {
         echo '<a href="' . $item['url'] . '" class="nav-link">' . $item['title'] . '</a>';
     }
 }
 
-function renderFeatures() {
-    $features = getFeatures();
+function renderFeatures($conn) {
+    $features = getFeatures($conn);
     foreach ($features as $feature) {
         echo '<div class="feature-item">' . $feature['title'] . '</div>';
     }
 }
 
-function renderCards() {
-    $cards = getCards();
+function renderCards($conn) {
+    $cards = getCards($conn);
     foreach ($cards as $card) {
         echo '<div class="card" style="border-bottom-color: ' . $card['color'] . '">';
         echo '<div class="card-image">';
@@ -97,8 +97,8 @@ function renderCards() {
     }
 }
 
-function renderStatistics() {
-    $stats = getStatistics();
+function renderStatistics($conn) {
+    $stats = getStatistics($conn);
     foreach ($stats as $stat) {
         echo '<div class="stat-item">';
         echo '<div class="stat-value">' . $stat['value'] . '</div>';
@@ -109,8 +109,8 @@ function renderStatistics() {
 }
 
 // Функция для получения меню из базы данных
-function getNavigationMenu() {
-    $conn = getDBConnection();
+function getNavigationMenu($conn) {
+    // $conn = getDBConnection();
     $result = $conn->query("SELECT * FROM menu_items WHERE is_active = 1 ORDER BY sort_order");
     $items = [];
     
@@ -122,8 +122,8 @@ function getNavigationMenu() {
 }
 
 // Функция для рендеринга навигации
-function renderNavigation() {
-    $menuItems = getNavigationMenu();
+function renderNavigation($conn) {
+    $menuItems = getNavigationMenu($conn);
     
     // Основные элементы меню
     $mainItems = ['О компании'];

@@ -2,12 +2,18 @@
 
 
 require_once __DIR__. '/includes/functions.php';
+
+
+// подключаемся к базе 
+$conn = getDBConnection();
+
+$mainTitle = getContentBlock($conn, 'main_title');
+$mainBg = getImage($conn, 'main_background');
+$heroImage = getImage($conn, 'hero_foreground');
+$mapLocation = getMapLocation($conn);
+
 require_once __DIR__. '/includes/header.php';
 
-$mainTitle = getContentBlock('main_title');
-$mainBg = getImage('main_background');
-$heroImage = getImage('hero_foreground');
-$mapLocation = getMapLocation();
 ?>
 
 <main>
@@ -24,7 +30,7 @@ $mapLocation = getMapLocation();
                         <h1 class="main-title"><?php echo $mainTitle['content']; ?></h1>
                         
                         <div class="features-list">
-                            <?php renderFeatures(); ?>
+                            <?php renderFeatures($conn); ?>
                         </div>
                         
                         <!-- Убираем дублирование телефона и кнопки, т.к. они уже в header -->
@@ -62,7 +68,7 @@ $mapLocation = getMapLocation();
         <div class="container">
             <h2 class="section-title">Наша продукция</h2>
             <div class="cards-container">
-                <?php renderCards(); ?>
+                <?php renderCards($conn); ?>
             </div>
         </div>
     </section>
@@ -70,8 +76,8 @@ $mapLocation = getMapLocation();
     <!-- Advantages Section -->
     <section class="advantages-section">
         <div class="container">
-            <h2 class="section-title"><?php echo getContentBlock('advantages_title')['content']; ?></h2>
-            <?php renderAdvantages(); ?>
+            <h2 class="section-title"><?php echo getContentBlock($conn, 'advantages_title')['content']; ?></h2>
+            <?php renderAdvantages($conn); ?>
         </div>
     </section>
 
@@ -79,29 +85,29 @@ $mapLocation = getMapLocation();
     <section class="about-section">
         <div class="container about-container">
             <div class="about-stats">
-                <?php renderStatistics(); ?>
+                <?php renderStatistics($conn); ?>
             </div>
             
             <div class="about-content">
                 <div class="video-section">
-                    <?php $videoThumb = getImage('video_thumbnail'); ?>
+                    <?php $videoThumb = getImage($conn, 'video_thumbnail'); ?>
                     <div class="video-container">
                         <img src="<?php echo $videoThumb['image_path']; ?>" alt="<?php echo $videoThumb['alt_text']; ?>" class="video-thumbnail">
                         <div class="play-button">
                             <span>▶</span>
                         </div>
                         <div class="video-title">
-                            <?php echo getContentBlock('video_button_text')['content']; ?>
+                            <?php echo getContentBlock($conn, 'video_button_text')['content']; ?>
                         </div>
                     </div>
                 </div>
                 
                 <div class="company-info">
                     <?php 
-                    $aboutContent = getContentBlock('about_content');
-                    $aboutFeatures = getContentBlock('about_features');
+                    $aboutContent = getContentBlock($conn, 'about_content');
+                    $aboutFeatures = getContentBlock($conn, 'about_features');
                     ?>
-                    <h2><?php echo getContentBlock('about_title')['content']; ?></h2>
+                    <h2><?php echo getContentBlock($conn, 'about_title')['content']; ?></h2>
                     
                     <ul class="company-features">
                         <?php

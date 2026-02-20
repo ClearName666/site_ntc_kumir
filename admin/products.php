@@ -3,20 +3,22 @@
 // Подключаем функции
 require_once __DIR__. '/includes/functions.php';
 
+// подключаемся к базе 
+$conn = getDBConnection();
+
 // Проверяем авторизацию
-requireAdminAuth();
+requireAdminAuth($conn);
 
 // Проверяем права доступа
-if (!hasPermission('editor')) {
+if (!hasPermission($conn, 'editor')) {
     redirectWithNotification('index.php', 'Недостаточно прав для доступа к этой странице', 'error');
 }
 
-$conn = getDBConnection();
 $action = $_GET['action'] ?? 'list';
 $id = $_GET['id'] ?? 0;
 
-// Получаем список категорий
-$categories = $conn->query("SELECT id, name FROM product_categories WHERE is_active = 1 ORDER BY sort_order")->fetch_all(MYSQLI_ASSOC);
+// Получаем список категорий через функцию
+$categories = getActiveCategories($conn);
 
 // Обработка добавления/редактирования
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -53,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $counter = 1;
     $originalSlug = $slug;
     
-    while (!isSlugUnique('products', $slug, $id)) {
+    while (!isSlugUnique($conn, 'products', $slug, $id)) {
         $slug = $originalSlug . '-' . $counter;
         $counter++;
     }
@@ -66,49 +68,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
     
-    if ($action === 'add' || ($action === 'edit' && $id)) {
-        if ($action === 'add') {
-            $stmt = $conn->prepare("INSERT INTO products (category_id, name, slug, description, full_description, image_path, price, specifications, is_available, sort_order, is_active) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("isssssdsiii", $categoryId, $name, $slug, $description, $fullDescription, $imagePath, $price, $specificationsJson, $isAvailable, $sortOrder, $isActive);
-            
-            if ($stmt->execute()) {
-                $newId = $stmt->insert_id;
-                logAdminAction('product_add', "Добавлен товар: " . safeSubstr($name, 0, 50));
-                redirectWithNotification('products.php', 'Товар успешно добавлен', 'success');
-            } else {
-                redirectWithNotification('products.php?action=add', 'Ошибка при добавлении товара', 'error');
-            }
-        } else {
-            $stmt = $conn->prepare("UPDATE products SET category_id = ?, name = ?, slug = ?, description = ?, full_description = ?, image_path = ?, price = ?, specifications = ?, is_available = ?, sort_order = ?, is_active = ?, updated_at = NOW() WHERE id = ?");
-            $stmt->bind_param("isssssdsiiii", $categoryId, $name, $slug, $description, $fullDescription, $imagePath, $price, $specificationsJson, $isAvailable, $sortOrder, $isActive, $id);
-            
-            if ($stmt->execute()) {
-                logAdminAction('product_edit', "Отредактирован товар: " . safeSubstr($name, 0, 50));
-                redirectWithNotification('products.php', 'Товар успешно обновлен', 'success');
-            } else {
-                redirectWithNotification('products.php?action=edit&id=' . $id, 'Ошибка при обновлении товара', 'error');
-            }
+    // Собираем все данные в массив для функций
+    $productData = [
+        'category_id' => intval($_POST['category_id'] ?? 0),
+        'name' => cleanInput($_POST['name'] ?? ''),
+        'slug' => $slug, // уже сгенерированный вами ранее в коде
+        'description' => cleanInput($_POST['description'] ?? ''),
+        'full_description' => $_POST['full_description'] ?? '',
+        'image_path' => $imagePath,
+        'price' => !empty($_POST['price']) ? floatval($_POST['price']) : null,
+        'specifications' => $specificationsJson,
+        'is_available' => isset($_POST['is_available']) ? 1 : 0,
+        'is_active' => isset($_POST['is_active']) ? 1 : 0,
+        'sort_order' => intval($_POST['sort_order'] ?? 0)
+    ];
+
+    if ($action === 'add') {
+        $newId = addProduct($conn, $productData);
+        if ($newId) {
+            logAdminAction($conn, 'product_add', "Добавлен товар: " . safeSubstr($productData['name'], 0, 50));
+            redirectWithNotification('products.php', 'Товар успешно добавлен', 'success');
+        }
+    } elseif ($action === 'edit' && $id) {
+        if (updateProduct($conn, $id, $productData)) {
+            logAdminAction($conn, 'product_edit', "Отредактирован товар: " . safeSubstr($productData['name'], 0, 50));
+            redirectWithNotification('products.php', 'Товар успешно обновлен', 'success');
         }
     }
 }
 
 // Обработка удаления
 if ($action === 'delete' && $id) {
-    // Получаем информацию о товаре для лога
-    $stmt = $conn->prepare("SELECT name FROM products WHERE id = ?");
-    $stmt->bind_param("i", $id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $product = $result->fetch_assoc();
-    
-    $stmt = $conn->prepare("DELETE FROM products WHERE id = ?");
-    $stmt->bind_param("i", $id);
-    
-    if ($stmt->execute()) {
-        logAdminAction('product_delete', "Удален товар: " . safeSubstr($product['name'] ?? '', 0, 50));
+    $product = getProductById($conn, $id); // Используем функцию для лога
+    if ($product && deleteProduct($conn, $id)) {
+        logAdminAction($conn, 'product_delete', "Удален товар: " . $product['name']);
         redirectWithNotification('products.php', 'Товар успешно удален', 'success');
-    } else {
-        redirectWithNotification('products.php', 'Ошибка при удалении товара', 'error');
     }
 }
 
@@ -175,17 +169,8 @@ require_once __DIR__. '/includes/menu.php';
                         </thead>
                         <tbody>
                             <?php
-                            $pagination = getPagination('products', 10);
-                            $stmt = $conn->prepare("
-                                SELECT p.*, pc.name as category_name 
-                                FROM products p 
-                                LEFT JOIN product_categories pc ON p.category_id = pc.id 
-                                ORDER BY p.sort_order, p.created_at DESC 
-                                LIMIT ? OFFSET ?
-                            ");
-                            $stmt->bind_param("ii", $pagination['perPage'], $pagination['offset']);
-                            $stmt->execute();
-                            $result = $stmt->get_result();
+                            $pagination = getPagination($conn, 'products', 10);
+                            $result = getProductsList($conn, $pagination['perPage'], $pagination['offset']);
                             
                             while ($row = $result->fetch_assoc()):
                                 $specifications = json_decode($row['specifications'], true) ?? [];
@@ -249,16 +234,8 @@ require_once __DIR__. '/includes/menu.php';
         $specifications = [];
         
         if ($action === 'edit' && $id) {
-            $stmt = $conn->prepare("SELECT * FROM products WHERE id = ?");
-            $stmt->bind_param("i", $id);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            $product = $result->fetch_assoc();
-            
-            if (!$product) {
-                redirectWithNotification('products.php', 'Товар не найден', 'error');
-            }
-            
+            $product = getProductById($conn, $id);
+            if (!$product) redirectWithNotification('products.php', 'Товар не найден', 'error');
             $specifications = json_decode($product['specifications'], true) ?? [];
         }
         ?>

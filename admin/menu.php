@@ -1,107 +1,59 @@
 <?php
 
-// Подключаем функции
 require_once __DIR__. '/includes/functions.php';
 
-// Проверяем авторизацию
-requireAdminAuth();
-
-// Проверяем права доступа
-if (!hasPermission('admin')) {
-    redirectWithNotification('index.php', 'Недостаточно прав для доступа к этой странице', 'error');
-}
-
 $conn = getDBConnection();
+requireAdminAuth($conn);
+
+if (!hasPermission($conn, 'admin')) {
+    redirectWithNotification('index.php', 'Недостаточно прав', 'error');
+}
+
 $action = $_GET['action'] ?? 'list';
-$id = $_GET['id'] ?? 0;
+$id = intval($_GET['id'] ?? 0);
 
-// Обработка добавления/редактирования
+// --- ОБРАБОТКА POST (Сохранение / Редактирование) ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $title = cleanInput($_POST['title'] ?? '');
-    $url = cleanInput($_POST['url'] ?? '');
-    $parentId = intval($_POST['parent_id'] ?? 0);
-    $sortOrder = intval($_POST['sort_order'] ?? 0);
-    $isActive = isset($_POST['is_active']) ? 1 : 0;
+    $formData = [
+        'title'      => cleanInput($_POST['title'] ?? ''),
+        'url'        => cleanInput($_POST['url'] ?? ''),
+        'parent_id'  => intval($_POST['parent_id'] ?? 0),
+        'sort_order' => intval($_POST['sort_order'] ?? 0),
+        'is_active'  => isset($_POST['is_active']) ? 1 : 0
+    ];
     
-    if ($action === 'add' || ($action === 'edit' && $id)) {
-        if ($action === 'add') {
-            $stmt = $conn->prepare("INSERT INTO menu_items (title, url, parent_id, sort_order, is_active) VALUES (?, ?, ?, ?, ?)");
-            $stmt->bind_param("ssiii", $title, $url, $parentId, $sortOrder, $isActive);
-            
-            if ($stmt->execute()) {
-                $newId = $stmt->insert_id;
-                logAdminAction('menu_add', "Добавлен пункт меню: $title");
-                redirectWithNotification('menu.php', 'Пункт меню успешно добавлен', 'success');
-            } else {
-                redirectWithNotification('menu.php?action=add', 'Ошибка при добавлении пункта меню', 'error');
-            }
-        } else {
-            $stmt = $conn->prepare("UPDATE menu_items SET title = ?, url = ?, parent_id = ?, sort_order = ?, is_active = ? WHERE id = ?");
-            $stmt->bind_param("ssiiii", $title, $url, $parentId, $sortOrder, $isActive, $id);
-            
-            if ($stmt->execute()) {
-                logAdminAction('menu_edit', "Отредактирован пункт меню: $title");
-                redirectWithNotification('menu.php', 'Пункт меню успешно обновлен', 'success');
-            } else {
-                redirectWithNotification('menu.php?action=edit&id=' . $id, 'Ошибка при обновлении пункта меню', 'error');
-            }
+    if ($action === 'add') {
+        if ($newId = addMenuItem($conn, $formData)) {
+            logAdminAction($conn, 'menu_add', "Добавлен пункт: " . $formData['title']);
+            redirectWithNotification('menu.php', 'Успешно добавлено', 'success');
+        }
+    } elseif ($action === 'edit' && $id) {
+        if (updateMenuItem($conn, $id, $formData)) {
+            logAdminAction($conn, 'menu_edit', "Изменен пункт: " . $formData['title']);
+            redirectWithNotification('menu.php', 'Успешно обновлено', 'success');
         }
     }
 }
 
-// Обработка удаления
+// --- ОБРАБОТКА УДАЛЕНИЯ ---
 if ($action === 'delete' && $id) {
-    // Проверяем, есть ли подпункты
-    $checkStmt = $conn->prepare("SELECT COUNT(*) as count FROM menu_items WHERE parent_id = ?");
-    $checkStmt->bind_param("i", $id);
-    $checkStmt->execute();
-    $checkResult = $checkStmt->get_result();
-    $count = $checkResult->fetch_assoc()['count'];
-    
-    if ($count > 0) {
-        redirectWithNotification('menu.php', 'Нельзя удалить пункт меню, у которого есть подпункты', 'error');
+    if (hasChildMenu($conn, $id)) {
+        redirectWithNotification('menu.php', 'Сначала удалите подпункты!', 'error');
     }
     
-    // Получаем информацию о пункте меню для лога
-    $stmt = $conn->prepare("SELECT title FROM menu_items WHERE id = ?");
-    $stmt->bind_param("i", $id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $menuItem = $result->fetch_assoc();
-    
-    $stmt = $conn->prepare("DELETE FROM menu_items WHERE id = ?");
-    $stmt->bind_param("i", $id);
-    
-    if ($stmt->execute()) {
-        logAdminAction('menu_delete', "Удален пункт меню: " . ($menuItem['title'] ?? 'ID ' . $id));
-        redirectWithNotification('menu.php', 'Пункт меню успешно удален', 'success');
-    } else {
-        redirectWithNotification('menu.php', 'Ошибка при удалении пункта меню', 'error');
+    $menuItem = getMenuItemById($conn, $id);
+    if (deleteMenuItem($conn, $id)) {
+        logAdminAction($conn, 'menu_delete', "Удален пункт: " . ($menuItem['title'] ?? $id));
+        redirectWithNotification('menu.php', 'Пункт удален', 'success');
     }
 }
 
-// Получаем все пункты меню
-$menuItems = $conn->query("SELECT * FROM menu_items ORDER BY parent_id, sort_order, title")->fetch_all(MYSQLI_ASSOC);
+// --- ПОДГОТОВКА ДАННЫХ ДЛЯ ВЫВОДА ---
+$allMenuItems = getAllMenuItems($conn);
+$menuTree = buildMenuTree($allMenuItems);
 
-// Функция для построения дерева меню
-function buildMenuTree($items, $parentId = 0) {
-    $tree = [];
-    
-    foreach ($items as $item) {
-        if ($item['parent_id'] == $parentId) {
-            $children = buildMenuTree($items, $item['id']);
-            if ($children) {
-                $item['children'] = $children;
-            }
-            $tree[] = $item;
-        }
-    }
-    
-    return $tree;
-}
-
-// Строим дерево меню
-$menuTree = buildMenuTree($menuItems);
+// Если редактируем, получаем данные для формы
+$editItem = ($action === 'edit' && $id) ? getMenuItemById($conn, $id) : null;
 
 // Подключаем шапку
 require_once __DIR__. '/includes/header.php';
@@ -126,7 +78,7 @@ require_once __DIR__. '/includes/menu.php';
         <div class="header-right">
             <div class="user-menu">
                 <div class="user-avatar">
-                    <?php $admin = getCurrentAdmin(); echo strtoupper(substr($admin['username'], 0, 1)); ?>
+                    <?php $admin = getCurrentAdmin($conn); echo strtoupper(substr($admin['username'], 0, 1)); ?>
                 </div>
                 <div class="user-info">
                     <h4><?php echo htmlspecialchars($admin['full_name'] ?? $admin['username']); ?></h4>
@@ -225,21 +177,8 @@ require_once __DIR__. '/includes/menu.php';
         <?php elseif ($action === 'add' || $action === 'edit'): ?>
         <!-- Форма добавления/редактирования -->
         <?php
-        $menuItem = [];
-        if ($action === 'edit' && $id) {
-            $stmt = $conn->prepare("SELECT * FROM menu_items WHERE id = ?");
-            $stmt->bind_param("i", $id);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            $menuItem = $result->fetch_assoc();
-            
-            if (!$menuItem) {
-                redirectWithNotification('menu.php', 'Пункт меню не найден', 'error');
-            }
-        }
-        
-        // Получаем основные пункты меню для выбора родителя
-        $mainMenuItems = $conn->query("SELECT id, title FROM menu_items WHERE parent_id = 0 AND id != " . intval($id) . " ORDER BY title")->fetch_all(MYSQLI_ASSOC);
+        // Получаем список родителей через функцию
+        $mainMenuItems = getPotentialParents($conn, $id);
         ?>
         
         <div class="card">
