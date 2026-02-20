@@ -3,6 +3,9 @@
 
 require_once __DIR__. '/includes/functions.php';
 
+// 2. СОЗДАЕМ ПОДКЛЮЧЕНИЕ СРАЗУ (нужно для функции getSetting в HTML)
+$conn = getDBConnection();
+
 // Если пользователь уже авторизован, перенаправляем в админку
 if (isset($_SESSION['admin_id'])) {
     header('Location: index.php');
@@ -19,7 +22,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($username) || empty($password)) {
         $error = 'Пожалуйста, заполните все поля';
     } else {
-        $conn = getDBConnection();
         $stmt = $conn->prepare("SELECT * FROM admins WHERE username = ? AND is_active = 1");
         $stmt->bind_param("s", $username);
         $stmt->execute();
