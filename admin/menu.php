@@ -53,7 +53,7 @@ $allMenuItems = getAllMenuItems($conn);
 $menuTree = buildMenuTree($allMenuItems);
 
 // Если редактируем, получаем данные для формы
-$editItem = ($action === 'edit' && $id) ? getMenuItemById($conn, $id) : null;
+$menuItem = ($action === 'edit' && $id) ? getMenuItemById($conn, $id) : null;
 
 // Подключаем шапку
 require_once __DIR__. '/includes/header.php';

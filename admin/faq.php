@@ -1,4 +1,4 @@
-<?php
+d<?php
 require_once __DIR__. '/includes/functions.php';
 
 $conn = getDBConnection();
@@ -142,8 +142,8 @@ require_once __DIR__. '/includes/menu.php';
         <?php elseif ($action === 'add' || $action === 'edit'): ?>
         <!-- Форма добавления/редактирования -->
         <?php 
-            $faqData = ($action === 'edit') ? getFaqById($conn, $id) : []; 
-            if ($action === 'edit' && !$faqData) redirectWithNotification('faq.php', 'Не найден', 'error');
+            $faq = ($action === 'edit') ? getFaqById($conn, $id) : []; 
+            if ($action === 'edit' && !$faq) redirectWithNotification('faq.php', 'Не найден', 'error');
         ?>
         
         <div class="card">

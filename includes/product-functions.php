@@ -3,16 +3,29 @@
 require_once __DIR__ . '/../config/database.php';
 
 // Функция для получения всех активных категорий
+// function getProductCategories($conn) {
+//     // $conn = getDBConnection();
+//     $result = $conn->query("SELECT * FROM product_categories WHERE is_active = 1 ORDER BY sort_order");
+//     $categories = [];
+    
+//     while ($row = $result->fetch_assoc()) {
+//         $categories[] = $row;
+//     }
+    
+//     return $categories;
+// }
 function getProductCategories($conn) {
-    // $conn = getDBConnection();
+    global $cache;
+    $cacheKey = "categories_public_all";
+
+    $cached = $cache->get($cacheKey);
+    if ($cached !== null) return $cached;
+
     $result = $conn->query("SELECT * FROM product_categories WHERE is_active = 1 ORDER BY sort_order");
-    $categories = [];
+    $data = $result->fetch_all(MYSQLI_ASSOC);
     
-    while ($row = $result->fetch_assoc()) {
-        $categories[] = $row;
-    }
-    
-    return $categories;
+    $cache->set($cacheKey, $data);
+    return $data;
 }
 
 // Функция для получения категории по slug
@@ -31,30 +44,53 @@ function getCategoryBySlug($conn, $slug) {
 }
 
 // Функция для получения товаров категории
-function getProductsByCategory($conn, $categoryId, $limit = null) {
-    // $conn = getDBConnection();
+// function getProductsByCategory($conn, $categoryId, $limit = null) {
+//     // $conn = getDBConnection();
     
+//     $sql = "SELECT p.*, c.name as category_name, c.slug as category_slug 
+//             FROM products p 
+//             JOIN product_categories c ON p.category_id = c.id 
+//             WHERE p.category_id = ? AND p.is_active = 1 AND c.is_active = 1 
+//             ORDER BY p.sort_order";
+    
+//     if ($limit) {
+//         $sql .= " LIMIT " . intval($limit);
+//     }
+    
+//     $stmt = $conn->prepare($sql);
+//     $stmt->bind_param("i", $categoryId);
+//     $stmt->execute();
+//     $result = $stmt->get_result();
+    
+//     $products = [];
+//     while ($row = $result->fetch_assoc()) {
+//         $products[] = $row;
+//     }
+    
+//     return $products;
+// }
+function getProductsByCategory($conn, $categoryId, $limit = null) {
+    global $cache;
+    $cacheKey = "products_cat_{$categoryId}_lim_{$limit}";
+
+    $cached = $cache->get($cacheKey);
+    if ($cached !== null) return $cached;
+
     $sql = "SELECT p.*, c.name as category_name, c.slug as category_slug 
             FROM products p 
             JOIN product_categories c ON p.category_id = c.id 
             WHERE p.category_id = ? AND p.is_active = 1 AND c.is_active = 1 
             ORDER BY p.sort_order";
     
-    if ($limit) {
-        $sql .= " LIMIT " . intval($limit);
-    }
+    if ($limit) $sql .= " LIMIT " . intval($limit);
     
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $categoryId);
     $stmt->execute();
-    $result = $stmt->get_result();
+    $data = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     
-    $products = [];
-    while ($row = $result->fetch_assoc()) {
-        $products[] = $row;
-    }
-    
-    return $products;
+    $cache->set($cacheKey, $data);
+    return $data;
 }
 
 // Функция для получения товара по slug

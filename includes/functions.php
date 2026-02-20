@@ -1,5 +1,8 @@
 <?php
 
+require_once __DIR__ . '/../Cache.php'; // путь к классу кэша
+$cache = new Cache();
+
 // Подключаем database.php
 require_once __DIR__ . '/../config/database.php';
 
@@ -23,18 +26,34 @@ require_once __DIR__ . '/auth-functions.php';
 
 
 // Функция для получения изображения
+// function getImage($conn, $key) {
+//     // $conn = getDBConnection();
+//     $stmt = $conn->prepare("SELECT image_path, alt_text FROM images WHERE image_key = ?");
+//     $stmt->bind_param("s", $key);
+//     $stmt->execute();
+//     $result = $stmt->get_result();
+    
+//     if ($row = $result->fetch_assoc()) {
+//         return $row;
+//     }
+    
+//     return ['image_path' => '', 'alt_text' => ''];
+// }
 function getImage($conn, $key) {
-    // $conn = getDBConnection();
+    global $cache;
+    $cacheKey = "image_key_" . $key;
+
+    $cached = $cache->get($cacheKey);
+    if ($cached !== null) return $cached;
+
     $stmt = $conn->prepare("SELECT image_path, alt_text FROM images WHERE image_key = ?");
     $stmt->bind_param("s", $key);
     $stmt->execute();
-    $result = $stmt->get_result();
+    $data = $stmt->get_result()->fetch_assoc();
     
-    if ($row = $result->fetch_assoc()) {
-        return $row;
-    }
-    
-    return ['image_path' => '', 'alt_text' => ''];
+    $result = $data ?: ['image_path' => '', 'alt_text' => ''];
+    $cache->set($cacheKey, $result);
+    return $result;
 }
 
 // Функция для получения координат карты
@@ -109,15 +128,28 @@ function renderStatistics($conn) {
 }
 
 // Функция для получения меню из базы данных
+// function getNavigationMenu($conn) {
+//     // $conn = getDBConnection();
+//     $result = $conn->query("SELECT * FROM menu_items WHERE is_active = 1 ORDER BY sort_order");
+//     $items = [];
+    
+//     while ($row = $result->fetch_assoc()) {
+//         $items[] = $row;
+//     }
+    
+//     return $items;
+// }
 function getNavigationMenu($conn) {
-    // $conn = getDBConnection();
+    global $cache;
+    $cacheKey = "system_menu";
+
+    $cached = $cache->get($cacheKey);
+    if ($cached !== null) return $cached;
+
     $result = $conn->query("SELECT * FROM menu_items WHERE is_active = 1 ORDER BY sort_order");
-    $items = [];
+    $items = $result->fetch_all(MYSQLI_ASSOC);
     
-    while ($row = $result->fetch_assoc()) {
-        $items[] = $row;
-    }
-    
+    $cache->set($cacheKey, $items);
     return $items;
 }
 

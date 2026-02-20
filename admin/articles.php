@@ -122,9 +122,11 @@ require_once __DIR__. '/includes/menu.php';
                         <tbody>
                             <?php
                             $pagination = getPagination($conn, 'articles', 10);
-                            $result = getArticlesList($conn, $pagination['perPage'], $pagination['offset']);
+                            // Теперь $result — это массив данных
+                            $articles = getArticlesList($conn, $pagination['perPage'], $pagination['offset']);
 
-                            while ($row = $result->fetch_assoc()):
+                            // Используем foreach для обхода массива
+                            foreach ($articles as $row): 
                             ?>
                             <tr>
                                 <td><?php echo $row['id']; ?></td>
@@ -147,16 +149,15 @@ require_once __DIR__. '/includes/menu.php';
                                             <i class="fas fa-edit"></i>
                                         </a>
                                         <a href="articles.php?action=delete&id=<?php echo $row['id']; ?>" 
-                                           class="btn btn-sm btn-delete" 
-                                           onclick="return confirm('Удалить эту статью?')">
+                                        class="btn btn-sm btn-delete" 
+                                        onclick="return confirm('Удалить эту статью?')">
                                             <i class="fas fa-trash"></i>
                                         </a>
                                     </div>
                                 </td>
                             </tr>
-                            <?php endwhile; ?>
+                            <?php endforeach; ?>
                         </tbody>
-                    </table>
                 </div>
                 
                 <?php echo generatePaginationLinks($pagination); ?>

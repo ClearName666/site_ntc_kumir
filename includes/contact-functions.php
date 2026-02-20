@@ -3,24 +3,43 @@
 require_once __DIR__ . '/../config/database.php';
 
 // Функция для получения контактов по типу
-function getContactsByType($conn, $type = null) {
-    // $conn = getDBConnection();
+// function getContactsByType($conn, $type = null) {
+//     // $conn = getDBConnection();
     
+//     if ($type) {
+//         $stmt = $conn->prepare("SELECT * FROM contacts WHERE contact_type = ? AND is_active = 1 ORDER BY sort_order");
+//         $stmt->bind_param("s", $type);
+//         $stmt->execute();
+//         $result = $stmt->get_result();
+//     } else {
+//         $result = $conn->query("SELECT * FROM contacts WHERE is_active = 1 ORDER BY sort_order");
+//     }
+    
+//     $contacts = [];
+//     while ($row = $result->fetch_assoc()) {
+//         $contacts[] = $row;
+//     }
+    
+//     return $contacts;
+// }
+function getContactsByType($conn, $type = null) {
+    global $cache;
+    $cacheKey = "contacts_type_" . ($type ?? 'all');
+
+    $cached = $cache->get($cacheKey);
+    if ($cached !== null) return $cached;
+
     if ($type) {
         $stmt = $conn->prepare("SELECT * FROM contacts WHERE contact_type = ? AND is_active = 1 ORDER BY sort_order");
         $stmt->bind_param("s", $type);
         $stmt->execute();
-        $result = $stmt->get_result();
+        $data = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     } else {
-        $result = $conn->query("SELECT * FROM contacts WHERE is_active = 1 ORDER BY sort_order");
+        $data = $conn->query("SELECT * FROM contacts WHERE is_active = 1 ORDER BY sort_order")->fetch_all(MYSQLI_ASSOC);
     }
     
-    $contacts = [];
-    while ($row = $result->fetch_assoc()) {
-        $contacts[] = $row;
-    }
-    
-    return $contacts;
+    $cache->set($cacheKey, $data);
+    return $data;
 }
 
 // Функция для получения всех офисов
