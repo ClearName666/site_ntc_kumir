@@ -111,19 +111,19 @@ function getMenuItems($conn) {
 //     return $items;
 // }
 
-// function getContentBlock($conn, $key) {
-//     // $conn = getDBConnection();
-//     $stmt = $conn->prepare("SELECT title, content FROM content_blocks WHERE block_key = ?");
-//     $stmt->bind_param("s", $key);
-//     $stmt->execute();
-//     $result = $stmt->get_result();
+function getContentBlock($conn, $key) {
+    // $conn = getDBConnection();
+    $stmt = $conn->prepare("SELECT title, content FROM content_blocks WHERE block_key = ?");
+    $stmt->bind_param("s", $key);
+    $stmt->execute();
+    $result = $stmt->get_result();
     
-//     if ($row = $result->fetch_assoc()) {
-//         return $row;
-//     }
+    if ($row = $result->fetch_assoc()) {
+        return $row;
+    }
     
-//     return ['title' => '', 'content' => ''];
-// }
+    return ['title' => '', 'content' => ''];
+}
 
 
 function getFeatures($conn) {
@@ -182,26 +182,26 @@ function getStatistics($conn) {
     return $items;
 }
 
-function getContentBlock($conn, $key) {
-    global $cache;
-    $cacheKey = "content_block_" . md5($key);
+// function getContentBlock($conn, $key) {
+//     global $cache;
+//     $cacheKey = "content_block_" . md5($key);
 
-    $cached = $cache->get($cacheKey);
-    if ($cached !== null) return $cached;
+//     $cached = $cache->get($cacheKey);
+//     if ($cached !== null) return $cached;
 
-    $stmt = $conn->prepare("SELECT title, content FROM content_blocks WHERE block_key = ?");
-    $stmt->bind_param("s", $key);
-    $stmt->execute();
-    $result = $stmt->get_result();
+//     $stmt = $conn->prepare("SELECT title, content FROM content_blocks WHERE block_key = ?");
+//     $stmt->bind_param("s", $key);
+//     $stmt->execute();
+//     $result = $stmt->get_result();
     
-    $data = $result->fetch_assoc();
-    if (!$data) {
-        $data = ['title' => '', 'content' => ''];
-    }
+//     $data = $result->fetch_assoc();
+//     if (!$data) {
+//         $data = ['title' => '', 'content' => ''];
+//     }
     
-    $cache->set($cacheKey, $data);
-    return $data;
-}
+//     $cache->set($cacheKey, $data);
+//     return $data;
+// }
 
 require_once __DIR__ . '/../includes/article-functions.php';
 ?>
