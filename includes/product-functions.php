@@ -94,25 +94,48 @@ function getProductsByCategory($conn, $categoryId, $limit = null) {
 }
 
 // Функция для получения товара по slug
+// function getProductBySlug($conn, $slug) {
+//     // $conn = getDBConnection();
+//     $stmt = $conn->prepare("SELECT p.*, c.name as category_name, c.slug as category_slug 
+//                            FROM products p 
+//                            JOIN product_categories c ON p.category_id = c.id 
+//                            WHERE p.slug = ? AND p.is_active = 1 AND c.is_active = 1");
+//     $stmt->bind_param("s", $slug);
+//     $stmt->execute();
+//     $result = $stmt->get_result();
+    
+//     if ($row = $result->fetch_assoc()) {
+//         // Парсим спецификации из JSON
+//         if (!empty($row['specifications'])) {
+//             $row['specifications_array'] = json_decode($row['specifications'], true);
+//         }
+//         return $row;
+//     }
+    
+//     return null;
+// }
 function getProductBySlug($conn, $slug) {
-    // $conn = getDBConnection();
+    global $cache;
+    $cacheKey = "product_single_" . md5($slug);
+
+    $cached = $cache->get($cacheKey);
+    if ($cached !== null) return $cached;
+
     $stmt = $conn->prepare("SELECT p.*, c.name as category_name, c.slug as category_slug 
-                           FROM products p 
-                           JOIN product_categories c ON p.category_id = c.id 
-                           WHERE p.slug = ? AND p.is_active = 1 AND c.is_active = 1");
+                            FROM products p 
+                            JOIN product_categories c ON p.category_id = c.id 
+                            WHERE p.slug = ? AND p.is_active = 1 AND c.is_active = 1");
     $stmt->bind_param("s", $slug);
     $stmt->execute();
-    $result = $stmt->get_result();
+    $row = $stmt->get_result()->fetch_assoc();
     
-    if ($row = $result->fetch_assoc()) {
-        // Парсим спецификации из JSON
+    if ($row) {
         if (!empty($row['specifications'])) {
             $row['specifications_array'] = json_decode($row['specifications'], true);
         }
-        return $row;
+        $cache->set($cacheKey, $row);
     }
-    
-    return null;
+    return $row;
 }
 
 // Функция для отображения категорий

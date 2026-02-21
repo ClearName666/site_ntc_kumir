@@ -170,10 +170,9 @@ require_once __DIR__. '/includes/menu.php';
                         <tbody>
                             <?php
                             $pagination = getPagination($conn, 'products', 10);
-                            $result = getProductsList($conn, $pagination['perPage'], $pagination['offset']);
+                            $products = getProductsList($conn, $pagination['perPage'], $pagination['offset']);
                             
-                            while ($row = $result->fetch_assoc()):
-                                $specifications = json_decode($row['specifications'], true) ?? [];
+                            foreach ($products as $row):
                             ?>
                             <tr>
                                 <td><?php echo $row['id']; ?></td>
@@ -218,7 +217,7 @@ require_once __DIR__. '/includes/menu.php';
                                     </div>
                                 </td>
                             </tr>
-                            <?php endwhile; ?>
+                            <?php endforeach; ?>
                         </tbody>
                     </table>
                 </div>

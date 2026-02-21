@@ -14,6 +14,12 @@ $offset = ($currentPage - 1) * $newsPerPage;
 $newsItem = null;
 if (isset($_GET['news']) && !empty($_GET['news'])) {
     $newsItem = getNewsBySlug($conn, $_GET['news']);
+
+    // 1. Увеличиваем просмотры в БД (тихий запрос)
+    incrementNewsViews($conn, $newsItem["id"]);
+
+    // 2. Получаем СВЕЖЕЕ число просмотров, игнорируя то, что в кэше $newsItem
+    $currentViews = getActualNewsViews($conn, $newsItem['id']);
 }
 
 // Устанавливаем мета-данные страницы
@@ -95,7 +101,10 @@ $footerPath = __DIR__. '/includes/footer.php';
                                 <span class="news-author">👤 <?= htmlspecialchars($newsItem['author']) ?></span>
                             <?php endif; ?>
                             
-                            <span class="news-views">👁 <?= $newsItem['views'] ?> просмотров</span>
+                            <span class="news-views">👁 <?= 
+                            // $newsItem['views'] 
+                            $currentViews ?? '-'
+                            ?> просмотров</span>
                         </div>
                     </header>
                     

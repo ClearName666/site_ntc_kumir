@@ -7,12 +7,24 @@ $conn = getDBConnection();
 
 // Проверяем, запрошена ли конкретная статья
 $article = null;
+// if (isset($_GET['article']) && !empty($_GET['article'])) {
+//     $article = getArticleBySlug($conn, $_GET['article']);
+    
+//     // Увеличиваем счетчик просмотров если статья найдена
+//     if ($article) {
+//         incrementArticleViews($conn, $article['id']);
+//     }
+// }
 if (isset($_GET['article']) && !empty($_GET['article'])) {
     $article = getArticleBySlug($conn, $_GET['article']);
     
-    // Увеличиваем счетчик просмотров если статья найдена
     if ($article) {
+        // 1. Сначала плюсуем в базе
         incrementArticleViews($conn, $article['id']);
+        
+        // 2. Сразу подменяем значение в текущем массиве на актуальное из БД
+        // Таким образом, на текущей странице сразу будет +1
+        $article['views'] = getActualViews($conn, $article['id']);
     }
 }
 

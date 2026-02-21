@@ -74,11 +74,11 @@ function getArticleBySlug($conn, $slug) {
     $cached = $cache->get($cacheKey);
     if ($cached !== null) {
         // Даже если берем из кэша, просмотры надо считать в БД
-        $conn->query("UPDATE articles SET views = views + 1 WHERE slug = '$slug'");
+        // $conn->query("UPDATE articles SET views = views + 1 WHERE slug = '$slug'");
         return $cached;
     }
 
-    $conn->query("UPDATE articles SET views = views + 1 WHERE slug = '$slug'");
+    // $conn->query("UPDATE articles SET views = views + 1 WHERE slug = '$slug'");
     $stmt = $conn->prepare("SELECT * FROM articles WHERE slug = ? AND is_published = 1");
     $stmt->bind_param("s", $slug);
     $stmt->execute();
@@ -173,5 +173,18 @@ function articleExists($conn, $slug) {
     $row = $result->fetch_assoc();
     
     return $row['count'] > 0;
+}
+
+
+/**
+ * Получает актуальное количество просмотров напрямую из БД
+ * Это очень быстрый запрос, так как мы берем только одно поле по индексу (ID)
+ */
+function getActualViews($conn, $articleId) {
+    $stmt = $conn->prepare("SELECT views FROM articles WHERE id = ?");
+    $stmt->bind_param("i", $articleId);
+    $stmt->execute();
+    $result = $stmt->get_result()->fetch_assoc();
+    return $result ? $result['views'] : 0;
 }
 ?>

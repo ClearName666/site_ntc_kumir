@@ -123,9 +123,9 @@ require_once __DIR__. '/includes/menu.php';
                         <tbody>
                             <?php
                             $pagination = getPagination($conn, 'news', 10);
-                            $result = getNewsList($conn, $pagination['perPage'], $pagination['offset']);
+                            $newsList = getNewsList($conn, $pagination['perPage'], $pagination['offset']);
                             
-                            while ($row = $result->fetch_assoc()):
+                            foreach ($newsList as $row): 
                             ?>
                             <tr>
                                 <td><?php echo $row['id']; ?></td>
@@ -155,7 +155,7 @@ require_once __DIR__. '/includes/menu.php';
                                     </div>
                                 </td>
                             </tr>
-                            <?php endwhile; ?>
+                            <?php endforeach; ?>
                         </tbody>
                     </table>
                 </div>

@@ -63,66 +63,144 @@ function getMenuItems($conn) {
     return $items;
 }
 
+// function getFeatures($conn) {
+//     // $conn = getDBConnection();
+//     $result = $conn->query("SELECT * FROM features WHERE is_active = 1 ORDER BY sort_order");
+//     $items = [];
+    
+//     while ($row = $result->fetch_assoc()) {
+//         $items[] = $row;
+//     }
+    
+//     return $items;
+// }
+
+// function getCards($conn) {
+//     // $conn = getDBConnection();
+//     $result = $conn->query("SELECT * FROM cards WHERE is_active = 1 ORDER BY sort_order");
+//     $items = [];
+    
+//     while ($row = $result->fetch_assoc()) {
+//         $items[] = $row;
+//     }
+    
+//     return $items;
+// }
+
+// function getAdvantages($conn) {
+//     // $conn = getDBConnection();
+//     $result = $conn->query("SELECT * FROM advantages WHERE is_active = 1 ORDER BY sort_order");
+//     $items = [];
+    
+//     while ($row = $result->fetch_assoc()) {
+//         $items[] = $row;
+//     }
+    
+//     return $items;
+// }
+
+// function getStatistics($conn) {
+//     // $conn = getDBConnection();
+//     $result = $conn->query("SELECT * FROM statistics WHERE is_active = 1 ORDER BY sort_order");
+//     $items = [];
+    
+//     while ($row = $result->fetch_assoc()) {
+//         $items[] = $row;
+//     }
+    
+//     return $items;
+// }
+
+// function getContentBlock($conn, $key) {
+//     // $conn = getDBConnection();
+//     $stmt = $conn->prepare("SELECT title, content FROM content_blocks WHERE block_key = ?");
+//     $stmt->bind_param("s", $key);
+//     $stmt->execute();
+//     $result = $stmt->get_result();
+    
+//     if ($row = $result->fetch_assoc()) {
+//         return $row;
+//     }
+    
+//     return ['title' => '', 'content' => ''];
+// }
+
+
 function getFeatures($conn) {
-    // $conn = getDBConnection();
+    global $cache;
+    $cacheKey = "features_active_all";
+    
+    $cached = $cache->get($cacheKey);
+    if ($cached !== null) return $cached;
+
     $result = $conn->query("SELECT * FROM features WHERE is_active = 1 ORDER BY sort_order");
-    $items = [];
+    $items = $result->fetch_all(MYSQLI_ASSOC);
     
-    while ($row = $result->fetch_assoc()) {
-        $items[] = $row;
-    }
-    
+    $cache->set($cacheKey, $items);
     return $items;
 }
 
 function getCards($conn) {
-    // $conn = getDBConnection();
+    global $cache;
+    $cacheKey = "cards_active_all";
+
+    $cached = $cache->get($cacheKey);
+    if ($cached !== null) return $cached;
+
     $result = $conn->query("SELECT * FROM cards WHERE is_active = 1 ORDER BY sort_order");
-    $items = [];
+    $items = $result->fetch_all(MYSQLI_ASSOC);
     
-    while ($row = $result->fetch_assoc()) {
-        $items[] = $row;
-    }
-    
+    $cache->set($cacheKey, $items);
     return $items;
 }
 
 function getAdvantages($conn) {
-    // $conn = getDBConnection();
+    global $cache;
+    $cacheKey = "advantages_active_all";
+
+    $cached = $cache->get($cacheKey);
+    if ($cached !== null) return $cached;
+
     $result = $conn->query("SELECT * FROM advantages WHERE is_active = 1 ORDER BY sort_order");
-    $items = [];
+    $items = $result->fetch_all(MYSQLI_ASSOC);
     
-    while ($row = $result->fetch_assoc()) {
-        $items[] = $row;
-    }
-    
+    $cache->set($cacheKey, $items);
     return $items;
 }
 
 function getStatistics($conn) {
-    // $conn = getDBConnection();
+    global $cache;
+    $cacheKey = "statistics_active_all";
+
+    $cached = $cache->get($cacheKey);
+    if ($cached !== null) return $cached;
+
     $result = $conn->query("SELECT * FROM statistics WHERE is_active = 1 ORDER BY sort_order");
-    $items = [];
+    $items = $result->fetch_all(MYSQLI_ASSOC);
     
-    while ($row = $result->fetch_assoc()) {
-        $items[] = $row;
-    }
-    
+    $cache->set($cacheKey, $items);
     return $items;
 }
 
 function getContentBlock($conn, $key) {
-    // $conn = getDBConnection();
+    global $cache;
+    $cacheKey = "content_block_" . md5($key);
+
+    $cached = $cache->get($cacheKey);
+    if ($cached !== null) return $cached;
+
     $stmt = $conn->prepare("SELECT title, content FROM content_blocks WHERE block_key = ?");
     $stmt->bind_param("s", $key);
     $stmt->execute();
     $result = $stmt->get_result();
     
-    if ($row = $result->fetch_assoc()) {
-        return $row;
+    $data = $result->fetch_assoc();
+    if (!$data) {
+        $data = ['title' => '', 'content' => ''];
     }
     
-    return ['title' => '', 'content' => ''];
+    $cache->set($cacheKey, $data);
+    return $data;
 }
 
 require_once __DIR__ . '/../includes/article-functions.php';

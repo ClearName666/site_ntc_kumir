@@ -43,24 +43,56 @@ function getContactsByType($conn, $type = null) {
 }
 
 // Функция для получения всех офисов
-function getOffices($conn) {
-    // $conn = getDBConnection();
-    $result = $conn->query("SELECT * FROM offices ORDER BY is_main DESC, sort_order");
+// function getOffices($conn) {
+//     // $conn = getDBConnection();
+//     $result = $conn->query("SELECT * FROM offices ORDER BY is_main DESC, sort_order");
     
+//     $offices = [];
+//     while ($row = $result->fetch_assoc()) {
+//         $offices[] = $row;
+//     }
+    
+//     return $offices;
+// }
+function getOffices($conn) {
+    global $cache;
+    $cacheKey = "offices_all";
+
+    $cached = $cache->get($cacheKey);
+    if ($cached !== null) return $cached;
+
+    $result = $conn->query("SELECT * FROM offices ORDER BY is_main DESC, sort_order");
     $offices = [];
+    
     while ($row = $result->fetch_assoc()) {
         $offices[] = $row;
     }
     
+    $cache->set($cacheKey, $offices);
     return $offices;
 }
 
 // Функция для получения основного офиса
-function getMainOffice($conn) {
-    // $conn = getDBConnection();
-    $result = $conn->query("SELECT * FROM offices WHERE is_main = 1 LIMIT 1");
+// function getMainOffice($conn) {
+//     // $conn = getDBConnection();
+//     $result = $conn->query("SELECT * FROM offices WHERE is_main = 1 LIMIT 1");
     
-    return $result->fetch_assoc();
+//     return $result->fetch_assoc();
+// }
+function getMainOffice($conn) {
+    global $cache;
+    $cacheKey = "office_main";
+
+    $cached = $cache->get($cacheKey);
+    if ($cached !== null) return $cached;
+
+    $result = $conn->query("SELECT * FROM offices WHERE is_main = 1 LIMIT 1");
+    $data = $result->fetch_assoc();
+    
+    if ($data) {
+        $cache->set($cacheKey, $data);
+    }
+    return $data;
 }
 
 

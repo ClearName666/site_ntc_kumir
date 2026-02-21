@@ -462,6 +462,8 @@ function updateOrInsertSetting($conn, $key, $value) {
  * Специальная функция для обновления путей к изображениям (в две таблицы сразу)
  */
 function updateImageSettings($conn, $imageKey, $settingKey, $path) {
+    global $cache;
+
     // 1. Обновляем таблицу settings
     $stmt1 = $conn->prepare("UPDATE settings SET setting_value = ?, updated_at = NOW() WHERE setting_key = ?");
     $stmt1->bind_param("ss", $path, $settingKey);
@@ -480,7 +482,12 @@ function updateImageSettings($conn, $imageKey, $settingKey, $path) {
         $stmt2 = $conn->prepare("INSERT INTO images (image_key, image_path, alt_text, category, sort_order, created_at) VALUES (?, ?, ?, 'content', 0, NOW())");
         $stmt2->bind_param("sss", $imageKey, $path, $altText);
     }
+
+    $cache->deleteByPrefix("image_key_");   
+
     return $stmt2->execute();
+
+     
 }
 
 
@@ -545,17 +552,50 @@ function getActiveCategories($conn) {
 /**
  * Получить один товар по ID
  */
+// function getProductById($conn, $id) {
+//     $stmt = $conn->prepare("SELECT * FROM products WHERE id = ?");
+//     $stmt->bind_param("i", $id);
+//     $stmt->execute();
+//     return $stmt->get_result()->fetch_assoc();
+// }
 function getProductById($conn, $id) {
+    global $cache;
+    $cacheKey = "product_id_" . intval($id);
+    
+    $cached = $cache->get($cacheKey);
+    if ($cached !== null) return $cached;
+
     $stmt = $conn->prepare("SELECT * FROM products WHERE id = ?");
     $stmt->bind_param("i", $id);
     $stmt->execute();
-    return $stmt->get_result()->fetch_assoc();
+    $data = $stmt->get_result()->fetch_assoc();
+    
+    if ($data) $cache->set($cacheKey, $data);
+    return $data;
 }
 
 /**
  * Получить список товаров с пагинацией и названием категории
  */
+// function getProductsList($conn, $limit, $offset) {
+//     $stmt = $conn->prepare("
+//         SELECT p.*, pc.name as category_name 
+//         FROM products p 
+//         LEFT JOIN product_categories pc ON p.category_id = pc.id 
+//         ORDER BY p.sort_order, p.created_at DESC 
+//         LIMIT ? OFFSET ?
+//     ");
+//     $stmt->bind_param("ii", $limit, $offset);
+//     $stmt->execute();
+//     return $stmt->get_result();
+// }
 function getProductsList($conn, $limit, $offset) {
+    global $cache;
+    $cacheKey = "admin_product_list_l{$limit}_o{$offset}";
+
+    $cached = $cache->get($cacheKey);
+    if ($cached !== null) return $cached;
+
     $stmt = $conn->prepare("
         SELECT p.*, pc.name as category_name 
         FROM products p 
@@ -565,13 +605,27 @@ function getProductsList($conn, $limit, $offset) {
     ");
     $stmt->bind_param("ii", $limit, $offset);
     $stmt->execute();
-    return $stmt->get_result();
+    $data = $stmt->get_result()->fetch_all(MYSQLI_ASSOC); // Сразу в массив!
+    
+    $cache->set($cacheKey, $data);
+    return $data;
 }
 
 /**
  * Добавить новый товар
  */
+// function addProduct($conn, $data) {
+//     $stmt = $conn->prepare("INSERT INTO products (category_id, name, slug, description, full_description, image_path, price, specifications, is_available, sort_order, is_active) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+//     $stmt->bind_param("isssssdsiii", 
+//         $data['category_id'], $data['name'], $data['slug'], 
+//         $data['description'], $data['full_description'], 
+//         $data['image_path'], $data['price'], $data['specifications'], 
+//         $data['is_available'], $data['sort_order'], $data['is_active']
+//     );
+//     return $stmt->execute() ? $conn->insert_id : false;
+// }
 function addProduct($conn, $data) {
+    global $cache;
     $stmt = $conn->prepare("INSERT INTO products (category_id, name, slug, description, full_description, image_path, price, specifications, is_available, sort_order, is_active) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     $stmt->bind_param("isssssdsiii", 
         $data['category_id'], $data['name'], $data['slug'], 
@@ -579,13 +633,32 @@ function addProduct($conn, $data) {
         $data['image_path'], $data['price'], $data['specifications'], 
         $data['is_available'], $data['sort_order'], $data['is_active']
     );
-    return $stmt->execute() ? $conn->insert_id : false;
+    
+    $res = $stmt->execute();
+    if ($res) {
+        $cache->deleteByPrefix("product_");
+        $cache->deleteByPrefix("admin_product_");
+        $cache->deleteByPrefix("products_cat_");
+        return $conn->insert_id;
+    }
+    return false;
 }
 
 /**
  * Обновить существующий товар
  */
+// function updateProduct($conn, $id, $data) {
+//     $stmt = $conn->prepare("UPDATE products SET category_id = ?, name = ?, slug = ?, description = ?, full_description = ?, image_path = ?, price = ?, specifications = ?, is_available = ?, sort_order = ?, is_active = ?, updated_at = NOW() WHERE id = ?");
+//     $stmt->bind_param("isssssdsiiii", 
+//         $data['category_id'], $data['name'], $data['slug'], 
+//         $data['description'], $data['full_description'], 
+//         $data['image_path'], $data['price'], $data['specifications'], 
+//         $data['is_available'], $data['sort_order'], $data['is_active'], $id
+//     );
+//     return $stmt->execute();
+// }
 function updateProduct($conn, $id, $data) {
+    global $cache;
     $stmt = $conn->prepare("UPDATE products SET category_id = ?, name = ?, slug = ?, description = ?, full_description = ?, image_path = ?, price = ?, specifications = ?, is_available = ?, sort_order = ?, is_active = ?, updated_at = NOW() WHERE id = ?");
     $stmt->bind_param("isssssdsiiii", 
         $data['category_id'], $data['name'], $data['slug'], 
@@ -593,16 +666,38 @@ function updateProduct($conn, $id, $data) {
         $data['image_path'], $data['price'], $data['specifications'], 
         $data['is_available'], $data['sort_order'], $data['is_active'], $id
     );
-    return $stmt->execute();
+    
+    $res = $stmt->execute();
+    if ($res) {
+        $cache->deleteByPrefix("product_");
+        $cache->deleteByPrefix("admin_product_");
+        $cache->deleteByPrefix("products_cat_");
+        $cache->delete("product_id_" . $id);
+    }
+    return $res;
 }
 
 /**
  * Удалить товар
  */
+// function deleteProduct($conn, $id) {
+//     $stmt = $conn->prepare("DELETE FROM products WHERE id = ?");
+//     $stmt->bind_param("i", $id);
+//     return $stmt->execute();
+// }
 function deleteProduct($conn, $id) {
+    global $cache;
     $stmt = $conn->prepare("DELETE FROM products WHERE id = ?");
     $stmt->bind_param("i", $id);
-    return $stmt->execute();
+    
+    $res = $stmt->execute();
+    if ($res) {
+        $cache->deleteByPrefix("product_");
+        $cache->deleteByPrefix("admin_product_");
+        $cache->deleteByPrefix("products_cat_");
+        $cache->delete("product_id_" . $id);
+    }
+    return $res;
 }
 
 
@@ -613,27 +708,74 @@ function deleteProduct($conn, $id) {
 /**
  * Получить список новостей с пагинацией
  */
+// function getNewsList($conn, $perPage, $offset) {
+//     $stmt = $conn->prepare("SELECT * FROM news ORDER BY created_at DESC LIMIT ? OFFSET ?");
+//     $stmt->bind_param("ii", $perPage, $offset);
+//     $stmt->execute();
+//     return $stmt->get_result();
+// }
 function getNewsList($conn, $perPage, $offset) {
+    global $cache;
+    $cacheKey = "admin_news_list_p" . $perPage . "_o" . $offset;
+
+    $cached = $cache->get($cacheKey);
+    if ($cached !== null) return $cached;
+
     $stmt = $conn->prepare("SELECT * FROM news ORDER BY created_at DESC LIMIT ? OFFSET ?");
     $stmt->bind_param("ii", $perPage, $offset);
     $stmt->execute();
-    return $stmt->get_result();
+    
+    // ВАЖНО: Кэшируем результат как массив, а не объект mysqli_result
+    $data = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    
+    $cache->set($cacheKey, $data);
+    return $data;
 }
 
 /**
  * Получить одну новость по ID
  */
+// function getNewsById($conn, $id) {
+//     $stmt = $conn->prepare("SELECT * FROM news WHERE id = ?");
+//     $stmt->bind_param("i", $id);
+//     $stmt->execute();
+//     return $stmt->get_result()->fetch_assoc();
+// }
 function getNewsById($conn, $id) {
+    global $cache;
+    $cacheKey = "news_id_" . intval($id);
+
+    $cached = $cache->get($cacheKey);
+    if ($cached !== null) return $cached;
+
     $stmt = $conn->prepare("SELECT * FROM news WHERE id = ?");
     $stmt->bind_param("i", $id);
     $stmt->execute();
-    return $stmt->get_result()->fetch_assoc();
+    $data = $stmt->get_result()->fetch_assoc();
+
+    if ($data) $cache->set($cacheKey, $data);
+    return $data;
 }
 
 /**
  * Добавить новую новость
  */
+// function addNews($conn, $data) {
+//     $stmt = $conn->prepare("INSERT INTO news (title, slug, excerpt, content, author, image_path, is_published, published_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+//     $stmt->bind_param("ssssssis", 
+//         $data['title'], 
+//         $data['slug'], 
+//         $data['excerpt'], 
+//         $data['content'], 
+//         $data['author'], 
+//         $data['image_path'], 
+//         $data['is_published'], 
+//         $data['published_at']
+//     );
+//     return $stmt->execute();
+// }
 function addNews($conn, $data) {
+    global $cache;
     $stmt = $conn->prepare("INSERT INTO news (title, slug, excerpt, content, author, image_path, is_published, published_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
     $stmt->bind_param("ssssssis", 
         $data['title'], 
@@ -645,13 +787,35 @@ function addNews($conn, $data) {
         $data['is_published'], 
         $data['published_at']
     );
-    return $stmt->execute();
+    $res = $stmt->execute();
+    if ($res) {
+        // Очищаем кэш и для фронтенда, и для админки
+        $cache->deleteByPrefix("news_"); 
+        $cache->deleteByPrefix("admin_news_"); 
+    }
+    return $res;
 }
 
 /**
  * Обновить существующую новость
  */
+// function updateNews($conn, $id, $data) {
+//     $stmt = $conn->prepare("UPDATE news SET title = ?, slug = ?, excerpt = ?, content = ?, author = ?, image_path = ?, is_published = ?, published_at = ?, updated_at = NOW() WHERE id = ?");
+//     $stmt->bind_param("ssssssisi", 
+//         $data['title'], 
+//         $data['slug'], 
+//         $data['excerpt'], 
+//         $data['content'], 
+//         $data['author'], 
+//         $data['image_path'], 
+//         $data['is_published'], 
+//         $data['published_at'], 
+//         $id
+//     );
+//     return $stmt->execute();
+// }
 function updateNews($conn, $id, $data) {
+    global $cache;
     $stmt = $conn->prepare("UPDATE news SET title = ?, slug = ?, excerpt = ?, content = ?, author = ?, image_path = ?, is_published = ?, published_at = ?, updated_at = NOW() WHERE id = ?");
     $stmt->bind_param("ssssssisi", 
         $data['title'], 
@@ -664,16 +828,35 @@ function updateNews($conn, $id, $data) {
         $data['published_at'], 
         $id
     );
-    return $stmt->execute();
+    $res = $stmt->execute();
+    if ($res) {
+        // Сбрасываем всё: списки, саму новость по ID и админ-панель
+        $cache->deleteByPrefix("news_"); 
+        $cache->deleteByPrefix("admin_news_");
+        $cache->delete("news_id_" . $id);
+    }
+    return $res;
 }
 
 /**
  * Удалить новость
  */
+// function deleteNews($conn, $id) {
+//     $stmt = $conn->prepare("DELETE FROM news WHERE id = ?");
+//     $stmt->bind_param("i", $id);
+//     return $stmt->execute();
+// }
 function deleteNews($conn, $id) {
+    global $cache;
     $stmt = $conn->prepare("DELETE FROM news WHERE id = ?");
     $stmt->bind_param("i", $id);
-    return $stmt->execute();
+    $res = $stmt->execute();
+    if ($res) {
+        $cache->deleteByPrefix("news_"); 
+        $cache->deleteByPrefix("admin_news_");
+        $cache->delete("news_id_" . $id);
+    }
+    return $res;
 }
 
 
@@ -970,24 +1153,67 @@ function getLogIcon($action) {
 
 // FAQ
 
+
+/**
+ * Общая функция для сброса всего кэша FAQ
+ */
+function clearFaqCache() {
+    global $cache;
+    $cache->deleteByPrefix("faq_");
+    $cache->deleteByPrefix("admin_faq_");
+}
+
+
 /**
  * Получить список FAQ с пагинацией
  */
+// function getFaqList($conn, $limit, $offset) {
+//     $stmt = $conn->prepare("SELECT * FROM faq ORDER BY category, sort_order, id DESC LIMIT ? OFFSET ?");
+//     $stmt->bind_param("ii", $limit, $offset);
+//     $stmt->execute();
+//     return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+// }
 function getFaqList($conn, $limit, $offset) {
+    global $cache;
+    $cacheKey = "admin_faq_list_l{$limit}_o{$offset}";
+
+    $cached = $cache->get($cacheKey);
+    if ($cached !== null) return $cached;
+
     $stmt = $conn->prepare("SELECT * FROM faq ORDER BY category, sort_order, id DESC LIMIT ? OFFSET ?");
     $stmt->bind_param("ii", $limit, $offset);
     $stmt->execute();
-    return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    $data = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    
+    $cache->set($cacheKey, $data);
+    return $data;
 }
 
 /**
  * Получить один вопрос по ID
  */
+// function getFaqById($conn, $id) {
+//     $stmt = $conn->prepare("SELECT * FROM faq WHERE id = ?");
+//     $stmt->bind_param("i", $id);
+//     $stmt->execute();
+//     return $stmt->get_result()->fetch_assoc();
+// }
 function getFaqById($conn, $id) {
+    global $cache;
+    $cacheKey = "faq_item_" . intval($id);
+
+    $cached = $cache->get($cacheKey);
+    if ($cached !== null) return $cached;
+
     $stmt = $conn->prepare("SELECT * FROM faq WHERE id = ?");
     $stmt->bind_param("i", $id);
     $stmt->execute();
-    return $stmt->get_result()->fetch_assoc();
+    $data = $stmt->get_result()->fetch_assoc();
+
+    if ($data) {
+        $cache->set($cacheKey, $data);
+    }
+    return $data;
 }
 
 /**
@@ -996,7 +1222,9 @@ function getFaqById($conn, $id) {
 function addFaq($conn, $data) {
     $stmt = $conn->prepare("INSERT INTO faq (question, answer, category, sort_order, is_active) VALUES (?, ?, ?, ?, ?)");
     $stmt->bind_param("sssii", $data['question'], $data['answer'], $data['category'], $data['sort_order'], $data['is_active']);
-    return $stmt->execute();
+    $res = $stmt->execute();
+    if ($res) clearFaqCache();
+    return $res;
 }
 
 /**
@@ -1005,7 +1233,13 @@ function addFaq($conn, $data) {
 function updateFaq($conn, $id, $data) {
     $stmt = $conn->prepare("UPDATE faq SET question = ?, answer = ?, category = ?, sort_order = ?, is_active = ? WHERE id = ?");
     $stmt->bind_param("sssiii", $data['question'], $data['answer'], $data['category'], $data['sort_order'], $data['is_active'], $id);
-    return $stmt->execute();
+    $res = $stmt->execute();
+    if ($res) {
+        clearFaqCache();
+        global $cache;
+        $cache->delete("faq_item_" . $id);
+    }
+    return $res;
 }
 
 /**
@@ -1014,7 +1248,9 @@ function updateFaq($conn, $id, $data) {
 function deleteFaq($conn, $id) {
     $stmt = $conn->prepare("DELETE FROM faq WHERE id = ?");
     $stmt->bind_param("i", $id);
-    return $stmt->execute();
+    $res = $stmt->execute();
+    if ($res) clearFaqCache();
+    return $res;
 }
 
 
@@ -1138,20 +1374,17 @@ function addContact($conn, $data) {
     global $cache;
     $stmt = $conn->prepare("INSERT INTO contacts (contact_type, title, value, icon, sort_order, is_active) VALUES (?, ?, ?, ?, ?, ?)");
     $stmt->bind_param("ssssii", 
-        $data['contact_type'], 
-        $data['title'], 
-        $data['value'], 
-        $data['icon'], 
-        $data['sort_order'], 
-        $data['is_active']
+        $data['contact_type'], $data['title'], $data['value'], 
+        $data['icon'], $data['sort_order'], $data['is_active']
     );
     
-    $success = $stmt->execute();
-    if ($success) {
-        // Очищаем ВЕСЬ кэш контактов, так как списки (пагинация) изменились
-        $cache->deleteByPrefix("contacts_");
+    $result = $stmt->execute();
+    if ($result) {
+        // Убиваем все списки контактов (и админские, и фронтенд)
+        $cache->deleteByPrefix("contacts_list");
+        $cache->deleteByPrefix("contacts_type");
     }
-    return $success;
+    return $result;
 }
 
 /**
@@ -1174,23 +1407,19 @@ function updateContact($conn, $id, $data) {
     global $cache;
     $stmt = $conn->prepare("UPDATE contacts SET contact_type = ?, title = ?, value = ?, icon = ?, sort_order = ?, is_active = ? WHERE id = ?");
     $stmt->bind_param("ssssiii", 
-        $data['contact_type'], 
-        $data['title'], 
-        $data['value'], 
-        $data['icon'], 
-        $data['sort_order'], 
-        $data['is_active'], 
-        $id
+        $data['contact_type'], $data['title'], $data['value'], 
+        $data['icon'], $data['sort_order'], $data['is_active'], $id
     );
     
-    $success = $stmt->execute();
-    if ($success) {
-        // Удаляем кэш конкретного элемента
+    $result = $stmt->execute();
+    if ($result) {
+        // Удаляем конкретный айтем
         $cache->delete("contact_item_" . $id);
-        // Сбрасываем все списки (пагинацию)
+        // Удаляем все списки, так как в них данные этого контакта теперь неверные
         $cache->deleteByPrefix("contacts_list");
+        $cache->deleteByPrefix("contacts_type");
     }
-    return $success;
+    return $result;
 }
 /**
  * Удалить контакт
@@ -1205,14 +1434,14 @@ function deleteContact($conn, $id) {
     $stmt = $conn->prepare("DELETE FROM contacts WHERE id = ?");
     $stmt->bind_param("i", $id);
     
-    $success = $stmt->execute();
-    if ($success) {
+    $result = $stmt->execute();
+    if ($result) {
         $cache->delete("contact_item_" . $id);
-        $cache->deleteByPrefix("contacts_");
+        $cache->deleteByPrefix("contacts_list");
+        $cache->deleteByPrefix("contacts_type");
     }
-    return $success;
+    return $result;
 }
-
 
 
 // CATEGORIES
@@ -1313,6 +1542,8 @@ function updateCategory($conn, $id, $data) {
     if ($success) {
         // Сбрасываем кэш этой категории и всех списков
         $cache->deleteByPrefix("categories_");
+        $cache->deleteByPrefix("product_");
+        $cache->deleteByPrefix("admin_product_");
     }
     return $success;
 }
@@ -1443,6 +1674,8 @@ function addArticle($conn, $data) {
     if ($success) {
         // Сбрасываем все списки статей, так как появилась новая запись
         $cache->deleteByPrefix("articles_list");
+        $cache->deleteByPrefix("article_slug");
+
     }
     return $success;
 }
@@ -1471,6 +1704,7 @@ function updateArticle($conn, $id, $data) {
         $cache->delete("article_item_" . $id);
         // Сбрасываем списки, так как заголовки или анонсы в списках могли измениться
         $cache->deleteByPrefix("articles_list");
+        $cache->deleteByPrefix("article_slug");
     }
     return $success;
 }
@@ -1491,8 +1725,9 @@ function deleteArticle($conn, $id) {
     $success = $stmt->execute();
     if ($success) {
         // Полная очистка по префиксу (удалит и саму статью, и все списки)
-        $cache->delete("article_item_" . $id);
+        $cache->delete("article_slug_" . $id);
         $cache->deleteByPrefix("articles_list");
+
     }
     return $success;
 }

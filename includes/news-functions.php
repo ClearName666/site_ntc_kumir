@@ -3,40 +3,78 @@
 require_once __DIR__ . '/../config/database.php';
 
 // Функция для получения всех опубликованных новостей
+// function getNews($conn, $limit = null, $offset = 0) {
+//     // $conn = getDBConnection();
+    
+//     $sql = "SELECT * FROM news WHERE is_published = 1 ORDER BY published_at DESC";
+    
+//     if ($limit) {
+//         $sql .= " LIMIT " . intval($offset) . ", " . intval($limit);
+//     }
+    
+//     $result = $conn->query($sql);
+//     $news = [];
+    
+//     while ($row = $result->fetch_assoc()) {
+//         $news[] = $row;
+//     }
+    
+//     return $news;
+// }
 function getNews($conn, $limit = null, $offset = 0) {
-    // $conn = getDBConnection();
-    
+    global $cache;
+    // Создаем уникальный ключ для каждой страницы пагинации
+    $cacheKey = "news_list_l" . intval($limit) . "_o" . intval($offset);
+
+    $cached = $cache->get($cacheKey);
+    if ($cached !== null) return $cached;
+
     $sql = "SELECT * FROM news WHERE is_published = 1 ORDER BY published_at DESC";
-    
-    if ($limit) {
+    if ($limit !== null) {
         $sql .= " LIMIT " . intval($offset) . ", " . intval($limit);
     }
     
     $result = $conn->query($sql);
     $news = [];
-    
     while ($row = $result->fetch_assoc()) {
         $news[] = $row;
     }
     
+    $cache->set($cacheKey, $news);
     return $news;
 }
 
 // Функция для получения одной новости по slug
+// function getNewsBySlug($conn, $slug) {
+//     // $conn = getDBConnection();
+//     $stmt = $conn->prepare("SELECT * FROM news WHERE slug = ? AND is_published = 1");
+//     $stmt->bind_param("s", $slug);
+//     $stmt->execute();
+//     $result = $stmt->get_result();
+    
+//     if ($row = $result->fetch_assoc()) {
+//         // Увеличиваем счетчик просмотров
+//         $conn->query("UPDATE news SET views = views + 1 WHERE id = " . $row['id']);
+//         return $row;
+//     }
+    
+//     return null;
+// }
+// Получение одной новости по slug
 function getNewsBySlug($conn, $slug) {
-    // $conn = getDBConnection();
+    global $cache;
+    $cacheKey = "news_single_" . md5($slug);
+
+    $cached = $cache->get($cacheKey);
+    if ($cached !== null) return $cached;
+
     $stmt = $conn->prepare("SELECT * FROM news WHERE slug = ? AND is_published = 1");
     $stmt->bind_param("s", $slug);
     $stmt->execute();
-    $result = $stmt->get_result();
+    $data = $stmt->get_result()->fetch_assoc();
     
-    if ($row = $result->fetch_assoc()) {
-        // Увеличиваем счетчик просмотров
-        $conn->query("UPDATE news SET views = views + 1 WHERE id = " . $row['id']);
-        return $row;
-    }
-    
-    return null;
+    if ($data) $cache->set($cacheKey, $data);
+    return $data;
 }
 
 // Функция для получения количества новостей
@@ -48,19 +86,43 @@ function getNewsCount($conn) {
 }
 
 // Функция для получения последних новостей
+// function getLatestNews($conn, $limit = 3) {
+//     // $conn = getDBConnection();
+//     $stmt = $conn->prepare("SELECT * FROM news WHERE is_published = 1 ORDER BY published_at DESC LIMIT ?");
+//     $stmt->bind_param("i", $limit);
+//     $stmt->execute();
+//     $result = $stmt->get_result();
+    
+//     $news = [];
+//     while ($row = $result->fetch_assoc()) {
+//         $news[] = $row;
+//     }
+    
+//     return $news;
+// }
+// Получение последних новостей (например, для главной)
 function getLatestNews($conn, $limit = 3) {
-    // $conn = getDBConnection();
+    global $cache;
+    $cacheKey = "news_latest_" . $limit;
+
+    $cached = $cache->get($cacheKey);
+    if ($cached !== null) return $cached;
+
     $stmt = $conn->prepare("SELECT * FROM news WHERE is_published = 1 ORDER BY published_at DESC LIMIT ?");
     $stmt->bind_param("i", $limit);
     $stmt->execute();
-    $result = $stmt->get_result();
+    $data = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     
-    $news = [];
-    while ($row = $result->fetch_assoc()) {
-        $news[] = $row;
-    }
-    
-    return $news;
+    $cache->set($cacheKey, $data);
+    return $data;
+}
+
+// Функция для увеличения счетчика просмотров
+function incrementNewsViews($conn, $articleId) {
+    // $conn = getDBConnection();
+    $stmt = $conn->prepare("UPDATE news SET views = views + 1 WHERE id = ?");
+    $stmt->bind_param("i", $articleId);
+    $stmt->execute();
 }
 
 // Функция для отображения карточек новостей
@@ -149,5 +211,14 @@ function renderNewsPagination($currentPage, $totalPages, $baseUrl = 'news.php') 
     }
     
     echo '</div>';
+}
+
+
+function getActualNewsViews($conn, $newsId) {
+    $stmt = $conn->prepare("SELECT views FROM news WHERE id = ?");
+    $stmt->bind_param("i", $newsId);
+    $stmt->execute();
+    $res = $stmt->get_result()->fetch_assoc();
+    return $res ? $res['views'] : 0;
 }
 ?>
