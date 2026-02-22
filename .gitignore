@@ -1,7 +1,7 @@
-# Игнорировать всё содержимое папки с картинками, кроме самого файла-заглушки
-assets/images/*
-!assets/images/.gitkeep
+# Игнорируем всё внутри папки uploads, кроме .gitkeep
+assets/images/uploads/*
+!assets/images/uploads/.gitkeep
 
-# Игнорировать всё содержимое папки с кэшем
+# Игнорируем всё внутри папки cache, кроме .gitkeep
 cache/*
 !cache/.gitkeep
