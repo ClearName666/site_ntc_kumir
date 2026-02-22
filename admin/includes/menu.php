@@ -54,6 +54,30 @@ $current_page = basename($_SERVER['PHP_SELF']);
             <i class="fas fa-file-alt"></i>
             <span>Текстовые блоки</span>
         </a>
+        <a href="cards.php" class="menu-item <?php echo ($current_page == 'cards.php') ? 'active' : ''; ?>">
+            <i class="fas fa-th-large"></i> 
+            <span>Карточки товаров</span>
+        </a>
+
+        <a href="statistics.php" class="menu-item <?php echo ($current_page == 'statistics.php') ? 'active' : ''; ?>">
+            <i class="fas fa-chart-bar"></i> 
+            <span>Статистика</span>
+        </a>
+
+        <a href="features.php" class="menu-item <?php echo ($current_page == 'features.php') ? 'active' : ''; ?>">
+            <i class="fas fa-star"></i> 
+            <span>Главные преимущества</span>
+        </a>
+
+        <a href="advantages.php" class="menu-item <?php echo ($current_page == 'advantages.php') ? 'active' : ''; ?>">
+            <i class="fas fa-check-circle"></i> 
+            <span>Преимущества</span>
+        </a>
+
+        <a href="offices.php" class="menu-item <?php echo ($current_page == 'offices.php') ? 'active' : ''; ?>">
+            <i class="fas fa-building"></i> 
+            <span>Офисы</span>
+        </a>
         <a href="articles.php" class="menu-item <?php echo ($current_page == 'articles.php') ? 'active' : ''; ?>">
             <i class="fas fa-newspaper"></i>
             <span>Статьи</span>
@@ -85,6 +109,10 @@ $current_page = basename($_SERVER['PHP_SELF']);
         <a href="settings.php" class="menu-item <?php echo ($current_page == 'settings.php') ? 'active' : ''; ?>">
             <i class="fas fa-cog"></i>
             <span>Настройки сайта</span>
+        </a>
+        <a href="images.php" class="menu-item <?php echo ($current_page == 'images.php') ? 'active' : ''; ?>">
+            <i class="fas fa-images"></i>
+            <span>Изображения</span>
         </a>
         <a href="menu.php" class="menu-item <?php echo ($current_page == 'menu.php') ? 'active' : ''; ?>">
             <i class="fas fa-bars"></i>

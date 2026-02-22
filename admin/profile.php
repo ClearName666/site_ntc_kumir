@@ -199,40 +199,6 @@ require_once __DIR__. '/includes/menu.php';
                         </form>
                     </div>
                 </div>
-                
-                <!-- Смена пароля -->
-                <div class="card mt-4">
-                    <div class="card-header">
-                        <h3><i class="fas fa-key"></i> Смена пароля</h3>
-                    </div>
-                    <div class="card-body">
-                        <form method="POST" action="">
-                            <div class="form-group">
-                                <label for="current_password">Текущий пароль *</label>
-                                <input type="password" id="current_password" name="current_password" class="form-control" required>
-                            </div>
-                            
-                            <div class="form-row">
-                                <div class="form-group col-md-6">
-                                    <label for="new_password">Новый пароль *</label>
-                                    <input type="password" id="new_password" name="new_password" class="form-control" required>
-                                    <small class="text-muted">Минимум 6 символов</small>
-                                </div>
-                                
-                                <div class="form-group col-md-6">
-                                    <label for="confirm_password">Подтверждение пароля *</label>
-                                    <input type="password" id="confirm_password" name="confirm_password" class="form-control" required>
-                                </div>
-                            </div>
-                            
-                            <div class="form-actions">
-                                <button type="submit" name="change_password" class="btn btn-primary">
-                                    <i class="fas fa-key"></i> Сменить пароль
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
             </div>
         </div>
     </div>

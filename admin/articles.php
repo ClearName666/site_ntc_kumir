@@ -250,14 +250,6 @@ require_once __DIR__. '/includes/menu.php';
                                 <input type="file" id="article-image" name="image" class="drop-zone__input" accept="image/*">
                                 <input type="hidden" name="existing_image" id="existing_image_input" value="<?php echo $article['image_path'] ?? ''; ?>">
                             </div>
-
-                            <?php if (!empty($article['image_path'])): ?>
-                                <div class="mt-2" id="remove-image-btn">
-                                    <button type="button" onclick="removeArticleImage()" class="btn btn-sm btn-outline-danger">
-                                        <i class="fas fa-trash"></i> Удалить текущую обложку
-                                    </button>
-                                </div>
-                            <?php endif; ?>
                             
                             <small class="text-muted">Рекомендуемый размер: 1200×600px (16:9), форматы: JPG, PNG, WebP, SVG</small>
                         </div>

@@ -69,6 +69,23 @@ function getMapLocation($conn) {
 }
 
 // Остальные функции остаются как были, но обновим advantages для отображения в две колонки
+// function renderAdvantages($conn) {
+//     $advantages = getAdvantages($conn);
+//     echo '<div class="advantages-grid">';
+//     foreach ($advantages as $advantage) {
+//         echo '<div class="advantage-item">';
+//         echo '<div class="advantage-header">';
+//         echo '<div class="advantage-icon">';
+//         // Здесь можно использовать иконки или текст
+//         echo '<span>✓</span>';
+//         echo '</div>';
+//         echo '<h3 class="advantage-title">' . $advantage['title'] . '</h3>';
+//         echo '</div>';
+//         echo '<p class="advantage-description">' . $advantage['description'] . '</p>';
+//         echo '</div>';
+//     }
+//     echo '</div>';
+// }
 function renderAdvantages($conn) {
     $advantages = getAdvantages($conn);
     echo '<div class="advantages-grid">';
@@ -76,17 +93,30 @@ function renderAdvantages($conn) {
         echo '<div class="advantage-item">';
         echo '<div class="advantage-header">';
         echo '<div class="advantage-icon">';
-        // Здесь можно использовать иконки или текст
-        echo '<span>✓</span>';
+        
+        $fileName = !empty($advantage['icon_path']) ? basename($advantage['icon_path']) : '';
+        // Полный путь для проверки на сервере (относительно этого файла)
+        $serverPath = __DIR__ . '/../assets/images/uploads/' . $fileName;
+        // Путь для браузера
+        $browserPath = '/assets/images/uploads/' . $fileName;
+
+        // Если путь в базе не пустой И файл реально существует на диске
+        if (!empty($fileName) && file_exists($serverPath)) {
+            echo '<img src="' . $browserPath . '" alt="' . htmlspecialchars($advantage['title']) . '">';
+        } else {
+            // Если картинки нет или она не нашлась — ставим галочку
+            echo '<span>✓</span>';
+        }
+        
+        echo '</div>'; // Конец .advantage-icon
+
+        echo '<h3 class="advantage-title">' . htmlspecialchars($advantage['title']) . '</h3>';
         echo '</div>';
-        echo '<h3 class="advantage-title">' . $advantage['title'] . '</h3>';
-        echo '</div>';
-        echo '<p class="advantage-description">' . $advantage['description'] . '</p>';
+        echo '<p class="advantage-description">' . htmlspecialchars($advantage['description']) . '</p>';
         echo '</div>';
     }
     echo '</div>';
 }
-
 function renderMenu($conn) {
     $menuItems = getMenuItems($conn);
     foreach ($menuItems as $item) {

@@ -162,22 +162,6 @@ require_once __DIR__. '/includes/menu.php';
                                 <small class="text-muted">ICO, PNG</small>
                             </div>
                         </div>
-
-                        <div class="form-group image-field-col">
-                            <label>Фоновое изображение</label>
-                            <div class="image-upload-container">
-                                <div class="drop-zone" > <!-- onclick="document.getElementById('bg-input').click()" -->
-                                    <?php if (!empty($settings['background_image'])): ?>
-                                        <img src="../<?php echo $settings['background_image']; ?>" class="drop-zone__thumb" alt="Фон">
-                                    <?php else: ?>
-                                        <span class="drop-zone__prompt"><i class="fas fa-image"></i>Фон HD</span>
-                                    <?php endif; ?>
-                                    <input type="file" name="background" id="bg-input" class="drop-zone__input" accept="image/*">
-                                </div>
-                                <small class="text-muted">Рекомендуемый размер: HD</small>
-                            </div>
-                        </div>
-                        
                     </div>
                 </div>
             </div>

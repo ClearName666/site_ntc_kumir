@@ -268,6 +268,7 @@ require_once __DIR__. '/includes/menu.php';
         </div>
         <?php endif; ?>
     </div>
+    <script src="assets/js/admin.js"></script>
 </div>
 
 <?php

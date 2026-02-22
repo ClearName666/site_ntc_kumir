@@ -216,46 +216,30 @@ $mapLng = $mainOffice ? $mainOffice['longitude'] : 104.278817;
 
 
 
-        // Инициализация Яндекс Карты
-        ymaps.ready(initMap);
+    // Инициализация Яндекс Карты
+    ymaps.ready(initMap);
+
+    function initMap() {
+        // Если главного офиса нет в базе, карта не упадет, а возьмет дефолтные координаты
+        const map = new ymaps.Map('yandex-map', {
+            center: [<?= $mapLat ?>, <?= $mapLng ?>],
+            zoom: 16,
+            controls: ['zoomControl', 'fullscreenControl']
+        });
         
-        function initMap() {
-            const map = new ymaps.Map('yandex-map', {
-                center: [<?= $mapLat ?>, <?= $mapLng ?>],
-                zoom: 16,
-                controls: ['zoomControl', 'fullscreenControl']
-            });
-            
-            // Добавляем метку
-            const placemark = new ymaps.Placemark([<?= $mapLat ?>, <?= $mapLng ?>], {
-                balloonContent: '<?= addslashes($mainOffice ? $mainOffice['address'] : 'НТЦ КУМИР') ?>',
-                hintContent: 'НТЦ КУМИР'
-            }, {
-                preset: 'islands#darkGreenDotIconWithCaption'
-            });
-            
-            map.geoObjects.add(placemark);
-            
-            // Добавляем остальные офисы
-            <?php foreach ($offices as $office): ?>
-                <?php if (!$office['is_main'] && !empty($office['latitude']) && !empty($office['longitude'])): ?>
-                    const officePlacemark = new ymaps.Placemark(
-                        [<?= $office['latitude'] ?>, <?= $office['longitude'] ?>],
-                        {
-                            balloonContent: '<?= addslashes($office['city'] . ', ' . $office['address']) ?>',
-                            hintContent: 'Офис в <?= addslashes($office['city']) ?>'
-                        },
-                        {
-                            preset: 'islands#blueDotIconWithCaption'
-                        }
-                    );
-                    map.geoObjects.add(officePlacemark);
-                <?php endif; ?>
-            <?php endforeach; ?>
-            
-            // Открываем балун главной метки
-            placemark.balloon.open();
-        }
+        // Добавляем ТОЛЬКО ОДНУ метку (Главный офис)
+        const placemark = new ymaps.Placemark([<?= $mapLat ?>, <?= $mapLng ?>], {
+            balloonContent: '<?= addslashes($mainOffice ? $mainOffice['address'] : 'НТЦ КУМИР') ?>',
+            hintContent: 'НТЦ КУМИР'
+        }, {
+            preset: 'islands#darkGreenDotIconWithCaption'
+        });
+        
+        map.geoObjects.add(placemark);
+        
+        // Открываем балун главной метки
+        placemark.balloon.open();
+    }
         
         // Копирование адреса
         function copyAddress() {

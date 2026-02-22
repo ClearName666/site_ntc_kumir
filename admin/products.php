@@ -308,14 +308,6 @@ require_once __DIR__. '/includes/menu.php';
                                     <input type="file" id="product-image" name="image" class="drop-zone__input" accept="image/*">
                                     <input type="hidden" name="existing_image" id="existing_image_input" value="<?php echo $product['image_path'] ?? ''; ?>">
                                 </div>
-
-                                <?php if (!empty($product['image_path'])): ?>
-                                    <div class="mt-2 text-center" id="remove-image-wrapper">
-                                        <button type="button" onclick="removeProductImage()" class="btn btn-sm btn-outline-danger">
-                                            <i class="fas fa-trash-alt"></i> Удалить фото
-                                        </button>
-                                    </div>
-                                <?php endif; ?>
                                 <small class="text-muted d-block mt-1">Рекомендуемый размер: 800×800px (JPG, PNG)</small>
                             </div>
                         </div>

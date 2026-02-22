@@ -103,9 +103,6 @@ require_once __DIR__. '/includes/menu.php';
             <div class="card-header">
                 <div class="d-flex justify-content-between align-items-center">
                     <h3>Журнал действий</h3>
-                    <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#clearLogsModal">
-                        <i class="fas fa-broom"></i> Очистить логи
-                    </button>
                 </div>
             </div>
             <div class="card-body">
@@ -149,39 +146,6 @@ require_once __DIR__. '/includes/menu.php';
                     </table>
                 </div>
             </div>
-        </div>
-    </div>
-</div>
-
-<!-- Модальное окно очистки логов -->
-<div class="modal fade" id="clearLogsModal" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Очистка логов</h5>
-                <button type="button" class="close" data-dismiss="modal">
-                    <span>&times;</span>
-                </button>
-            </div>
-            <form method="POST" action="">
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label for="days">Удалить логи старше (дней)</label>
-                        <select id="days" name="days" class="form-control" required>
-                            <option value="7">7 дней</option>
-                            <option value="30">30 дней</option>
-                            <option value="90">90 дней</option>
-                            <option value="180">180 дней</option>
-                            <option value="365">365 дней</option>
-                        </select>
-                        <small class="text-muted">Все логи старше указанного периода будут удалены безвозвратно.</small>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
-                    <button type="submit" name="clear_logs" class="btn btn-danger">Очистить логи</button>
-                </div>
-            </form>
         </div>
     </div>
 </div>

@@ -470,24 +470,67 @@ function updateImageSettings($conn, $imageKey, $settingKey, $path) {
     $stmt1->execute();
 
     // 2. Обновляем или вставляем в таблицу images
-    $checkStmt = $conn->prepare("SELECT id FROM images WHERE image_key = ?");
-    $checkStmt->bind_param("s", $imageKey);
-    $checkStmt->execute();
+    // $checkStmt = $conn->prepare("SELECT id FROM images WHERE image_key = ?");
+    // $checkStmt->bind_param("s", $imageKey);
+    // $checkStmt->execute();
     
-    if ($checkStmt->get_result()->num_rows > 0) {
-        $stmt2 = $conn->prepare("UPDATE images SET image_path = ?, created_at = NOW() WHERE image_key = ?");
-        $stmt2->bind_param("ss", $path, $imageKey);
-    } else {
-        $altText = ucfirst($imageKey);
-        $stmt2 = $conn->prepare("INSERT INTO images (image_key, image_path, alt_text, category, sort_order, created_at) VALUES (?, ?, ?, 'content', 0, NOW())");
-        $stmt2->bind_param("sss", $imageKey, $path, $altText);
-    }
+    // if ($checkStmt->get_result()->num_rows > 0) {
+    //     $stmt2 = $conn->prepare("UPDATE images SET image_path = ?, created_at = NOW() WHERE image_key = ?");
+    //     $stmt2->bind_param("ss", $path, $imageKey);
+    // } else {
+    //     $altText = ucfirst($imageKey);
+    //     $stmt2 = $conn->prepare("INSERT INTO images (image_key, image_path, alt_text, category, sort_order, created_at) VALUES (?, ?, ?, 'content', 0, NOW())");
+    //     $stmt2->bind_param("sss", $imageKey, $path, $altText);
+    // }
 
     $cache->deleteByPrefix("image_key_");   
 
-    return $stmt2->execute();
+    return $stmt1->execute();
+}
 
-     
+
+// IMAGE
+
+
+/**
+ * Получает все изображения из таблицы images с поддержкой кэширования
+ */
+function getAllImagesFromDB($conn) {
+    global $cache;
+    $cacheKey = 'all_site_images';
+    
+    $cachedData = $cache->get($cacheKey);
+    if ($cachedData !== null) {
+        return $cachedData;
+    }
+
+    $result = $conn->query("SELECT * FROM images ORDER BY category, id");
+    $images = [];
+    while ($row = $result->fetch_assoc()) {
+        $images[] = $row;
+    }
+
+    $cache->set($cacheKey, $images);
+    return $images;
+}
+
+/**
+ * Обновляет путь к изображению в таблице images и чистит кэш
+ */
+function updateImageInTable($conn, $id, $newPath) {
+    global $cache;
+
+    $stmt = $conn->prepare("UPDATE images SET image_path = ? WHERE id = ?");
+    $stmt->bind_param("si", $newPath, $id);
+    $res = $stmt->execute();
+    if ($res) {
+        // Очищаем кэш списка изображений и общих настроек (на всякий случай)
+        $cache->delete('all_site_images');
+        $cache->deleteByPrefix('settings_');
+        $cache->deleteByPrefix('image_key_');
+        
+    }
+    return $res;
 }
 
 
@@ -1261,28 +1304,80 @@ function deleteFaq($conn, $id) {
 /**
  * Получить все контент-блоки
  */
+// function getAllContentBlocks($conn) {
+//     $result = $conn->query("SELECT * FROM content_blocks ORDER BY block_key");
+//     return $result->fetch_all(MYSQLI_ASSOC);
+// }
+/**
+ * Получить все контент-блоки (для админки)
+ */
 function getAllContentBlocks($conn) {
+    global $cache;
+    $cacheKey = "admin_content_blocks_all";
+
+    $cached = $cache->get($cacheKey);
+    if ($cached !== null) return $cached;
+
     $result = $conn->query("SELECT * FROM content_blocks ORDER BY block_key");
-    return $result->fetch_all(MYSQLI_ASSOC);
+    $data = $result->fetch_all(MYSQLI_ASSOC);
+    
+    $cache->set($cacheKey, $data);
+    return $data;
 }
 
 /**
  * Получить конкретный блок по ID
  */
+// function getContentBlockById($conn, $id) {
+//     $stmt = $conn->prepare("SELECT * FROM content_blocks WHERE id = ?");
+//     $stmt->bind_param("i", $id);
+//     $stmt->execute();
+//     return $stmt->get_result()->fetch_assoc();
+// }
 function getContentBlockById($conn, $id) {
+    global $cache;
+    $cacheKey = "content_block_id_" . intval($id);
+
+    $cached = $cache->get($cacheKey);
+    if ($cached !== null) return $cached;
+
     $stmt = $conn->prepare("SELECT * FROM content_blocks WHERE id = ?");
     $stmt->bind_param("i", $id);
     $stmt->execute();
-    return $stmt->get_result()->fetch_assoc();
+    $data = $stmt->get_result()->fetch_assoc();
+    
+    if ($data) {
+        $cache->set($cacheKey, $data);
+    }
+    return $data;
 }
 
 /**
  * Обновить контент-блок
  */
+// function updateContentBlock($conn, $id, $title, $content) {
+//     $stmt = $conn->prepare("UPDATE content_blocks SET title = ?, content = ?, updated_at = NOW() WHERE id = ?");
+//     $stmt->bind_param("ssi", $title, $content, $id);
+//     return $stmt->execute();
+// }
 function updateContentBlock($conn, $id, $title, $content) {
+    global $cache;
+    
     $stmt = $conn->prepare("UPDATE content_blocks SET title = ?, content = ?, updated_at = NOW() WHERE id = ?");
     $stmt->bind_param("ssi", $title, $content, $id);
-    return $stmt->execute();
+    $res = $stmt->execute();
+    
+    if ($res) {
+        // Очищаем кэш по ID
+        $cache->delete("content_block_id_" . $id);
+        
+        // ВАЖНО: Очищаем вообще ВСЕ контентные блоки для сайта и админки,
+        // так как мы не знаем block_key в этой функции, а сайт запрашивает данные по нему.
+        $cache->deleteByPrefix("content_block_");
+        $cache->deleteByPrefix("admin_content_blocks_");
+    }
+    
+    return $res;
 }
 
 /**
@@ -1894,4 +1989,544 @@ function deleteAdmin($conn, $id) {
     return $success;
 }
 
+
+
+// FEATURES
+
+
+
+/**
+ * Получить список всех преимуществ (для админки с пагинацией)
+ */
+function getAdminFeaturesList($conn, $limit, $offset) {
+    global $cache;
+    $cacheKey = "admin_features_list_l{$limit}_o{$offset}";
+
+    $cached = $cache->get($cacheKey);
+    if ($cached !== null) return $cached;
+
+    $stmt = $conn->prepare("SELECT * FROM features ORDER BY sort_order ASC, id DESC LIMIT ? OFFSET ?");
+    $stmt->bind_param("ii", $limit, $offset);
+    $stmt->execute();
+    $data = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    
+    $cache->set($cacheKey, $data);
+    return $data;
+}
+
+/**
+ * Получить одно преимущество по ID
+ */
+function getFeatureById($conn, $id) {
+    global $cache;
+    $cacheKey = "feature_item_" . intval($id);
+
+    $cached = $cache->get($cacheKey);
+    if ($cached !== null) return $cached;
+
+    $stmt = $conn->prepare("SELECT * FROM features WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $data = $stmt->get_result()->fetch_assoc();
+
+    if ($data) $cache->set($cacheKey, $data);
+    return $data;
+}
+
+/**
+ * Добавить преимущество
+ */
+function addFeature($conn, $data) {
+    global $cache;
+    $stmt = $conn->prepare("INSERT INTO features (title, description, sort_order, is_active) VALUES (?, ?, ?, ?)");
+    $stmt->bind_param("ssii", $data['title'], $data['description'], $data['sort_order'], $data['is_active']);
+    
+    $res = $stmt->execute();
+    if ($res) {
+        $cache->deleteByPrefix("features_active_"); // чистим фронтенд
+        $cache->deleteByPrefix("admin_features_"); // чистим админку
+    }
+    return $res;
+}
+
+/**
+ * Обновить преимущество
+ */
+function updateFeature($conn, $id, $data) {
+    global $cache;
+    // Убрали updated_at, так как этой колонки нет в таблице
+    $stmt = $conn->prepare("UPDATE features SET title = ?, description = ?, sort_order = ?, is_active = ? WHERE id = ?");
+    
+    // В bind_param теперь 4 строки/числа для данных и 1 для ID (ssii + i)
+    $stmt->bind_param("ssiii", 
+        $data['title'], 
+        $data['description'], 
+        $data['sort_order'], 
+        $data['is_active'], 
+        $id
+    );
+    
+    $res = $stmt->execute();
+    if ($res) {
+        // Чистим кэш, чтобы изменения сразу появились на сайте
+        $cache->delete("feature_item_" . $id);
+        $cache->deleteByPrefix("features_active_");
+        $cache->deleteByPrefix("admin_features_");
+    }
+    return $res;
+}
+
+/**
+ * Удалить преимущество
+ */
+function deleteFeature($conn, $id) {
+    global $cache;
+    $stmt = $conn->prepare("DELETE FROM features WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    
+    $res = $stmt->execute();
+    if ($res) {
+        $cache->delete("feature_item_" . $id);
+        $cache->deleteByPrefix("features_active_");
+        $cache->deleteByPrefix("admin_features_");
+    }
+    return $res;
+}
+
+
+
+
+
+
+// Advantages
+
+/**
+ * Получить список всех преимуществ (админка)
+ */
+function getAdminAdvantagesList($conn, $limit, $offset) {
+    global $cache;
+    $cacheKey = "admin_advantages_list_l{$limit}_o{$offset}";
+    $cached = $cache->get($cacheKey);
+    if ($cached !== null) return $cached;
+
+    $stmt = $conn->prepare("SELECT * FROM advantages ORDER BY sort_order ASC LIMIT ? OFFSET ?");
+    $stmt->bind_param("ii", $limit, $offset);
+    $stmt->execute();
+    $data = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    $cache->set($cacheKey, $data);
+    return $data;
+}
+
+// function addAdvantage($conn, $data) {
+//     global $cache;
+//     $stmt = $conn->prepare("INSERT INTO advantages (title, description, icon_path, sort_order, is_active) VALUES (?, ?, ?, ?, ?)");
+//     $stmt->bind_param("sssii", $data['title'], $data['description'], $data['icon_path'], $data['sort_order'], $data['is_active']);
+//     $res = $stmt->execute();
+//     if ($res) {
+//         $cache->deleteByPrefix("advantages_active_"); 
+//         $cache->deleteByPrefix("admin_advantages_");
+//         $cache->deleteByPrefix("advantage_item_");
+//     }
+//     return $res;
+// }
+function addAdvantage($conn, $data) {
+    global $cache;
+    // Исправлено: icon_path в запросе
+    $sql = "INSERT INTO advantages (title, description, icon_path, sort_order, is_active) VALUES (?, ?, ?, ?, ?)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param('sssii', $data['title'], $data['description'], $data['icon_path'], $data['sort_order'], $data['is_active']);
+    $res = $stmt->execute();
+    if ($res) {
+        $cache->deleteByPrefix("advantages_active_");
+        $cache->deleteByPrefix("admin_advantages_");
+        $cache->deleteByPrefix("advantage_item_");
+    }
+    return $res;
+}
+
+// function updateAdvantage($conn, $id, $data) {
+//     global $cache;
+//     $stmt = $conn->prepare("UPDATE advantages SET title = ?, description = ?, icon_path = ?, sort_order = ?, is_active = ? WHERE id = ?");
+//     $stmt->bind_param("sssiii", $data['title'], $data['description'], $data['icon_path'], $data['sort_order'], $data['is_active'], $id);
+//     $res = $stmt->execute();
+//     if ($res) {
+//         $cache->deleteByPrefix("advantages_active_");
+//         $cache->deleteByPrefix("admin_advantages_");
+//         $cache->deleteByPrefix("advantage_item_");
+//     }
+//     return $res;
+// }
+function updateAdvantage($conn, $id, $data) {
+    global $cache;
+    // Исправлено: icon_path в запросе
+    $sql = "UPDATE advantages SET title = ?, description = ?, icon_path = ?, sort_order = ?, is_active = ? WHERE id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param('sssiii', $data['title'], $data['description'], $data['icon_path'], $data['sort_order'], $data['is_active'], $id);
+    $res = $stmt->execute();
+    if ($res) {
+        $cache->deleteByPrefix("advantages_active_");
+        $cache->deleteByPrefix("admin_advantages_");
+        $cache->deleteByPrefix("advantage_item_");
+    }
+    return $res;
+}
+
+/**
+ * Получить преимущество по ID (для формы редактирования)
+ */
+// function getAdvantageById($conn, $id) {
+//     global $cache;
+//     $id = intval($id);
+//     $cacheKey = "advantage_item_" . $id;
+
+//     $cached = $cache->get($cacheKey);
+//     if ($cached !== null) return $cached;
+
+//     $stmt = $conn->prepare("SELECT * FROM advantages WHERE id = ?");
+//     $stmt->bind_param("i", $id);
+//     $stmt->execute();
+//     $data = $stmt->get_result()->fetch_assoc();
+
+//     if ($data) {
+//         $cache->set($cacheKey, $data);
+//     }
+//     return $data;
+// }
+/**
+ * Получить преимущество по ID с кэшированием
+ */
+function getAdvantageById($conn, $id) {
+    global $cache;
+    $id = intval($id);
+    $cacheKey = "advantage_item_" . $id;
+
+    $cached = $cache->get($cacheKey);
+    if ($cached !== null) return $cached;
+
+    // Исправлено: запрашиваем icon_path
+    $stmt = $conn->prepare("SELECT id, title, description, icon_path, sort_order, is_active FROM advantages WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $data = $stmt->get_result()->fetch_assoc();
+
+    if ($data) {
+        $cache->set($cacheKey, $data);
+    }
+    return $data;
+}
+
+/**
+ * Удалить преимущество
+ */
+function deleteAdvantage($conn, $id) {
+    global $cache;
+    $stmt = $conn->prepare("DELETE FROM advantages WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    $res = $stmt->execute();
+    if ($res) {
+        $cache->deleteByPrefix("advantages_active_");
+        $cache->deleteByPrefix("admin_advantages_");
+        $cache->deleteByPrefix("advantage_item_");
+    }
+    return $res;
+}
+
+/**
+ * Получает список всех преимуществ для админки с кэшированием
+ */
+function getAdvantagesList($conn, $limit = 100, $offset = 0) {
+    global $cache;
+    $cacheKey = "admin_advantages_list_l{$limit}_o{$offset}";
+    
+    $cached = $cache->get($cacheKey);
+    if ($cached !== null) return $cached;
+
+    $sql = "SELECT * FROM advantages ORDER BY sort_order ASC, id DESC LIMIT ? OFFSET ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param('ii', $limit, $offset);
+    $stmt->execute();
+    $data = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    
+    $cache->set($cacheKey, $data);
+    return $data;
+}
+
+// Offices
+
+
+/**
+ * Получить список всех офисов (админка)
+ */
+function getAdminOfficesList($conn) {
+    global $cache;
+    $cacheKey = "admin_offices_all";
+    $cached = $cache->get($cacheKey);
+    if ($cached !== null) return $cached;
+
+    $result = $conn->query("SELECT * FROM offices ORDER BY is_main DESC, sort_order ASC");
+    $data = $result->fetch_all(MYSQLI_ASSOC);
+    $cache->set($cacheKey, $data);
+    return $data;
+}
+
+function addOffice($conn, $data) {
+    global $cache;
+    $stmt = $conn->prepare("INSERT INTO offices (city, address, phone, email, work_hours, latitude, longitude, is_main, sort_order) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("sssssddii", 
+        $data['city'], $data['address'], $data['phone'], $data['email'], 
+        $data['work_hours'], $data['latitude'], $data['longitude'], 
+        $data['is_main'], $data['sort_order']
+    );
+    $res = $stmt->execute();
+    if ($res) {
+        $cache->deleteByPrefix("office"); // Удалит и office_main, и offices_all
+        $cache->deleteByPrefix("admin_offices_");
+        $cache->deleteByPrefix("office_item_");
+    }
+    return $res;
+}
+
+function updateOffice($conn, $id, $data) {
+    global $cache;
+    $stmt = $conn->prepare("UPDATE offices SET city=?, address=?, phone=?, email=?, work_hours=?, latitude=?, longitude=?, is_main=?, sort_order=? WHERE id=?");
+    $stmt->bind_param("sssssddiii", 
+        $data['city'], $data['address'], $data['phone'], $data['email'], 
+        $data['work_hours'], $data['latitude'], $data['longitude'], 
+        $data['is_main'], $data['sort_order'], $id
+    );
+    $res = $stmt->execute();
+    if ($res) {
+        $cache->deleteByPrefix("office");
+        $cache->deleteByPrefix("admin_offices_");
+        $cache->deleteByPrefix("office_item_");
+    }
+    return $res;
+}
+
+
+/**
+ * Получить офис по ID (для формы редактирования)
+ */
+function getOfficeById($conn, $id) {
+    global $cache;
+    $id = intval($id);
+    $cacheKey = "office_item_" . $id;
+
+    $cached = $cache->get($cacheKey);
+    if ($cached !== null) return $cached;
+
+    $stmt = $conn->prepare("SELECT * FROM offices WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $data = $stmt->get_result()->fetch_assoc();
+
+    if ($data) {
+        $cache->set($cacheKey, $data);
+    }
+    return $data;
+}
+
+/**
+ * Удалить офис
+ */
+function deleteOffice($conn, $id) {
+    global $cache;
+    $stmt = $conn->prepare("DELETE FROM offices WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    $res = $stmt->execute();
+    if ($res) {
+        $cache->deleteByPrefix("office");
+        $cache->deleteByPrefix("admin_offices_");
+        $cache->deleteByPrefix("office_item_");
+    }
+    return $res;
+}
+
+
+// STATISTIC
+
+/** --- Функции для работы со СТАТИСТИКОЙ --- **/
+
+function getStatsList($conn, $perPage, $offset) {
+    global $cache;
+    $cacheKey = "admin_stats_list_p" . $perPage . "_o" . $offset;
+
+    $cached = $cache->get($cacheKey);
+    if ($cached !== null) return $cached;
+
+    // Сортируем по sort_order, как в таблице
+    $stmt = $conn->prepare("SELECT * FROM statistics ORDER BY sort_order ASC LIMIT ? OFFSET ?");
+    $stmt->bind_param("ii", $perPage, $offset);
+    $stmt->execute();
+    
+    $data = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    
+    $cache->set($cacheKey, $data);
+    return $data;
+}
+
+function getStatById($conn, $id) {
+    global $cache;
+    $cacheKey = "stat_id_" . intval($id);
+
+    $cached = $cache->get($cacheKey);
+    if ($cached !== null) return $cached;
+
+    $stmt = $conn->prepare("SELECT * FROM statistics WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $data = $stmt->get_result()->fetch_assoc();
+
+    if ($data) $cache->set($cacheKey, $data);
+    return $data;
+}
+
+function addStat($conn, $data) {
+    global $cache;
+    $stmt = $conn->prepare("INSERT INTO statistics (title, value, description, sort_order, is_active) VALUES (?, ?, ?, ?, ?)");
+    $stmt->bind_param("sssii", 
+        $data['title'], 
+        $data['value'], 
+        $data['description'], 
+        $data['sort_order'], 
+        $data['is_active']
+    );
+    $res = $stmt->execute();
+    if ($res) {
+        $cache->deleteByPrefix("stat_"); 
+        $cache->deleteByPrefix("admin_stats_"); 
+        $cache->deleteByPrefix("statistics_active_all");
+    }
+    return $res;
+}
+
+function updateStat($conn, $id, $data) {
+    global $cache;
+    $stmt = $conn->prepare("UPDATE statistics SET title = ?, value = ?, description = ?, sort_order = ?, is_active = ? WHERE id = ?");
+    $stmt->bind_param("sssiii", 
+        $data['title'], 
+        $data['value'], 
+        $data['description'], 
+        $data['sort_order'], 
+        $data['is_active'],
+        $id
+    );
+    $res = $stmt->execute();
+    if ($res) {
+        $cache->deleteByPrefix("stat_"); 
+        $cache->deleteByPrefix("admin_stats_");
+        $cache->deleteByPrefix("statistics_active_all");
+        $cache->delete("stat_id_" . $id);
+    }
+    return $res;
+}
+
+function deleteStat($conn, $id) {
+    global $cache;
+    $stmt = $conn->prepare("DELETE FROM statistics WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    $res = $stmt->execute();
+    if ($res) {
+        $cache->deleteByPrefix("stat_"); 
+        $cache->deleteByPrefix("admin_stats_");
+        $cache->deleteByPrefix("statistics_active_all");
+        $cache->delete("stat_id_" . $id);
+    }
+    return $res;
+}
+
+
+
+//  cards
+
+/** --- Функции для работы с КАРТОЧКАМИ (cards) --- **/
+
+function getCardsList($conn, $perPage, $offset) {
+    global $cache;
+    $cacheKey = "admin_cards_list_p" . $perPage . "_o" . $offset;
+
+    $cached = $cache->get($cacheKey);
+    if ($cached !== null) return $cached;
+
+    $stmt = $conn->prepare("SELECT * FROM cards ORDER BY sort_order ASC LIMIT ? OFFSET ?");
+    $stmt->bind_param("ii", $perPage, $offset);
+    $stmt->execute();
+    
+    $data = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    
+    $cache->set($cacheKey, $data);
+    return $data;
+}
+
+function getCardById($conn, $id) {
+    global $cache;
+    $cacheKey = "card_id_" . intval($id);
+
+    $cached = $cache->get($cacheKey);
+    if ($cached !== null) return $cached;
+
+    $stmt = $conn->prepare("SELECT * FROM cards WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $data = $stmt->get_result()->fetch_assoc();
+
+    if ($data) $cache->set($cacheKey, $data);
+    return $data;
+}
+
+function addCard($conn, $data) {
+    global $cache;
+    $stmt = $conn->prepare("INSERT INTO cards (title, description, image_path, color, sort_order, is_active) VALUES (?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("ssssii", 
+        $data['title'], 
+        $data['description'], 
+        $data['image_path'], 
+        $data['color'],
+        $data['sort_order'], 
+        $data['is_active']
+    );
+    $res = $stmt->execute();
+    if ($res) {
+        $cache->deleteByPrefix("card_"); 
+        $cache->deleteByPrefix("admin_cards_"); 
+        $cache->deleteByPrefix("cards_active_all"); 
+    }
+    return $res;
+}
+
+function updateCard($conn, $id, $data) {
+    global $cache;
+    $stmt = $conn->prepare("UPDATE cards SET title = ?, description = ?, image_path = ?, color = ?, sort_order = ?, is_active = ? WHERE id = ?");
+    $stmt->bind_param("ssssiii", 
+        $data['title'], 
+        $data['description'], 
+        $data['image_path'], 
+        $data['color'],
+        $data['sort_order'], 
+        $data['is_active'],
+        $id
+    );
+    $res = $stmt->execute();
+    if ($res) {
+        $cache->deleteByPrefix("card_"); 
+        $cache->deleteByPrefix("cards_active_all"); 
+        $cache->deleteByPrefix("admin_cards_");
+        $cache->delete("card_id_" . $id);
+    }
+    return $res;
+}
+
+function deleteCard($conn, $id) {
+    global $cache;
+    $stmt = $conn->prepare("DELETE FROM cards WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    $res = $stmt->execute();
+    if ($res) {
+        $cache->deleteByPrefix("card_"); 
+        $cache->deleteByPrefix("cards_active_all"); 
+        $cache->deleteByPrefix("admin_cards_");
+        $cache->delete("card_id_" . $id);
+    }
+    return $res;
+}
 ?>

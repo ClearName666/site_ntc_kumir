@@ -233,13 +233,6 @@ require_once __DIR__. '/includes/menu.php';
                                     <input type="hidden" name="existing_image" id="existing_image_input" value="<?php echo $category['image_path'] ?? ''; ?>">
                                 </div>
 
-                                <?php if (!empty($category['image_path'])): ?>
-                                    <div class="mt-2" id="remove-image-wrapper">
-                                        <button type="button" onclick="removeCategoryImage()" class="btn btn-sm btn-outline-danger">
-                                            <i class="fas fa-times"></i> Удалить изображение
-                                        </button>
-                                    </div>
-                                <?php endif; ?>
                                 <small class="text-muted">Рекомендуемый размер: 400×400px (квадрат)</small>
                             </div>
                         </div>
