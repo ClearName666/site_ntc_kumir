@@ -404,6 +404,10 @@ body {
     flex: 1;
 }
 
+.map-text-location {
+    color: white;
+}
+
 .map-text h3 {
     color: var(--dark-color);
     margin-bottom: 8px;
@@ -433,6 +437,8 @@ body {
     font-size: 20px;
 }
 
+
+
 .analytics-badge {
     display: inline-flex;
     align-items: center;
@@ -443,6 +449,23 @@ body {
     border-radius: 30px;
     font-weight: 500;
     margin-top: 10px;
+    text-decoration: none; /* убираем подчеркивание */
+    transition: all 0.3s ease; /* плавная анимация */
+    cursor: pointer;
+    border: none;
+}
+
+/* Эффекты при наведении */
+.analytics-badge:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    background: var(--secondary-color-dark, #2a5f8a); /* затемненный вариант */
+}
+
+/* Эффект при нажатии */
+.analytics-badge:active {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 10px rgba(0,0,0,0.2);
 }
 
 @keyframes slideDown {
@@ -515,6 +538,17 @@ body {
 .card-content p {
     color: var(--gray-color);
     line-height: 1.6;
+}
+
+.card-link {
+    display: block; /* Чтобы ссылка занимала всю ширину */
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.3s ease;
+}
+
+.card-link:hover {
+    transform: translateY(-5px);
 }
 
 /* Advantages Section */
@@ -815,44 +849,44 @@ body {
 .footer-bottom p {
     margin-bottom: 10px;
 }
-        /* Стили для кнопки входа в админку */
-        .btn-admin {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: #27ae60;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: 500;
-            font-size: 16px;
-            transition: all 0.3s;
-            text-decoration: none;
-            margin-left: 10px;
-        }
+/* Стили для кнопки входа в админку */
+.btn-admin {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #27ae60;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 16px;
+    transition: all 0.3s;
+    text-decoration: none;
+    margin-left: 10px;
+}
         
-        .btn-admin:hover {
-            background: #229954;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(39, 174, 96, 0.3);
-        }
+.btn-admin:hover {
+    background: #229954;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(39, 174, 96, 0.3);
+}
         
-        .admin-icon {
-            font-size: 18px;
-        }
+.admin-icon {
+    font-size: 18px;
+}
         
-        .admin-text {
-            white-space: nowrap;
-        }
+.admin-text {
+    white-space: nowrap;
+}
         
-        /* Стили для мобильной версии */
-        .mobile-admin-btn {
-            display: none;
-            width: 100%;
-            justify-content: center;
-            margin-top: 20px;
-        }
+/* Стили для мобильной версии */
+.mobile-admin-btn {
+    display: none;
+    width: 100%;
+    justify-content: center;
+    margin-top: 20px;
+}
         
 

@@ -81,8 +81,6 @@ $footerPath = 'includes/footer.php';
     <link rel="icon" href="<?= getSetting($conn, 'favicon_path') ?>" type="image/x-icon">
     
     <!-- Стили -->
-    <link rel="stylesheet" href="assets/css/style.css">
-    <link rel="stylesheet" href="assets/css/responsive.css">
     <link rel="stylesheet" href="assets/css/products.css">
 
 </head>

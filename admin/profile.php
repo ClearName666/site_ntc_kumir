@@ -204,14 +204,12 @@ require_once __DIR__. '/includes/menu.php';
     </div>
 </div>
 
+<script src="assets/js/scripts.js"></script>
 
 
 <?php
 // Подключаем стили
-require_once __DIR__. '/includes/profile.php';
-
-// Подключаем скрипты
-require_once __DIR__. '/includes/scripts.php';
+require_once __DIR__. '/assets/css/profile.php';
 
 // Подключаем подвал
 require_once __DIR__. '/includes/footer.php';

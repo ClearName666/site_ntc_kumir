@@ -233,10 +233,9 @@ require_once __DIR__. '/includes/menu.php';
     </div>
 </div>
 
-<?php
-// Подключаем скрипты
-require_once __DIR__. '/includes/scripts.php';
+<script src="assets/js/miniAdminstration.js"></script>
 
+<?php
 // Подключаем подвал
 require_once __DIR__. '/includes/footer.php';
 ?>

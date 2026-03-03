@@ -3,25 +3,6 @@
 require_once __DIR__ . '/../config/database.php';
 
 // Функция для получения контактов по типу
-// function getContactsByType($conn, $type = null) {
-//     // $conn = getDBConnection();
-    
-//     if ($type) {
-//         $stmt = $conn->prepare("SELECT * FROM contacts WHERE contact_type = ? AND is_active = 1 ORDER BY sort_order");
-//         $stmt->bind_param("s", $type);
-//         $stmt->execute();
-//         $result = $stmt->get_result();
-//     } else {
-//         $result = $conn->query("SELECT * FROM contacts WHERE is_active = 1 ORDER BY sort_order");
-//     }
-    
-//     $contacts = [];
-//     while ($row = $result->fetch_assoc()) {
-//         $contacts[] = $row;
-//     }
-    
-//     return $contacts;
-// }
 function getContactsByType($conn, $type = null) {
     global $cache;
     $cacheKey = "contacts_type_" . ($type ?? 'all');
@@ -43,17 +24,6 @@ function getContactsByType($conn, $type = null) {
 }
 
 // Функция для получения всех офисов
-// function getOffices($conn) {
-//     // $conn = getDBConnection();
-//     $result = $conn->query("SELECT * FROM offices ORDER BY is_main DESC, sort_order");
-    
-//     $offices = [];
-//     while ($row = $result->fetch_assoc()) {
-//         $offices[] = $row;
-//     }
-    
-//     return $offices;
-// }
 function getOffices($conn) {
     global $cache;
     $cacheKey = "offices_all";
@@ -73,12 +43,6 @@ function getOffices($conn) {
 }
 
 // Функция для получения основного офиса
-// function getMainOffice($conn) {
-//     // $conn = getDBConnection();
-//     $result = $conn->query("SELECT * FROM offices WHERE is_main = 1 LIMIT 1");
-    
-//     return $result->fetch_assoc();
-// }
 function getMainOffice($conn) {
     global $cache;
     $cacheKey = "office_main";
@@ -113,29 +77,31 @@ function getContactIcon($icon) {
     return $icons[$icon] ?? '📌';
 }
 
-// Функция для отображения контактов
+// Функция для отображения контактов 
 function renderContacts($contacts) {
     echo '<div class="contacts-list">';
     
     foreach ($contacts as $contact) {
         $icon = getContactIcon($contact['icon']);
+        $value = htmlspecialchars($contact['value']);
         
-        echo '<div class="contact-item">';
+        // Добавляем onclick к contact-item
+        echo '<div class="contact-item" onclick="copyToClipboard(\'' . htmlspecialchars($contact['value'], ENT_QUOTES) . '\', this)">';
         echo '<div class="contact-icon">' . $icon . '</div>';
         echo '<div class="contact-content">';
         echo '<h4 class="contact-title">' . htmlspecialchars($contact['title']) . '</h4>';
         
         if ($contact['contact_type'] === 'email') {
-            echo '<a href="mailto:' . htmlspecialchars($contact['value']) . '" class="contact-value">';
-            echo htmlspecialchars($contact['value']);
+            echo '<a href="mailto:' . htmlspecialchars($contact['value']) . '" class="contact-value" onclick="event.stopPropagation();">';
+            echo $value;
             echo '</a>';
         } elseif ($contact['contact_type'] === 'phone') {
             $phoneNumber = preg_replace('/[^0-9+]/', '', $contact['value']);
-            echo '<a href="tel:' . $phoneNumber . '" class="contact-value">';
-            echo htmlspecialchars($contact['value']);
+            echo '<a href="tel:' . $phoneNumber . '" class="contact-value" onclick="event.stopPropagation();">';
+            echo $value;
             echo '</a>';
         } else {
-            echo '<p class="contact-value">' . htmlspecialchars($contact['value']) . '</p>';
+            echo '<p class="contact-value">' . $value . '</p>';
         }
         
         echo '</div>';

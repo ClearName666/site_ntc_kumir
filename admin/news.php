@@ -264,16 +264,14 @@ require_once __DIR__. '/includes/menu.php';
                 </form>
             </div>
         </div>
-        
-        <script src="assets/js/news.js"></script>
         <?php endif; ?>
     </div>
 </div>
 
-<?php
-// Подключаем скрипты
-require_once __DIR__. '/includes/scripts.php';
+<script src="assets/js/news.js"></script>
+<script src="assets/js/scripts.js"></script>
 
+<?php
 // Подключаем подвал
 require_once __DIR__. '/includes/footer.php';
 ?>

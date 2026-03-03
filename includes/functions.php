@@ -26,19 +26,6 @@ require_once __DIR__ . '/auth-functions.php';
 
 
 // Функция для получения изображения
-// function getImage($conn, $key) {
-//     // $conn = getDBConnection();
-//     $stmt = $conn->prepare("SELECT image_path, alt_text FROM images WHERE image_key = ?");
-//     $stmt->bind_param("s", $key);
-//     $stmt->execute();
-//     $result = $stmt->get_result();
-    
-//     if ($row = $result->fetch_assoc()) {
-//         return $row;
-//     }
-    
-//     return ['image_path' => '', 'alt_text' => ''];
-// }
 function getImage($conn, $key) {
     global $cache;
     $cacheKey = "image_key_" . $key;
@@ -69,23 +56,6 @@ function getMapLocation($conn) {
 }
 
 // Остальные функции остаются как были, но обновим advantages для отображения в две колонки
-// function renderAdvantages($conn) {
-//     $advantages = getAdvantages($conn);
-//     echo '<div class="advantages-grid">';
-//     foreach ($advantages as $advantage) {
-//         echo '<div class="advantage-item">';
-//         echo '<div class="advantage-header">';
-//         echo '<div class="advantage-icon">';
-//         // Здесь можно использовать иконки или текст
-//         echo '<span>✓</span>';
-//         echo '</div>';
-//         echo '<h3 class="advantage-title">' . $advantage['title'] . '</h3>';
-//         echo '</div>';
-//         echo '<p class="advantage-description">' . $advantage['description'] . '</p>';
-//         echo '</div>';
-//     }
-//     echo '</div>';
-// }
 function renderAdvantages($conn) {
     $advantages = getAdvantages($conn);
     echo '<div class="advantages-grid">';
@@ -116,12 +86,6 @@ function renderAdvantages($conn) {
         echo '</div>';
     }
     echo '</div>';
-}
-function renderMenu($conn) {
-    $menuItems = getMenuItems($conn);
-    foreach ($menuItems as $item) {
-        echo '<a href="' . $item['url'] . '" class="nav-link">' . $item['title'] . '</a>';
-    }
 }
 
 function renderFeatures($conn) {
@@ -158,17 +122,6 @@ function renderStatistics($conn) {
 }
 
 // Функция для получения меню из базы данных
-// function getNavigationMenu($conn) {
-//     // $conn = getDBConnection();
-//     $result = $conn->query("SELECT * FROM menu_items WHERE is_active = 1 ORDER BY sort_order");
-//     $items = [];
-    
-//     while ($row = $result->fetch_assoc()) {
-//         $items[] = $row;
-//     }
-    
-//     return $items;
-// }
 function getNavigationMenu($conn) {
     global $cache;
     $cacheKey = "system_menu";
@@ -183,31 +136,7 @@ function getNavigationMenu($conn) {
     return $items;
 }
 
-// Функция для рендеринга навигации
-function renderNavigation($conn) {
-    $menuItems = getNavigationMenu($conn);
-    
-    // Основные элементы меню
-    $mainItems = ['О компании'];
-    $dropdownItems = ['Статьи', 'Новости', 'Продукция', 'Вопрос/ответ', 'Сотрудничество', 'Контакты'];
-    
-    echo '<nav class="main-nav">';
-    
-    // Выпадающее меню "Оставшиеся позиции"
-    echo '<div class="dropdown">';
-    echo '<a href="#" class="nav-link dropdown-toggle">Оставшиеся позиции</a>';
-    echo '<div class="dropdown-menu">';
-    foreach ($dropdownItems as $item) {
-        echo '<a href="#" class="dropdown-item">' . $item . '</a>';
-    }
-    echo '</div>';
-    echo '</div>';
-    
-    // Основной пункт меню
-    echo '<a href="#" class="nav-link">О компании</a>';
-    
-    echo '</nav>';
-}
+
 
 // Функция для безопасного обрезания строки с поддержкой UTF-8
 function safeSubstr($string, $start, $length = null) {

@@ -101,7 +101,7 @@ require_once __DIR__. '/includes/menu.php';
                                 <td>
                                     <div class="action-buttons">
                                         <a href="statistics.php?action=edit&id=<?php echo $row['id']; ?>" class="btn btn-sm btn-edit"><i class="fas fa-edit"></i></a>
-                                        <a href="statistics.php?action=delete&id=<?php echo $row['id']; ?>" class="btn btn-sm btn-delete" onclick="return confirm('Удалить?')"><i class="fas fa-trash"></i></a>
+                                        <a href="statistics.php?action=delete&id=<?php echo $row['id']; ?>" class="btn btn-sm btn-delete"><i class="fas fa-trash"></i></a>
                                     </div>
                                 </td>
                             </tr>
@@ -155,7 +155,8 @@ require_once __DIR__. '/includes/menu.php';
     </div>
 </div>
 
+<script src="assets/js/miniAdminstration.js"></script>
+
 <?php
-require_once __DIR__. '/includes/scripts.php';
 require_once __DIR__. '/includes/footer.php';
 ?>

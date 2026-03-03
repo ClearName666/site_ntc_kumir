@@ -9,6 +9,8 @@ $conn = getDBConnection();
 // Проверяем авторизацию
 requireAdminAuth($conn);
 
+
+
 // Проверяем права доступа
 if (!hasPermission($conn, 'admin')) {
     redirectWithNotification('index.php', 'Недостаточно прав для доступа к этой странице', 'error');
@@ -17,6 +19,7 @@ if (!hasPermission($conn, 'admin')) {
 // Обработка сохранения настроек
 // ОБРАБОТКА POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    
     // 1. Обработка текстовых настроек
     foreach ($_POST as $key => $value) {
         if (strpos($key, 'setting_') === 0) {
@@ -188,49 +191,22 @@ require_once __DIR__. '/includes/menu.php';
                 </div>
             </div>
             
-            <!-- Дополнительные настройки -->
-            <div class="card mt-4">
-                <div class="card-header">
-                    <h3><i class="fas fa-sliders-h"></i> Дополнительные настройки</h3>
-                </div>
-                <div class="card-body">
-                    <div class="form-group">
-                        <label for="setting_default_email">Email по умолчанию для уведомлений</label>
-                        <input type="email" id="setting_default_email" name="setting_default_email" 
-                               value="<?php echo htmlspecialchars($settings['default_email'] ?? ''); ?>">
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group col-md-6">
-                            <label for="setting_items_per_page">Элементов на странице (админка)</label>
-                            <input type="number" id="setting_items_per_page" name="setting_items_per_page" 
-                                   value="<?php echo htmlspecialchars($settings['items_per_page'] ?? '10'); ?>" min="5" max="100">
-                        </div>
-                        
-                        <div class="form-group col-md-6">
-                            <label for="setting_cache_timeout">Таймаут кэша (секунды)</label>
-                            <input type="number" id="setting_cache_timeout" name="setting_cache_timeout" 
-                                   value="<?php echo htmlspecialchars($settings['cache_timeout'] ?? '3600'); ?>" min="0">
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
             <!-- Кнопки сохранения -->
             <div class="form-actions mt-4">
                 <button type="submit" class="btn btn-primary btn-lg">
                     <i class="fas fa-save"></i> Сохранить все настройки
                 </button>
-                <button type="reset" class="btn btn-secondary">Сбросить</button>
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="fas fa-save"></i> Сьросить кэш сайта
+                </button>
             </div>
         </form>
     </div>
 </div>
 
-<?php
-// Подключаем скрипты
-require_once __DIR__. '/includes/scripts.php';
+<script src="assets/js/scripts.js"></script>
 
+<?php
 // Подключаем подвал
 require_once __DIR__. '/includes/footer.php';
 ?>

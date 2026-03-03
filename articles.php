@@ -7,14 +7,6 @@ $conn = getDBConnection();
 
 // Проверяем, запрошена ли конкретная статья
 $article = null;
-// if (isset($_GET['article']) && !empty($_GET['article'])) {
-//     $article = getArticleBySlug($conn, $_GET['article']);
-    
-//     // Увеличиваем счетчик просмотров если статья найдена
-//     if ($article) {
-//         incrementArticleViews($conn, $article['id']);
-//     }
-// }
 if (isset($_GET['article']) && !empty($_GET['article'])) {
     $article = getArticleBySlug($conn, $_GET['article']);
     
@@ -71,8 +63,6 @@ $footerPath = __DIR__. '/includes/footer.php';
     <link rel="icon" href="<?= getSetting($conn, 'favicon_path') ?>" type="image/x-icon">
     
     <!-- Стили -->
-    <link rel="stylesheet" href="assets/css/style.css">
-    <link rel="stylesheet" href="assets/css/responsive.css">
     <link rel="stylesheet" href="assets/css/articles.css">
     
 </head>

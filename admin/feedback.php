@@ -115,7 +115,7 @@ require_once __DIR__. '/includes/menu.php';
                                                 <?php endif; ?>
                                                 <a href="feedback.php?action=delete&id=<?php echo $item['id']; ?>" 
                                                    class="btn btn-sm btn-delete" 
-                                                   onclick="return confirm('Удалить это обращение?')" title="Удалить">
+                                                   title="Удалить">
                                                     <i class="fas fa-trash"></i>
                                                 </a>
                                             </div>
@@ -131,7 +131,8 @@ require_once __DIR__. '/includes/menu.php';
     </div>
 </div>
 
+<script src="assets/js/miniAdminstration.js"></script>
+
 <?php
-require_once __DIR__. '/includes/scripts.php';
 require_once __DIR__. '/includes/footer.php';
 ?>

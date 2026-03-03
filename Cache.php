@@ -44,6 +44,90 @@ class Cache {
             }
         }
     }
+
+    /**
+     * ПОЛНАЯ ОЧИСТКА КЭША
+     * Удаляет все файлы кэша, но сохраняет .gitkeep
+     * 
+     * @param bool $includeGitkeep Если true, то удалит и .gitkeep (по умолчанию false)
+     * @return array Статистика очистки
+     */
+    public function clearAll($includeGitkeep = false) {
+        $result = [
+            'success' => true,
+            'deleted_files' => 0,
+            'errors' => 0,
+            'protected_files' => 0,
+            'message' => ''
+        ];
+        
+        // Проверяем существование директории
+        if (!is_dir($this->cacheDir)) {
+            $result['message'] = 'Директория кэша не существует';
+            return $result;
+        }
+        
+        // Получаем все файлы в директории (исключаем поддиректории)
+        $files = glob($this->cacheDir . '*');
+        
+        foreach ($files as $file) {
+            // Пропускаем директории
+            if (is_dir($file)) {
+                continue;
+            }
+            
+            $filename = basename($file);
+            
+            // Проверяем, нужно ли защитить .gitkeep
+            if (!$includeGitkeep && $filename === '.gitkeep') {
+                $result['protected_files']++;
+                continue;
+            }
+            
+            // Пытаемся удалить файл
+            if (unlink($file)) {
+                $result['deleted_files']++;
+            } else {
+                $result['errors']++;
+                error_log("Не удалось удалить файл кэша: $file");
+            }
+        }
+        
+        // Формируем сообщение
+        $messages = [];
+        if ($result['deleted_files'] > 0) {
+            $messages[] = "Удалено файлов: {$result['deleted_files']}";
+        }
+        if ($result['protected_files'] > 0) {
+            $messages[] = "Защищено файлов: {$result['protected_files']}";
+        }
+        if ($result['errors'] > 0) {
+            $messages[] = "Ошибок: {$result['errors']}";
+        }
+        
+        $result['message'] = implode(', ', $messages) ?: 'Нет файлов для удаления';
+        
+        return $result;
+    }
+
+    /**
+     * ПОЛУЧИТЬ КОЛИЧЕСТВО ФАЙЛОВ В КЭШЕ
+     * 
+     * @return int Количество файлов
+     */
+    public function getStats() {
+        // Проверяем существование директории
+        if (!is_dir($this->cacheDir)) {
+            return 0;
+        }
+        
+        // Получаем все файлы (исключая директории)
+        $files = array_filter(glob($this->cacheDir . '*'), 'is_file');
+        
+        // Возвращаем количество файлов
+        return count($files);
+    }
+
 }
 
 ?>

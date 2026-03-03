@@ -137,39 +137,18 @@
     height: 100%;
 }
 
-/* .map-overlay {
-    position: absolute;
-    top: 1rem;
-    left: 1rem;
-    right: 1rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    pointer-events: none;
-}
 
-.map-info-card {
-    background: white;
-    border-radius: 12px;
-    padding: 1.5rem;
-    max-width: 300px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-    pointer-events: auto;
-    animation: slideInLeft 0.6s ease;
-} */
-
-/* Измени этот блок */
 
 .map-overlay {
     position: absolute;
-    top: 20px;          /* Отступ от верхнего края карты */
-    left: 20px;         /* Прижимаем к левому краю */
-    right: auto;        /* ВАЖНО: убираем растягивание до правого края */
-    bottom: auto;       /* Убираем растягивание до низа */
-    width: auto;        /* Ширина будет зависеть только от контента */
-    padding: 0;         /* Убираем внутренние отступы, если они были */
-    background: none;   /* Убираем фоновый цвет, который все перекрывает */
-    pointer-events: none; /* Пропускаем клики сквозь контейнер на карту */
+    top: 20px;          
+    left: 20px;         
+    right: auto;        
+    bottom: auto;       
+    width: auto;        
+    padding: 0;         
+    background: none;   
+    pointer-events: none;
     z-index: 10;
 }
 

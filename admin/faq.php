@@ -1,4 +1,4 @@
-d<?php
+<?php
 require_once __DIR__. '/includes/functions.php';
 
 $conn = getDBConnection();
@@ -123,8 +123,7 @@ require_once __DIR__. '/includes/menu.php';
                                             <i class="fas fa-edit"></i>
                                         </a>
                                         <a href="faq.php?action=delete&id=<?php echo $row['id']; ?>" 
-                                           class="btn btn-sm btn-delete" 
-                                           onclick="return confirm('Удалить этот вопрос?')">
+                                           class="btn btn-sm btn-delete">
                                             <i class="fas fa-trash"></i>
                                         </a>
                                     </div>
@@ -205,10 +204,9 @@ require_once __DIR__. '/includes/menu.php';
     </div>
 </div>
 
-<?php
-// Подключаем скрипты
-require_once __DIR__. '/includes/scripts.php';
+<script src="assets/js/miniAdminstration.js"></script>
 
+<?php
 // Подключаем подвал
 require_once __DIR__. '/includes/footer.php';
 ?>

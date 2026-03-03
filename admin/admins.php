@@ -268,13 +268,12 @@ require_once __DIR__. '/includes/menu.php';
         </div>
         <?php endif; ?>
     </div>
-    <script src="assets/js/admin.js"></script>
 </div>
 
-<?php
-// Подключаем скрипты
-require_once __DIR__. '/includes/scripts.php';
+<script src="assets/js/admin.js"></script>
+<script src="assets/js/miniAdminstration.js"></script>
 
+<?php
 // Подключаем подвал
 require_once __DIR__. '/includes/footer.php';
 ?>

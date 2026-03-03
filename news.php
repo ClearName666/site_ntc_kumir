@@ -67,10 +67,6 @@ $footerPath = __DIR__. '/includes/footer.php';
     <!-- Favicon -->
     <link rel="icon" href="<?= getSetting($conn, 'favicon_path') ?>" type="image/x-icon">
     
-    <!-- Стили -->
-    <link rel="stylesheet" href="assets/css/style.css">
-    <link rel="stylesheet" href="assets/css/responsive.css">
-    
     <!-- Стили для страницы новостей -->
     <link rel="stylesheet" href="assets/css/news.css">
 

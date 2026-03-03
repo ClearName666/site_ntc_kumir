@@ -1,25 +1,4 @@
 // Обработка формы вопроса
-// document.getElementById('questionForm').addEventListener('submit', function(e) {
-//     e.preventDefault();
-    
-//     const formData = new FormData(this);
-//     const submitBtn = this.querySelector('.submit-btn');
-//     const originalText = submitBtn.textContent;
-    
-//     submitBtn.textContent = 'Отправка...';
-//     submitBtn.disabled = true;
-    
-//     // Здесь должна быть AJAX отправка формы
-//     // Для примера просто покажем сообщение
-//     setTimeout(() => {
-//         alert('Ваш вопрос отправлен! Мы ответим вам в ближайшее время.');
-//         this.reset();
-//         submitBtn.textContent = originalText;
-//         submitBtn.disabled = false;
-//     }, 1000);
-// });
-
-// Обработка формы вопроса
 document.getElementById('questionForm').addEventListener('submit', function(e) {
     e.preventDefault();
     
@@ -104,21 +83,4 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Поиск по FAQ (можно добавить позже)
-    const searchInput = document.createElement('input');
-    searchInput.type = 'text';
-    searchInput.placeholder = 'Поиск по вопросам...';
-    searchInput.className = 'faq-search';
-    searchInput.style.cssText = `
-        width: 100%;
-        padding: 0.75rem 1rem;
-        border: 2px solid #e0e0e0;
-        border-radius: 8px;
-        font-size: 1rem;
-        margin-bottom: 2rem;
-        display: none;
-    `;
-    
-    // Можно добавить перед списком FAQ
-    // document.querySelector('.faq-section').prepend(searchInput);
 });

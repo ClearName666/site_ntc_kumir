@@ -81,6 +81,7 @@ require_once __DIR__. '/includes/menu.php';
             </div>
         </div>
     </div>
+    <script src="assets/js/scripts.js"></script>
 </div>
 
 <style>
@@ -123,6 +124,5 @@ require_once __DIR__. '/includes/menu.php';
 </style>
 
 <?php 
-require_once __DIR__. '/includes/scripts.php';
 require_once __DIR__. '/includes/footer.php'; 
 ?>

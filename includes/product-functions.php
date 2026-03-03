@@ -3,17 +3,6 @@
 require_once __DIR__ . '/../config/database.php';
 
 // Функция для получения всех активных категорий
-// function getProductCategories($conn) {
-//     // $conn = getDBConnection();
-//     $result = $conn->query("SELECT * FROM product_categories WHERE is_active = 1 ORDER BY sort_order");
-//     $categories = [];
-    
-//     while ($row = $result->fetch_assoc()) {
-//         $categories[] = $row;
-//     }
-    
-//     return $categories;
-// }
 function getProductCategories($conn) {
     global $cache;
     $cacheKey = "categories_public_all";
@@ -44,31 +33,6 @@ function getCategoryBySlug($conn, $slug) {
 }
 
 // Функция для получения товаров категории
-// function getProductsByCategory($conn, $categoryId, $limit = null) {
-//     // $conn = getDBConnection();
-    
-//     $sql = "SELECT p.*, c.name as category_name, c.slug as category_slug 
-//             FROM products p 
-//             JOIN product_categories c ON p.category_id = c.id 
-//             WHERE p.category_id = ? AND p.is_active = 1 AND c.is_active = 1 
-//             ORDER BY p.sort_order";
-    
-//     if ($limit) {
-//         $sql .= " LIMIT " . intval($limit);
-//     }
-    
-//     $stmt = $conn->prepare($sql);
-//     $stmt->bind_param("i", $categoryId);
-//     $stmt->execute();
-//     $result = $stmt->get_result();
-    
-//     $products = [];
-//     while ($row = $result->fetch_assoc()) {
-//         $products[] = $row;
-//     }
-    
-//     return $products;
-// }
 function getProductsByCategory($conn, $categoryId, $limit = null) {
     global $cache;
     $cacheKey = "products_cat_{$categoryId}_lim_{$limit}";
@@ -94,26 +58,6 @@ function getProductsByCategory($conn, $categoryId, $limit = null) {
 }
 
 // Функция для получения товара по slug
-// function getProductBySlug($conn, $slug) {
-//     // $conn = getDBConnection();
-//     $stmt = $conn->prepare("SELECT p.*, c.name as category_name, c.slug as category_slug 
-//                            FROM products p 
-//                            JOIN product_categories c ON p.category_id = c.id 
-//                            WHERE p.slug = ? AND p.is_active = 1 AND c.is_active = 1");
-//     $stmt->bind_param("s", $slug);
-//     $stmt->execute();
-//     $result = $stmt->get_result();
-    
-//     if ($row = $result->fetch_assoc()) {
-//         // Парсим спецификации из JSON
-//         if (!empty($row['specifications'])) {
-//             $row['specifications_array'] = json_decode($row['specifications'], true);
-//         }
-//         return $row;
-//     }
-    
-//     return null;
-// }
 function getProductBySlug($conn, $slug) {
     global $cache;
     $cacheKey = "product_single_" . md5($slug);

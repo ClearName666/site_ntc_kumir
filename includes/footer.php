@@ -10,11 +10,10 @@ $conn = getDBConnection();
                     <h3>Быстрые ссылки</h3>
                     <ul class="footer-links">
                         <?php
-                        $footerLinks = explode("\n", getContentBlock($conn, 'footer_links')['content']);
-                        foreach ($footerLinks as $link) {
-                            if (trim($link)) {
-                                echo '<li><a href="#">' . trim($link) . '</a></li>';
-                            }
+                        //$footerLinks = explode("\n", getContentBlock($conn, 'footer_links')['content']);
+                        $menuLinks = getMenuItems($conn);
+                        foreach ($menuLinks as $row) {
+                            echo '<li><a href="' . $row['url'] . '">' . trim($row['title']) . '</a></li>';
                         }
                         ?>
                     </ul>

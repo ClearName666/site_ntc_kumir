@@ -149,8 +149,7 @@ require_once __DIR__. '/includes/menu.php';
                                             <i class="fas fa-edit"></i>
                                         </a>
                                         <a href="articles.php?action=delete&id=<?php echo $row['id']; ?>" 
-                                        class="btn btn-sm btn-delete" 
-                                        onclick="return confirm('Удалить эту статью?')">
+                                        class="btn btn-sm btn-delete">
                                             <i class="fas fa-trash"></i>
                                         </a>
                                     </div>
@@ -272,15 +271,14 @@ require_once __DIR__. '/includes/menu.php';
             </div>
         </div>
         
-        <script src="assets/js/articles.js"></script>
         <?php endif; ?>
     </div>
 </div>
 
-<?php
-// Подключаем скрипты
-require_once __DIR__. '/includes/scripts.php';
+<script src="assets/js/articles.js"></script>
+<script src="assets/js/scripts.js"></script>
 
+<?php
 // Подключаем подвал
 require_once __DIR__. '/includes/footer.php';
 ?>

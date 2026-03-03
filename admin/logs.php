@@ -150,26 +150,7 @@ require_once __DIR__. '/includes/menu.php';
     </div>
 </div>
 
-<?php
-// Подключаем скрипты
-require_once __DIR__. '/includes/scripts.php';
-?>
-
-<script>
-// Инициализация модального окна
-if (window.location.hash === '#clear-logs') {
-    $('#clearLogsModal').modal('show');
-}
-
-// Подтверждение очистки
-$('form').on('submit', function(e) {
-    if ($(this).find('[name="clear_logs"]').length) {
-        if (!confirm('Вы уверены, что хотите очистить логи? Это действие нельзя отменить.')) {
-            e.preventDefault();
-        }
-    }
-});
-</script>
+<script src="assets/js/miniAdminstration.js"></script>
 
 <?php
 // Подключаем подвал

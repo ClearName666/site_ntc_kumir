@@ -69,8 +69,6 @@ $mapLng = $mainOffice ? $mainOffice['longitude'] : 104.278817;
     <link rel="icon" href="<?= getSetting($conn, 'favicon_path') ?>" type="image/x-icon">
     
     <!-- Стили -->
-    <link rel="stylesheet" href="assets/css/style.css">
-    <link rel="stylesheet" href="assets/css/responsive.css">
     <link rel="stylesheet" href="assets/css/contacts.css">
 
 </head>
@@ -178,41 +176,7 @@ $mapLng = $mainOffice ? $mainOffice['longitude'] : 104.278817;
     <!-- Скрипты -->
     <script src="assets/js/main.js"></script>
     <script>
-        document.getElementById('contactForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const form = this;
-            const submitBtn = form.querySelector('.submit-btn');
-            const originalText = submitBtn.textContent;
-            
-            submitBtn.textContent = 'Отправка...';
-            submitBtn.disabled = true;
-            
-            const formData = new FormData(form);
-            
-            // Отправляем запрос на ЭТОТ ЖЕ файл (contacts.php)
-            fetch(window.location.href, {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    alert(data.message);
-                    form.reset();
-                } else {
-                    alert('Ошибка: ' + data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Произошла ошибка при отправке.');
-            })
-            .finally(() => {
-                submitBtn.textContent = originalText;
-                submitBtn.disabled = false;
-            });
-        });
+
 
 
 
@@ -279,6 +243,8 @@ $mapLng = $mainOffice ? $mainOffice['longitude'] : 104.278817;
                 item.style.animationDelay = (index * 0.1) + 's';
             });
         });
+
     </script>
+    <script src="assets/js/contacts.js"></script>
 </body>
 </html>

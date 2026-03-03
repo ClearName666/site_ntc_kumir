@@ -33,12 +33,19 @@ require_once __DIR__. '/includes/header.php';
                             <?php renderFeatures($conn); ?>
                         </div>
                         
-                        <!-- Убираем дублирование телефона и кнопки, т.к. они уже в header -->
-                        <div class="contacts-section">
+                        <!-- <div class="contacts-section">
                             <div class="analytics-badge">
                                 <span>📊</span>
                                 <span>Дистанционный контроль и управление</span>
                             </div>
+                        </div> -->
+
+                        <!-- Кнопка для перехода к системе -->
+                        <div class="contacts-section">
+                            <a href="https://v4.ntckumir.ru/" class="analytics-badge" target="_blank" rel="noopener noreferrer">
+                                <span>📊</span>
+                                <span>Дистанционный контроль и управление</span>
+                            </a>
                         </div>
                     </div>
                     
@@ -50,7 +57,7 @@ require_once __DIR__. '/includes/header.php';
                                     <div class="map-icon">
                                         📍
                                     </div>
-                                    <div class="map-text">
+                                    <div class="map-text map-text-location">
                                         <h3>«НТЦ «КУМИР» на карте</h3>
                                         <p>№<?php echo $mapLocation['latitude']; ?>, E<?php echo $mapLocation['longitude']; ?></p>
                                     </div>

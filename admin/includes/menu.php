@@ -135,3 +135,4 @@ $current_page = basename($_SERVER['PHP_SELF']);
         </a>
     </nav>
 </aside>
+<script src="assets/js/setPositionScroll.js"></script>

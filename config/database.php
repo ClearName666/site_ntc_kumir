@@ -1,14 +1,14 @@
 <?php
 
-// define('DB_HOST', 'localhost');
-// define('DB_USER', 'root');
-// define('DB_PASS', 'password');
-// define('DB_NAME', 'ntc-kumir');
-
 define('DB_HOST', 'localhost');
-define('DB_USER', 'ntcuser');
-define('DB_PASS', 'StrongPassword123!');
+define('DB_USER', 'root');
+define('DB_PASS', 'password');
 define('DB_NAME', 'ntc-kumir');
+
+// define('DB_HOST', 'localhost');
+// define('DB_USER', 'ntcuser');
+// define('DB_PASS', 'StrongPassword123!');
+// define('DB_NAME', 'ntc-kumir');
 
 // Функция подключения к БД
 function getDBConnection() {
@@ -38,7 +38,6 @@ function getDBConnection() {
 }
 
 function getSetting($conn, $key) {
-    // $conn = getDBConnection();
     $stmt = $conn->prepare("SELECT setting_value FROM settings WHERE setting_key = ?");
     $stmt->bind_param("s", $key);
     $stmt->execute();
@@ -52,7 +51,6 @@ function getSetting($conn, $key) {
 }
 
 function getMenuItems($conn) {
-    // $conn = getDBConnection();
     $result = $conn->query("SELECT * FROM menu_items WHERE is_active = 1 ORDER BY sort_order");
     $items = [];
     
@@ -62,68 +60,6 @@ function getMenuItems($conn) {
     
     return $items;
 }
-
-// function getFeatures($conn) {
-//     // $conn = getDBConnection();
-//     $result = $conn->query("SELECT * FROM features WHERE is_active = 1 ORDER BY sort_order");
-//     $items = [];
-    
-//     while ($row = $result->fetch_assoc()) {
-//         $items[] = $row;
-//     }
-    
-//     return $items;
-// }
-
-// function getCards($conn) {
-//     // $conn = getDBConnection();
-//     $result = $conn->query("SELECT * FROM cards WHERE is_active = 1 ORDER BY sort_order");
-//     $items = [];
-    
-//     while ($row = $result->fetch_assoc()) {
-//         $items[] = $row;
-//     }
-    
-//     return $items;
-// }
-
-// function getAdvantages($conn) {
-//     // $conn = getDBConnection();
-//     $result = $conn->query("SELECT * FROM advantages WHERE is_active = 1 ORDER BY sort_order");
-//     $items = [];
-    
-//     while ($row = $result->fetch_assoc()) {
-//         $items[] = $row;
-//     }
-    
-//     return $items;
-// }
-
-// function getStatistics($conn) {
-//     // $conn = getDBConnection();
-//     $result = $conn->query("SELECT * FROM statistics WHERE is_active = 1 ORDER BY sort_order");
-//     $items = [];
-    
-//     while ($row = $result->fetch_assoc()) {
-//         $items[] = $row;
-//     }
-    
-//     return $items;
-// }
-
-// function getContentBlock($conn, $key) {
-//     // $conn = getDBConnection();
-//     $stmt = $conn->prepare("SELECT title, content FROM content_blocks WHERE block_key = ?");
-//     $stmt->bind_param("s", $key);
-//     $stmt->execute();
-//     $result = $stmt->get_result();
-    
-//     if ($row = $result->fetch_assoc()) {
-//         return $row;
-//     }
-    
-//     return ['title' => '', 'content' => ''];
-// }
 
 
 function getFeatures($conn) {

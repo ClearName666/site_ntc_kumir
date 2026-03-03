@@ -104,9 +104,11 @@ require_once __DIR__. '/includes/menu.php';
             </div>
         <?php endif; ?>
     </div>
+    
 </div>
 
+<script src="assets/js/miniAdminstration.js"></script>
+
 <?php
-require_once __DIR__. '/includes/scripts.php';
 require_once __DIR__. '/includes/footer.php';
 ?>
