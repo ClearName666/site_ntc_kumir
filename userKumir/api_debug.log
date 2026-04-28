@@ -1,0 +1,130 @@
+2026-04-09 09:49:16 - === НОВЫЙ ЗАПРОС ===
+
+2026-04-09 09:49:16 - REQUEST_METHOD - POST
+
+2026-04-09 09:49:16 - GET - Array
+(
+    [action] => search
+)
+
+
+2026-04-09 09:49:16 - SESSION - Array
+(
+    [sessid] => fe54effb9de8f68517efd486c7747170
+)
+
+
+2026-04-09 09:49:16 - ACTION - search
+
+2026-04-09 09:49:16 - SEARCH START
+
+2026-04-09 09:49:16 - SEARCH SESSID - fe54effb9de8f68517efd486c7747170
+
+2026-04-09 09:49:16 - SEARCH RAW INPUT - {"query":""}
+
+2026-04-09 09:49:16 - SEARCH DECODED INPUT - Array
+(
+    [query] => 
+)
+
+
+2026-04-09 09:49:16 - SEARCH QUERY - 
+
+2026-04-09 09:49:16 - SEARCH URL - https://v4.ntckumir.ru/modules/filter_search/action.php
+
+2026-04-09 09:49:16 - SEARCH POST DATA - type=nodes&query=&resource=all
+
+2026-04-09 09:49:16 - SEARCH CURL ERROR - 
+
+2026-04-09 09:49:16 - SEARCH HTTP CODE - 500
+
+2026-04-09 09:49:16 - SEARCH RESPONSE LENGTH - 0
+
+2026-04-09 09:49:16 - SEARCH RESPONSE - 
+
+2026-04-09 09:49:16 - SEARCH ERROR: HTTP code not 200 - 500
+
+2026-04-09 09:50:15 - === НОВЫЙ ЗАПРОС ===
+
+2026-04-09 09:50:15 - REQUEST_METHOD - POST
+
+2026-04-09 09:50:15 - GET - Array
+(
+    [action] => logout
+)
+
+
+2026-04-09 09:50:15 - SESSION - Array
+(
+    [sessid] => fe54effb9de8f68517efd486c7747170
+)
+
+
+2026-04-09 09:50:15 - ACTION - logout
+
+2026-04-09 09:50:15 - LOGOUT START
+
+2026-04-09 09:50:15 - LOGOUT SESSID - fe54effb9de8f68517efd486c7747170
+
+2026-04-09 09:50:16 - LOGOUT SUCCESS
+
+2026-04-09 09:50:23 - === НОВЫЙ ЗАПРОС ===
+
+2026-04-09 09:50:23 - REQUEST_METHOD - POST
+
+2026-04-09 09:50:23 - GET - Array
+(
+    [action] => login
+)
+
+
+2026-04-09 09:50:23 - SESSION - Array
+(
+)
+
+
+2026-04-09 09:50:23 - ACTION - login
+
+2026-04-09 09:50:23 - LOGIN START
+
+2026-04-09 09:50:23 - RAW INPUT - {"login":"test","password":"test"}
+
+2026-04-09 09:50:23 - DECODED INPUT - Array
+(
+    [login] => test
+    [password] => test
+)
+
+
+2026-04-09 09:50:23 - LOGIN URL - https://v4.ntckumir.ru/login.php
+
+2026-04-09 09:50:23 - LOGIN POST DATA - login=test&password=test
+
+2026-04-09 09:50:24 - LOGIN CURL ERROR - 
+
+2026-04-09 09:50:24 - LOGIN HTTP CODE - 302
+
+2026-04-09 09:50:24 - LOGIN HEADERS - HTTP/2 302 
+set-cookie: SESSID=c546af7b2e8831e65d51f7631904af6d
+location: /interface.php
+vary: Accept-Encoding
+cache-control: no-store, no-cache, must-revalidate, max-age=0
+pragma: no-cache
+content-length: 0
+content-type: text/html; charset=UTF-8
+date: Thu, 09 Apr 2026 09:50:24 GMT
+server: Apache/2.4.58 (Ubuntu)
+
+
+
+2026-04-09 09:50:24 - LOGIN BODY - 
+
+2026-04-09 09:50:24 - SESSID MATCHES - Array
+(
+    [0] => SESSID=c546af7b2e8831e65d51f7631904af6d
+    [1] => c546af7b2e8831e65d51f7631904af6d
+)
+
+
+2026-04-09 09:50:24 - LOGIN SUCCESS. SESSID - c546af7b2e8831e65d51f7631904af6d
+

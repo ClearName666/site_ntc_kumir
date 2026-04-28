@@ -196,9 +196,6 @@ require_once __DIR__. '/includes/menu.php';
                 <button type="submit" class="btn btn-primary btn-lg">
                     <i class="fas fa-save"></i> Сохранить все настройки
                 </button>
-                <button type="submit" class="btn btn-primary btn-lg">
-                    <i class="fas fa-save"></i> Сьросить кэш сайта
-                </button>
             </div>
         </form>
     </div>

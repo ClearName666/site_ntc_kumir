@@ -99,7 +99,7 @@ $footerPath = __DIR__. '/includes/footer.php';
                     <?php endif; ?>
                     
                     <div class="article-body">
-                        <?= nl2br(htmlspecialchars($article['content'])) ?>
+                        <?php echo $article['content']; ?>
                     </div>
                     
                     <div class="back-link-container">

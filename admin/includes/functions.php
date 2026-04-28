@@ -1,6 +1,7 @@
 <?php
 session_start();
 
+include 'deleteFile.php';
 require_once __DIR__ . '/../../Cache.php'; 
 
 $cache = new Cache(); // Вот эта строчка создает объект
@@ -509,14 +510,34 @@ function updateOrInsertSetting($conn, $key, $value) {
 function updateImageSettings($conn, $imageKey, $settingKey, $path) {
     global $cache;
 
+    // --- ДОБАВЛЕНО: Сначала узнаем старый путь, чтобы было что удалять ---
+    $oldPath = null;
+    $sel = $conn->prepare("SELECT setting_value FROM settings WHERE setting_key = ?");
+    $sel->bind_param("s", $settingKey);
+    $sel->execute();
+    $res = $sel->get_result();
+    if ($row = $res->fetch_assoc()) {
+        $oldPath = $row['setting_value'];
+    }
+    $sel->close();
+    // --------------------------------------------------------------------
+
     // 1. Обновляем таблицу settings
     $stmt1 = $conn->prepare("UPDATE settings SET setting_value = ?, updated_at = NOW() WHERE setting_key = ?");
     $stmt1->bind_param("ss", $path, $settingKey);
-    $stmt1->execute();
+    $success = $stmt1->execute(); // Выполняем ОДИН раз и сохраняем результат
+    $stmt1->close();
 
-    $cache->deleteByPrefix("image_key_");   
+    if ($success) {
+        // Если в базе обновилось — удаляем старое физически
+        if (!empty($oldPath) && $oldPath !== $path) {
+            deleteImageFromServer($oldPath);
+        }
 
-    return $stmt1->execute();
+        $cache->deleteByPrefix("image_key_");
+    }
+
+    return $success; // Возвращаем результат выполнения
 }
 
 
@@ -546,24 +567,44 @@ function getAllImagesFromDB($conn) {
 }
 
 /**
- * Обновляет путь к изображению в таблице images и чистит кэш
+ * Обновляет путь к изображению в таблице images, удаляет старый файл и чистит кэш
  */
 function updateImageInTable($conn, $id, $newPath) {
     global $cache;
 
+    // 1. Получаем путь к СТАРОМУ изображению перед обновлением
+    $oldPath = null;
+    $stmtGet = $conn->prepare("SELECT image_path FROM images WHERE id = ?");
+    $stmtGet->bind_param("i", $id);
+    $stmtGet->execute();
+    $result = $stmtGet->get_result();
+    if ($row = $result->fetch_assoc()) {
+        $oldPath = $row['image_path'];
+    }
+    $stmtGet->close();
+
+    // 2. Обновляем путь в базе данных на НОВЫЙ
     $stmt = $conn->prepare("UPDATE images SET image_path = ? WHERE id = ?");
     $stmt->bind_param("si", $newPath, $id);
     $res = $stmt->execute();
+    $stmt->close();
+
     if ($res) {
-        // Очищаем кэш списка изображений и общих настроек (на всякий случай)
+        // 3. Если запрос в базу прошел успешно — удаляем старый файл с сервера
+        if ($oldPath && $oldPath !== $newPath) {
+            deleteImageFromServer($oldPath); 
+        }
+
+        // Очищаем кэш
         $cache->delete('all_site_images');
         $cache->deleteByPrefix('settings_');
         $cache->deleteByPrefix('image_key_');
-        
+
+
     }
+
     return $res;
 }
-
 
 
 
@@ -691,10 +732,23 @@ function addProduct($conn, $data) {
 }
 
 /**
- * Обновить существующий товар
+ * Обновить существующий товар (с автоматической зачисткой старой картинки)
  */
 function updateProduct($conn, $id, $data) {
     global $cache;
+
+    // 1. Сначала узнаем путь к текущему изображению, которое лежит в базе
+    $oldImagePath = null;
+    $sel = $conn->prepare("SELECT image_path FROM products WHERE id = ?");
+    $sel->bind_param("i", $id);
+    $sel->execute();
+    $result = $sel->get_result();
+    if ($row = $result->fetch_assoc()) {
+        $oldImagePath = $row['image_path'];
+    }
+    $sel->close();
+
+    // 2. Обновляем данные товара
     $stmt = $conn->prepare("UPDATE products SET category_id = ?, name = ?, slug = ?, description = ?, full_description = ?, image_path = ?, price = ?, specifications = ?, is_available = ?, sort_order = ?, is_active = ?, updated_at = NOW() WHERE id = ?");
     $stmt->bind_param("isssssdsiiii", 
         $data['category_id'], $data['name'], $data['slug'], 
@@ -704,30 +758,61 @@ function updateProduct($conn, $id, $data) {
     );
     
     $res = $stmt->execute();
+    $stmt->close();
+
     if ($res) {
+        // 3. Если в базе всё успешно обновилось, проверяем: изменилась ли картинка?
+        // Если пришел новый путь, а старый не пустой и они разные — удаляем старый файл.
+        if (!empty($oldImagePath) && $oldImagePath !== $data['image_path']) {
+            deleteImageFromServer($oldImagePath);
+        }
+
+        // Чистим кэш
         $cache->deleteByPrefix("product_");
         $cache->deleteByPrefix("admin_product_");
         $cache->deleteByPrefix("products_cat_");
         $cache->delete("product_id_" . $id);
     }
+    
     return $res;
 }
 
 /**
- * Удалить товар
+ * Удалить товар и его изображение с сервера
  */
 function deleteProduct($conn, $id) {
     global $cache;
+
+    // 1. Сначала получаем путь к картинке, чтобы знать, что удалять
+    $imagePath = null;
+    $sel = $conn->prepare("SELECT image_path FROM products WHERE id = ?");
+    $sel->bind_param("i", $id);
+    $sel->execute();
+    $result = $sel->get_result();
+    if ($row = $result->fetch_assoc()) {
+        $imagePath = $row['image_path'];
+    }
+    $sel->close();
+
+    // 2. Удаляем саму запись из базы данных
     $stmt = $conn->prepare("DELETE FROM products WHERE id = ?");
     $stmt->bind_param("i", $id);
-    
     $res = $stmt->execute();
+    $stmt->close();
+    
     if ($res) {
+        // 3. Если из базы удалено успешно — сносим файл с сервера
+        if (!empty($imagePath)) {
+            deleteImageFromServer($imagePath);
+        }
+
+        // Чистим кэш
         $cache->deleteByPrefix("product_");
         $cache->deleteByPrefix("admin_product_");
         $cache->deleteByPrefix("products_cat_");
         $cache->delete("product_id_" . $id);
     }
+    
     return $res;
 }
 
@@ -802,10 +887,23 @@ function addNews($conn, $data) {
 }
 
 /**
- * Обновить существующую новость
+ * Обновить существующую новость (с автоматической зачисткой старой картинки)
  */
 function updateNews($conn, $id, $data) {
     global $cache;
+
+    // 1. Чекаем старый путь к картинке перед тем, как перезаписать его
+    $oldImagePath = null;
+    $sel = $conn->prepare("SELECT image_path FROM news WHERE id = ?");
+    $sel->bind_param("i", $id);
+    $sel->execute();
+    $result = $sel->get_result();
+    if ($row = $result->fetch_assoc()) {
+        $oldImagePath = $row['image_path'];
+    }
+    $sel->close();
+
+    // 2. Обновляем данные в базе
     $stmt = $conn->prepare("UPDATE news SET title = ?, slug = ?, excerpt = ?, content = ?, author = ?, image_path = ?, is_published = ?, published_at = ?, updated_at = NOW() WHERE id = ?");
     $stmt->bind_param("ssssssisi", 
         $data['title'], 
@@ -818,29 +916,61 @@ function updateNews($conn, $id, $data) {
         $data['published_at'], 
         $id
     );
+    
     $res = $stmt->execute();
+    $stmt->close();
+
     if ($res) {
-        // Сбрасываем всё: списки, саму новость по ID и админ-панель
+        // 3. Если в базе обновилось — прибираемся на сервере
+        // Удаляем, если путь изменился и старый файл вообще существовал
+        if (!empty($oldImagePath) && $oldImagePath !== $data['image_path']) {
+            deleteImageFromServer($oldImagePath);
+        }
+
+        // Сбрасываем кэш
         $cache->deleteByPrefix("news_"); 
         $cache->deleteByPrefix("admin_news_");
         $cache->delete("news_id_" . $id);
     }
+    
     return $res;
 }
 
 /**
- * Удалить новость
+ * Удалить новость и её изображение с сервера
  */
 function deleteNews($conn, $id) {
     global $cache;
+
+    // 1. Получаем путь к картинке перед удалением записи
+    $imagePath = null;
+    $sel = $conn->prepare("SELECT image_path FROM news WHERE id = ?");
+    $sel->bind_param("i", $id);
+    $sel->execute();
+    $result = $sel->get_result();
+    if ($row = $result->fetch_assoc()) {
+        $imagePath = $row['image_path'];
+    }
+    $sel->close();
+
+    // 2. Удаляем новость из базы
     $stmt = $conn->prepare("DELETE FROM news WHERE id = ?");
     $stmt->bind_param("i", $id);
     $res = $stmt->execute();
+    $stmt->close();
+
     if ($res) {
+        // 3. Если из базы удалено — удаляем файл
+        if (!empty($imagePath)) {
+            deleteImageFromServer($imagePath);
+        }
+
+        // Чистим кэш
         $cache->deleteByPrefix("news_"); 
         $cache->deleteByPrefix("admin_news_");
         $cache->delete("news_id_" . $id);
     }
+    
     return $res;
 }
 
@@ -1442,20 +1572,49 @@ function addCategory($conn, $data) {
 }
 
 /**
- * Обновить категорию
+ * Обновить категорию (с автоматической очисткой старого изображения)
  */
 function updateCategory($conn, $id, $data) {
     global $cache;
+
+    // 1. Получаем старый путь к картинке категории из базы
+    $oldImagePath = null;
+    $sel = $conn->prepare("SELECT image_path FROM product_categories WHERE id = ?");
+    $sel->bind_param("i", $id);
+    $sel->execute();
+    $result = $sel->get_result();
+    if ($row = $result->fetch_assoc()) {
+        $oldImagePath = $row['image_path'];
+    }
+    $sel->close();
+
+    // 2. Обновляем данные категории
     $stmt = $conn->prepare("UPDATE product_categories SET name = ?, slug = ?, description = ?, image_path = ?, sort_order = ?, is_active = ? WHERE id = ?");
-    $stmt->bind_param("ssssiii", $data['name'], $data['slug'], $data['description'], $data['image_path'], $data['sort_order'], $data['is_active'], $id);
+    $stmt->bind_param("ssssiii", 
+        $data['name'], 
+        $data['slug'], 
+        $data['description'], 
+        $data['image_path'], 
+        $data['sort_order'], 
+        $data['is_active'], 
+        $id
+    );
     
     $success = $stmt->execute();
+    $stmt->close();
+
     if ($success) {
+        // 3. Если запись обновилась — проверяем, нужно ли удалять старый файл
+        if (!empty($oldImagePath) && $oldImagePath !== $data['image_path']) {
+            deleteImageFromServer($oldImagePath);
+        }
+
         // Сбрасываем кэш этой категории и всех списков
         $cache->deleteByPrefix("categories_");
         $cache->deleteByPrefix("product_");
         $cache->deleteByPrefix("admin_product_");
     }
+
     return $success;
 }
 
@@ -1485,21 +1644,42 @@ function generateUniqueCategorySlug($conn, $name, $currentId = 0) {
 }
 
 /**
- * Полное удаление категории
+ * Полное удаление категории и её изображения
  */
 function deleteCategory($conn, $id) {
     global $cache;
+
+    // 1. Получаем путь к картинке, пока запись еще жива
+    $imagePath = null;
+    $sel = $conn->prepare("SELECT image_path FROM product_categories WHERE id = ?");
+    $sel->bind_param("i", $id);
+    $sel->execute();
+    $result = $sel->get_result();
+    if ($row = $result->fetch_assoc()) {
+        $imagePath = $row['image_path'];
+    }
+    $sel->close();
+
+    // 2. Удаляем категорию из базы
     $stmt = $conn->prepare("DELETE FROM product_categories WHERE id = ?");
     $stmt->bind_param("i", $id);
-    
     $success = $stmt->execute();
+    $stmt->close();
+
     if ($success) {
-        // После удаления данные в кэше больше не актуальны
+        // 3. Если из базы удалено — сносим файл
+        if (!empty($imagePath)) {
+            deleteImageFromServer($imagePath);
+        }
+
+        // Чистим кэш
         $cache->deleteByPrefix("categories_");
+        // Также стоит сбросить кэш товаров, так как их категории больше нет
+        $cache->deleteByPrefix("product_");
     }
+
     return $success;
 }
-
 
 // ARTICLES
 
@@ -1570,44 +1750,90 @@ function addArticle($conn, $data) {
 }
 
 /**
- * Обновить статью
+ * Обновить статью (с автоматической зачисткой старого изображения)
  */
 function updateArticle($conn, $id, $data) {
     global $cache;
+
+    // 1. Получаем старый путь к картинке из базы перед обновлением
+    $oldImagePath = null;
+    $sel = $conn->prepare("SELECT image_path FROM articles WHERE id = ?");
+    $sel->bind_param("i", $id);
+    $sel->execute();
+    $result = $sel->get_result();
+    if ($row = $result->fetch_assoc()) {
+        $oldImagePath = $row['image_path'];
+    }
+    $sel->close();
+
+    // 2. Обновляем статью
     $stmt = $conn->prepare("UPDATE articles SET title = ?, slug = ?, excerpt = ?, content = ?, author = ?, image_path = ?, is_published = ?, published_at = ?, updated_at = NOW() WHERE id = ?");
     $stmt->bind_param("ssssssisi", 
-        $data['title'], $data['slug'], $data['excerpt'], 
-        $data['content'], $data['author'], $data['image_path'], 
-        $data['is_published'], $data['published_at'], 
+        $data['title'], 
+        $data['slug'], 
+        $data['excerpt'], 
+        $data['content'], 
+        $data['author'], 
+        $data['image_path'], 
+        $data['is_published'], 
+        $data['published_at'], 
         $id
     );
     
     $success = $stmt->execute();
+    $stmt->close();
+
     if ($success) {
+        // 3. Если в базе всё ок, проверяем: изменился ли путь к картинке?
+        if (!empty($oldImagePath) && $oldImagePath !== $data['image_path']) {
+            deleteImageFromServer($oldImagePath);
+        }
+
         // Удаляем кэш самой статьи
         $cache->delete("article_item_" . $id);
-        // Сбрасываем списки, так как заголовки или анонсы в списках могли измениться
+        // Сбрасываем списки
         $cache->deleteByPrefix("articles_list");
         $cache->deleteByPrefix("article_slug");
     }
+
     return $success;
 }
 
 /**
- * Удалить статью
+ * Удалить статью и её изображение с сервера
  */
 function deleteArticle($conn, $id) {
     global $cache;
+
+    // 1. Получаем путь к картинке перед тем, как удалить строку из БД
+    $imagePath = null;
+    $sel = $conn->prepare("SELECT image_path FROM articles WHERE id = ?");
+    $sel->bind_param("i", $id);
+    $sel->execute();
+    $result = $sel->get_result();
+    if ($row = $result->fetch_assoc()) {
+        $imagePath = $row['image_path'];
+    }
+    $sel->close();
+
+    // 2. Удаляем статью из базы
     $stmt = $conn->prepare("DELETE FROM articles WHERE id = ?");
     $stmt->bind_param("i", $id);
-    
     $success = $stmt->execute();
+    $stmt->close();
+    
     if ($success) {
-        // Полная очистка по префиксу (удалит и саму статью, и все списки)
-        $cache->delete("article_slug_" . $id);
-        $cache->deleteByPrefix("articles_list");
+        // 3. Если из базы удалено — удаляем файл физически
+        if (!empty($imagePath)) {
+            deleteImageFromServer($imagePath);
+        }
 
+        // Полная очистка кэша
+        $cache->delete("article_slug_" . $id);
+        $cache->delete("article_item_" . $id); // Добавил для верности
+        $cache->deleteByPrefix("articles_list");
     }
+
     return $success;
 }
 
@@ -1883,21 +2109,52 @@ function addAdvantage($conn, $data) {
     return $res;
 }
 
+/**
+ * Обновить преимущество (с автоматическим удалением старой иконки)
+ */
 function updateAdvantage($conn, $id, $data) {
     global $cache;
-    // Исправлено: icon_path в запросе
+
+    // 1. Получаем текущий путь к иконке из базы
+    $oldIconPath = null;
+    $sel = $conn->prepare("SELECT icon_path FROM advantages WHERE id = ?");
+    $sel->bind_param("i", $id);
+    $sel->execute();
+    $result = $sel->get_result();
+    if ($row = $result->fetch_assoc()) {
+        $oldIconPath = $row['icon_path'];
+    }
+    $sel->close();
+
+    // 2. Обновляем данные преимущества
     $sql = "UPDATE advantages SET title = ?, description = ?, icon_path = ?, sort_order = ?, is_active = ? WHERE id = ?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param('sssiii', $data['title'], $data['description'], $data['icon_path'], $data['sort_order'], $data['is_active'], $id);
+    $stmt->bind_param('sssiii', 
+        $data['title'], 
+        $data['description'], 
+        $data['icon_path'], 
+        $data['sort_order'], 
+        $data['is_active'], 
+        $id
+    );
+    
     $res = $stmt->execute();
+    $stmt->close();
+
     if ($res) {
+        // 3. Если в базе обновилось — проверяем, нужно ли удалять старый файл иконки
+        if (!empty($oldIconPath) && $oldIconPath !== $data['icon_path']) {
+            deleteImageFromServer($oldIconPath);
+        }
+
+        // Чистим кэш
         $cache->deleteByPrefix("advantages_active_");
         $cache->deleteByPrefix("admin_advantages_");
         $cache->deleteByPrefix("advantage_item_");
     }
+
     return $res;
 }
-
 /**
  * Получить преимущество по ID с кэшированием
  */
@@ -1922,18 +2179,40 @@ function getAdvantageById($conn, $id) {
 }
 
 /**
- * Удалить преимущество
+ * Удалить преимущество и его иконку с сервера
  */
 function deleteAdvantage($conn, $id) {
     global $cache;
+
+    // 1. Получаем путь к иконке перед удалением записи
+    $iconPath = null;
+    $sel = $conn->prepare("SELECT icon_path FROM advantages WHERE id = ?");
+    $sel->bind_param("i", $id);
+    $sel->execute();
+    $result = $sel->get_result();
+    if ($row = $result->fetch_assoc()) {
+        $iconPath = $row['icon_path'];
+    }
+    $sel->close();
+
+    // 2. Удаляем запись из базы
     $stmt = $conn->prepare("DELETE FROM advantages WHERE id = ?");
     $stmt->bind_param("i", $id);
     $res = $stmt->execute();
+    $stmt->close();
+
     if ($res) {
+        // 3. Если в базе удалено — удаляем иконку физически
+        if (!empty($iconPath)) {
+            deleteImageFromServer($iconPath);
+        }
+
+        // Чистим кэш
         $cache->deleteByPrefix("advantages_active_");
         $cache->deleteByPrefix("admin_advantages_");
         $cache->deleteByPrefix("advantage_item_");
     }
+
     return $res;
 }
 
@@ -2200,8 +2479,24 @@ function addCard($conn, $data) {
     return $res;
 }
 
+/**
+ * Обновить карточку (с автоматической зачисткой старого изображения)
+ */
 function updateCard($conn, $id, $data) {
     global $cache;
+
+    // 1. Берем старый путь к картинке из базы
+    $oldPath = null;
+    $sel = $conn->prepare("SELECT image_path FROM cards WHERE id = ?");
+    $sel->bind_param("i", $id);
+    $sel->execute();
+    $result = $sel->get_result();
+    if ($row = $result->fetch_assoc()) {
+        $oldPath = $row['image_path'];
+    }
+    $sel->close();
+
+    // 2. Обновляем данные карточки
     $stmt = $conn->prepare("UPDATE cards SET title = ?, description = ?, image_path = ?, color = ?, sort_order = ?, is_active = ? WHERE id = ?");
     $stmt->bind_param("ssssiii", 
         $data['title'], 
@@ -2212,27 +2507,62 @@ function updateCard($conn, $id, $data) {
         $data['is_active'],
         $id
     );
+    
     $res = $stmt->execute();
+    $stmt->close();
+
     if ($res) {
+        // 3. Если в базе обновилось — удаляем старый файл, если он изменился
+        if (!empty($oldPath) && $oldPath !== $data['image_path']) {
+            deleteImageFromServer($oldPath);
+        }
+
+        // Чистим кэш
         $cache->deleteByPrefix("card_"); 
         $cache->deleteByPrefix("cards_active_all"); 
         $cache->deleteByPrefix("admin_cards_");
         $cache->delete("card_id_" . $id);
     }
+    
     return $res;
 }
 
+/**
+ * Удалить карточку и её изображение с сервера
+ */
 function deleteCard($conn, $id) {
     global $cache;
+
+    // 1. Сначала узнаем путь к картинке, пока запись еще в базе
+    $imagePath = null;
+    $sel = $conn->prepare("SELECT image_path FROM cards WHERE id = ?");
+    $sel->bind_param("i", $id);
+    $sel->execute();
+    $result = $sel->get_result();
+    if ($row = $result->fetch_assoc()) {
+        $imagePath = $row['image_path'];
+    }
+    $sel->close();
+
+    // 2. Удаляем карточку из базы данных
     $stmt = $conn->prepare("DELETE FROM cards WHERE id = ?");
     $stmt->bind_param("i", $id);
     $res = $stmt->execute();
+    $stmt->close();
+
     if ($res) {
+        // 3. Если из базы удалено успешно — удаляем файл
+        if (!empty($imagePath)) {
+            deleteImageFromServer($imagePath);
+        }
+
+        // Чистим кэш
         $cache->deleteByPrefix("card_"); 
         $cache->deleteByPrefix("cards_active_all"); 
         $cache->deleteByPrefix("admin_cards_");
         $cache->delete("card_id_" . $id);
     }
+    
     return $res;
 }
 ?>

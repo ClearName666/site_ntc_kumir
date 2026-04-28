@@ -1,0 +1,650 @@
+
+/* ===== БЛОК РЕДАКТОРА СТАТЕЙ - ИЗОЛИРОВАННЫЙ NAMESPACE ===== */
+.article-builder {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* Модальное окно */
+
+.builder-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 10000;
+    animation: fadeIn 0.3s ease;
+}
+
+.builder-modal.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.builder-modal__content {
+    background: white;
+    width: 90%;
+    max-width: 1400px;
+    height: 90%;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    animation: slideUp 0.3s ease;
+}
+
+.builder-modal__header {
+    padding: 20px 24px;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.builder-modal__header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #1f2937;
+}
+
+.builder-modal__close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #6b7280;
+    transition: all 0.2s;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+}
+
+.builder-modal__close:hover {
+    background: #f3f4f6;
+    color: #1f2937;
+}
+
+.builder-modal__body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+}
+
+/* Панель инструментов */
+.builder-toolbar {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid #e5e7eb;
+    flex-wrap: wrap;
+}
+
+.builder-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+}
+
+.builder-btn-primary {
+    background: #3b82f6;
+    color: white;
+}
+
+.builder-btn-primary:hover {
+    background: #2563eb;
+    transform: translateY(-1px);
+}
+
+.builder-btn-danger {
+    background: #ef4444;
+    color: white;
+}
+
+.builder-btn-danger:hover {
+    background: #dc2626;
+}
+
+/* Сетка блоков */
+.builder-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    min-height: 400px;
+}
+
+/* Блок */
+.builder-block {
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 16px;
+    position: relative;
+    transition: all 0.3s ease;
+    cursor: move;
+    min-height: 150px;
+    display: flex;
+    flex-direction: column;
+}
+
+.builder-block.dragging {
+    opacity: 0.5;
+    transform: scale(0.98);
+}
+
+.builder-block.drag-over {
+    border-color: #3b82f6;
+    background: #eff6ff;
+}
+
+/* Зона захвата для перетаскивания */
+.builder-block__drag-handle {
+    position: absolute;
+    left: -12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 24px;
+    height: 48px;
+    background: #e5e7eb;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: grab;
+    opacity: 0;
+    transition: opacity 0.2s;
+    color: #6b7280;
+}
+
+.builder-block:hover .builder-block__drag-handle {
+    opacity: 1;
+}
+
+.builder-block__drag-handle:active {
+    cursor: grabbing;
+}
+
+/* Кнопка удаления */
+.builder-block__delete {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    width: 28px;
+    height: 28px;
+    background: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    transition: all 0.2s;
+    z-index: 10;
+}
+
+.builder-block__delete:hover {
+    background: #dc2626;
+    transform: scale(1.1);
+}
+
+/* Ручки изменения размера */
+.builder-block__resizer {
+    position: absolute;
+    background: #3b82f6;
+    border-radius: 4px;
+}
+
+.builder-block__resizer-nw {
+    top: -4px;
+    left: -4px;
+    width: 12px;
+    height: 12px;
+    cursor: nw-resize;
+}
+
+.builder-block__resizer-ne {
+    top: -4px;
+    right: -4px;
+    width: 12px;
+    height: 12px;
+    cursor: ne-resize;
+}
+
+.builder-block__resizer-sw {
+    bottom: -4px;
+    left: -4px;
+    width: 12px;
+    height: 12px;
+    cursor: sw-resize;
+}
+
+.builder-block__resizer-se {
+    bottom: -4px;
+    right: -4px;
+    width: 12px;
+    height: 12px;
+    cursor: se-resize;
+}
+
+/* Панель форматирования текста */
+.builder-text-toolbar {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 8px;
+    margin-bottom: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.builder-text-toolbar button {
+    padding: 6px 12px;
+    border: 1px solid #d1d5db;
+    background: white;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s;
+}
+
+.builder-text-toolbar button:hover {
+    background: #e5e7eb;
+}
+
+/* Редактируемый контент */
+.builder-editable {
+    outline: none;
+    flex: 1;
+    overflow: auto;
+}
+
+.builder-text-content {
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.builder-text-content:focus {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+}
+
+/* Блок изображения */
+.builder-image-block {
+    text-align: center;
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f9fafb;
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+}
+
+.builder-image-preview {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.builder-image-upload {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    color: #6b7280;
+}
+
+.builder-image-upload input {
+    display: none;
+}
+
+.builder-image-upload label {
+    padding: 10px 20px;
+    background: #e5e7eb;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.builder-image-upload label:hover {
+    background: #d1d5db;
+}
+
+/* Генерация HTML для отображения */
+.article-content-generated {
+    line-height: 1.8;
+}
+
+.article-content-generated .generated-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    margin: 20px 0;
+}
+
+.article-content-generated .generated-block {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 0;
+}
+
+.article-content-generated .generated-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .builder-grid,
+    .article-content-generated .generated-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    
+    .builder-modal__content {
+        width: 95%;
+        height: 95%;
+    }
+    
+    .builder-block__drag-handle {
+        opacity: 1;
+        left: -8px;
+    }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ===== БЛОК РЕДАКТОРА СТАТЕЙ - ИЗОЛИРОВАННЫЙ NAMESPACE ===== */
+
+/* Модальное окно */
+.builder-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 10000;
+}
+
+.builder-modal.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.builder-modal__content {
+    background: white;
+    width: 90%;
+    max-width: 1200px;
+    height: 85%;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+}
+
+.builder-modal__header {
+    padding: 20px 24px;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.builder-modal__header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.builder-modal__close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+}
+
+.builder-modal__close:hover {
+    background: #f3f4f6;
+}
+
+.builder-modal__body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+}
+
+/* Панель инструментов */
+.builder-toolbar {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid #e5e7eb;
+    flex-wrap: wrap;
+}
+
+.builder-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+}
+
+.builder-btn-primary {
+    background: #3b82f6;
+    color: white;
+}
+
+.builder-btn-primary:hover {
+    background: #2563eb;
+}
+
+.builder-btn-danger {
+    background: #ef4444;
+    color: white;
+}
+
+.builder-btn-danger:hover {
+    background: #dc2626;
+}
+
+/* Сетка блоков */
+.builder-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    min-height: 200px;
+}
+
+/* Блок */
+.builder-block {
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 16px;
+    position: relative;
+    transition: all 0.3s ease;
+    min-height: 150px;
+    display: flex;
+    flex-direction: column;
+}
+
+.builder-block.dragging {
+    opacity: 0.5;
+}
+
+/* Зона захвата для перетаскивания */
+.builder-block__drag-handle {
+    position: absolute;
+    left: -12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 24px;
+    height: 48px;
+    background: #e5e7eb;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: grab;
+    color: #6b7280;
+}
+
+.builder-block__drag-handle:active {
+    cursor: grabbing;
+}
+
+/* Кнопка удаления */
+.builder-block__delete {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    width: 28px;
+    height: 28px;
+    background: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    z-index: 10;
+}
+
+.builder-block__delete:hover {
+    background: #dc2626;
+}
+
+/* Панель форматирования текста */
+.builder-text-toolbar {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 8px;
+    margin-bottom: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.builder-text-toolbar button {
+    padding: 6px 12px;
+    border: 1px solid #d1d5db;
+    background: white;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.builder-text-toolbar button:hover {
+    background: #e5e7eb;
+}
+
+/* Редактируемый контент */
+.builder-editable {
+    outline: none;
+    flex: 1;
+    overflow: auto;
+    min-height: 100px;
+}
+
+.builder-text-content {
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.builder-text-content:focus {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+}
+
+/* Блок изображения */
+.builder-image-block {
+    text-align: center;
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f9fafb;
+    border-radius: 8px;
+    position: relative;
+}
+
+.builder-image-preview {
+    max-width: 100%;
+    max-height: 300px;
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+.builder-image-upload {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    color: #6b7280;
+}
+
+.builder-image-upload input {
+    display: none;
+}
+
+.builder-image-upload label {
+    padding: 10px 20px;
+    background: #e5e7eb;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .builder-grid {
+        grid-template-columns: 1fr;
+    }
+}

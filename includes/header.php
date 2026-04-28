@@ -68,8 +68,8 @@ $isAdmin = isset($_SESSION['admin_id']);
                         <span><?php echo getSetting($conn, 'phone'); ?></span>
                     </a>
                     
-                    <!-- Личный кабинет -->
-                    <a href="https://v4.ntckumir.ru/" class="btn-personal">
+                    <!-- Личный кабинет https://v4.ntckumir.ru/ -->
+                    <a href="/userKumir/index.php" class="btn-personal">
                         <span class="btn-icon">👤</span>
                         <span class="btn-text">Личный кабинет</span>
                     </a>

@@ -75,21 +75,27 @@ require_once __DIR__. '/includes/menu.php';
         <div class="stats-grid">
             <?php 
             $cards = [
-                ['icon' => 'fa-newspaper', 'title' => 'Статьи', 'val' => $stats['articles']],
-                ['icon' => 'fa-bullhorn', 'title' => 'Новости', 'val' => $stats['news']],
-                ['icon' => 'fa-box', 'title' => 'Товары', 'val' => $stats['products']],
-                ['icon' => 'fa-question-circle', 'title' => 'Вопросы', 'val' => $stats['faq']],
-                ['icon' => 'fa-tags', 'title' => 'Категории', 'val' => $stats['categories']],
-                ['icon' => 'fa-users', 'title' => 'Админы', 'val' => $stats['admins']],
+                ['icon' => 'fa-newspaper', 'title' => 'Статьи', 'val' => $stats['articles'], 'href' => '/admin/articles.php'],
+                ['icon' => 'fa-bullhorn', 'title' => 'Новости', 'val' => $stats['news'], 'href' => '/admin/news.php'],
+                ['icon' => 'fa-box', 'title' => 'Товары', 'val' => $stats['products'], 'href' => '/admin/products.php'],
+                ['icon' => 'fa-question-circle', 'title' => 'Вопросы', 'val' => $stats['faq'], 'href' => '/admin/faq.php'],
+                ['icon' => 'fa-tags', 'title' => 'Категории', 'val' => $stats['categories'], 'href' => '/admin/categories.php'],
+                ['icon' => 'fa-users', 'title' => 'Админы', 'val' => $stats['admins'], 'href' => '/admin/admins.php'],
             ];
             foreach ($cards as $card): ?>
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <div class="stat-icon"><i class="fas <?php echo $card['icon']; ?>"></i></div>
-                        <div class="stat-title"><?php echo $card['title']; ?></div>
+                
+                <a style="text-decoration: none;" href="<?php echo $card['href']; ?>" class="stat-card-link">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon">
+                                <i class="fas <?php echo $card['icon']; ?>"></i>
+                            </div>
+                            <div class="stat-title"><?php echo $card['title']; ?></div>
+                        </div>
+                        <div class="stat-value"><?php echo $card['val']; ?></div>
                     </div>
-                    <div class="stat-value"><?php echo $card['val']; ?></div>
-                </div>
+                </a>
+
             <?php endforeach; ?>
         </div>
 

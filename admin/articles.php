@@ -70,6 +70,8 @@ require_once __DIR__. '/includes/header.php';
 require_once __DIR__. '/includes/menu.php';
 ?>
 
+<link rel="stylesheet" href="assets/css/redactor.css">
+
 <!-- Основной контент -->
 <div class="main-content">
     <!-- Шапка -->
@@ -131,7 +133,7 @@ require_once __DIR__. '/includes/menu.php';
                             <tr>
                                 <td><?php echo $row['id']; ?></td>
                                 <td>
-                                    <a href="../article.php?slug=<?php echo $row['slug']; ?>" target="_blank">
+                                    <a href="../articles.php?article=<?php echo $row['slug']; ?>" target="_blank">
                                         <?php echo htmlspecialchars($row['title']); ?>
                                     </a>
                                 </td>
@@ -196,7 +198,12 @@ require_once __DIR__. '/includes/menu.php';
                     </div>
                     
                     <div class="form-group">
-                        <label for="content">Содержание *</label>
+                        <label for="content" style="display: flex; justify-content: space-between; align-items: center;">
+                            <span>Содержание *</span>
+                            <button type="button" onclick="openArticleBuilder()" style="background: #3b82f6; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer;">
+                                <i class="fas fa-pen"></i> Редактор блоков
+                            </button>
+                        </label>
                         <textarea id="content" name="content" rows="10" required><?php echo htmlspecialchars($article['content'] ?? ''); ?></textarea>
                     </div>
                     
@@ -275,6 +282,34 @@ require_once __DIR__. '/includes/menu.php';
     </div>
 </div>
 
+<!-- Модальное окно редактора -->
+<div id="articleBuilderModal" class="builder-modal">
+    <div class="builder-modal__content">
+        <div class="builder-modal__header">
+            <h2>Редактор статей</h2>
+            <button class="builder-modal__close" onclick="closeArticleBuilder()">&times;</button>
+        </div>
+        <div class="builder-modal__body">
+            <div class="builder-toolbar">
+                <button class="builder-btn builder-btn-primary" onclick="addTextBlock()">
+                    <i class="fas fa-font"></i> Текстовый блок
+                </button>
+                <button class="builder-btn builder-btn-primary" onclick="addImageBlock()">
+                    <i class="fas fa-image"></i> Блок изображения
+                </button>
+                <button class="builder-btn builder-btn-danger" onclick="clearAllBlocks()">
+                    <i class="fas fa-trash-alt"></i> Очистить всё
+                </button>
+                <button class="builder-btn builder-btn-primary" onclick="generateAndSave()">
+                    <i class="fas fa-code"></i> Сохранить и сгенерировать HTML
+                </button>
+            </div>
+            <div id="blocksGrid" class="builder-grid"></div>
+        </div>
+    </div>
+</div>
+
+<script src="assets/js/redactor.js"></script>
 <script src="assets/js/articles.js"></script>
 <script src="assets/js/scripts.js"></script>
 
