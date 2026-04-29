@@ -2,6 +2,7 @@
 
 // Подключаем функции
 require_once __DIR__ . '/includes/functions.php';
+require_once __DIR__. '/config/config.php';
 
 // подключаемся к базе 
 $conn = getDBConnection();
@@ -81,7 +82,7 @@ $footerPath = 'includes/footer.php';
     <link rel="icon" href="<?= getSetting($conn, 'favicon_path') ?>" type="image/x-icon">
     
     <!-- Стили -->
-    <link rel="stylesheet" href="assets/css/products.css">
+    <link rel="stylesheet" href="assets/css/products.css?version=<?php echo $version_code; ?>">
 
 </head>
 <body>
@@ -129,7 +130,7 @@ $footerPath = 'includes/footer.php';
                     <div class="product-detail-content">
                         <div class="product-info-grid">
                             <!-- Блок цены -->
-                            <div class="product-price-block">
+                            <div>
                                 <div class="product-price-value">
                                     <?= number_format($productData['price'], 0, '.', ' ') ?> ₽
                                 </div>

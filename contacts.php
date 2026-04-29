@@ -2,6 +2,7 @@
 
 // Подключаем функции
 require_once __DIR__. '/includes/functions.php';
+require_once __DIR__. '/config/config.php';
 
 // подключаемся к базе 
 $conn = getDBConnection();
@@ -69,10 +70,10 @@ $mapLng = $mainOffice ? $mainOffice['longitude'] : 104.278817;
     <link rel="icon" href="<?= getSetting($conn, 'favicon_path') ?>" type="image/x-icon">
     
     <!-- Стили -->
-    <link rel="stylesheet" href="assets/css/contacts.css">
+    <link rel="stylesheet" href="assets/css/contacts.css?version=<?php echo $version_code; ?>">
 
 </head>
-<body>
+<body style="background: url('/static/background.jpg') center/cover no-repeat fixed;">
     <!-- Header -->
     <?php include $headerPath; ?>
     
@@ -123,7 +124,7 @@ $mapLng = $mainOffice ? $mainOffice['longitude'] : 104.278817;
                 <div class="offices-grid">
                     <?php renderOffices($offices); ?>
                 </div>
-            </section>
+            </section><br>
             
             <!-- Форма обратной связи -->
             <section class="contact-form-section">

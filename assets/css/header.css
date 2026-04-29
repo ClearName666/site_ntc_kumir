@@ -1,0 +1,124 @@
+/* ========================================
+   БАЗОВЫЙ HEADER (Состояние на самом верху)
+   ======================================== */
+.main-header {
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    color: white;
+
+    position: absolute; /* Не занимает место в потоке */
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+
+    border-radius: 0;
+    border: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    
+    /* Плавность трансформаций */
+    transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+/* ========================================
+   СОСТОЯНИЕ ПРИ СКРОЛЛЕ (Анимация выезда сверху)
+   ======================================== */
+.main-header.scrolled {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(0); /* Финальная точка */
+    
+    width: calc(100% - 40px);
+    max-width: 1400px;
+    
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 32px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    
+    /* Эффект появления сверху вниз при добавлении класса */
+    animation: slideDown 0.5s ease forwards;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateX(-50%) translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Контент внутри хедера */
+.header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 30px;
+}
+
+/* ========================================
+   МОБИЛЬНОЕ МЕНЮ (Выезд сверху)
+   ======================================== */
+.mobile-menu {
+    display: none; /* Скрыто по умолчанию */
+    position: fixed;
+    top: 90px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 40px);
+    max-width: 1400px;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(20px);
+    border-radius: 32px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    z-index: 999;
+    overflow: hidden;
+}
+
+/* Класс активации мобильного меню */
+.mobile-menu.active {
+    display: block;
+    animation: mobileSlideDown 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes mobileSlideDown {
+    from {
+        transform: translateX(-50%) translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Изменяем отступ мобильного меню, когда основной хедер скроллится */
+.main-header.scrolled ~ .mobile-menu {
+    top: 85px;
+}
+
+/* ========================================
+   КОНТЕНТ (Игнорирует хедер)
+   ======================================== */
+main, .hero, .products-page {
+    padding-top: 0 !important;
+}
+
+/* ========================================
+   АДАПТИВНОСТЬ
+   ======================================== */
+@media (max-width: 768px) {
+    .main-header.scrolled {
+        top: 10px;
+        width: calc(100% - 20px);
+    }
+    .mobile-menu {
+        top: 75px;
+        width: calc(100% - 20px);
+    }
+}

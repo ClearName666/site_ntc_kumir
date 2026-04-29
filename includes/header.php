@@ -14,8 +14,9 @@ $isAdmin = isset($_SESSION['admin_id']);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo getSetting($conn, 'site_title'); ?></title>
-    <link rel="stylesheet" href="assets/css/style.css">
-    <link rel="stylesheet" href="assets/css/responsive.css">
+    <link rel="stylesheet" href="assets/css/style.css?version=<?php echo $version_code; ?>">
+    <link rel="stylesheet" href="assets/css/responsive.css?version=<?php echo $version_code; ?>">
+    <link rel="stylesheet" href="assets/css/header.css?version=<?php echo $version_code; ?>">
     <link rel="icon" href="<?php echo getSetting($conn, 'favicon_path'); ?>" type="image/x-icon">
     <style>
 
@@ -88,7 +89,7 @@ $isAdmin = isset($_SESSION['admin_id']);
     </header>
     
     <!-- Мобильное меню -->
-    <div class="mobile-menu" style="background: black;">
+    <div class="mobile-menu">
         <nav class="mobile-nav">
             <?php
             // Получаем все пункты меню для мобильной версии
@@ -120,56 +121,46 @@ $isAdmin = isset($_SESSION['admin_id']);
         </div>
     </div>
     
-    <script>
-        // Добавляем проверку авторизации администратора
-        document.addEventListener('DOMContentLoaded', function() {
-            // Проверяем, авторизован ли администратор
-            const isAdmin = <?php echo $isAdmin ? 'true' : 'false'; ?>;
-            if (isAdmin) {
-                // 1. Меняем кнопку в обычном меню
-                const adminBtn = document.querySelector('.btn-admin');
-                if (adminBtn) {
-                    adminBtn.innerHTML = '<span class="admin-icon">👑</span><span class="admin-text">Админка</span>';
-                    adminBtn.href = '/admin/index.php'; // Путь к главной странице админки
-                }
-                
-                // 2. Меняем кнопку в мобильном меню
-                const mobileAdminBtn = document.querySelector('.mobile-admin-btn .btn-admin');
-                if (mobileAdminBtn) {
-                    mobileAdminBtn.innerHTML = '<span class="admin-icon">👑</span><span class="admin-text">Админка</span>';
-                    mobileAdminBtn.href = '/admin/index.php';
-                }
-            }
-            const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
-            const mobileMenu = document.querySelector('.mobile-menu');
-            
-            if (mobileMenuBtn && mobileMenu) {
-                // 1. Открытие/Закрытие по клику на кнопку
-                mobileMenuBtn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    mobileMenu.classList.toggle('active');
-                    this.textContent = mobileMenu.classList.contains('active') ? '✕' : '☰';
-                });
-                // 2. Закрытие меню при клике вне его области
-                document.addEventListener('click', function(event) {
-                    if (!event.target.closest('.mobile-menu') && 
-                        !event.target.closest('.mobile-menu-btn')) {
-                        if (mobileMenu.classList.contains('active')) {
-                            mobileMenu.classList.remove('active');
-                            mobileMenuBtn.textContent = '☰';
-                        }
-                    }
-                });
-                // 3. Закрытие меню при клике на любую ссылку внутри
-                mobileMenu.querySelectorAll('a').forEach(link => {
-                    link.addEventListener('click', function() {
-                        mobileMenu.classList.remove('active');
-                        mobileMenuBtn.textContent = '☰';
-                    });
-                });
-            }
-        });
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const isAdmin = <?php echo $isAdmin ? 'true' : 'false'; ?>;
+    
+    // Обновление кнопки админа
+    if (isAdmin) {
+        const adminBtn = document.querySelector('.btn-admin');
+        if (adminBtn) {
+            adminBtn.innerHTML = '<span class="admin-icon">👑</span><span class="admin-text">Админка</span>';
+            adminBtn.href = '/admin/index.php';
+        }
+        
+        const mobileAdminBtn = document.querySelector('.mobile-admin-btn .btn-admin');
+        if (mobileAdminBtn) {
+            mobileAdminBtn.innerHTML = '<span class="admin-icon">👑</span><span class="admin-text">Админка</span>';
+            mobileAdminBtn.href = '/admin/index.php';
+        }
+    }
+    
+    const header = document.querySelector('.main-header');
+    const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+    const mobileMenu = document.querySelector('.mobile-menu');
 
-    </script>
+    // Логика скролла
+    window.addEventListener('scroll', function() {
+        if (window.scrollY > 100) {
+            header.classList.add('scrolled');
+        } else {
+            header.classList.remove('scrolled');
+        }
+    });
+
+    // Логика мобильного меню
+    if (mobileMenuBtn && mobileMenu) {
+        mobileMenuBtn.addEventListener('click', function() {
+            mobileMenu.classList.toggle('active');
+            this.textContent = mobileMenu.classList.contains('active') ? '✕' : '☰';
+        });
+    }
+});
+</script>
 </body>
 </html>

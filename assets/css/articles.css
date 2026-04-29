@@ -1,23 +1,77 @@
 :root {
+    /* Основные цвета */
     --primary-blue: #3498db;
     --dark-blue: #2980b9;
     --text-dark: #2c3e50;
     --text-light: #7f8c8d;
+    --text-gray: #666;
+    --text-meta: #95a5a6;
+    
+    /* Фоны */
     --bg-light: #f8f9fa;
-    --bg-gradient: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    --shadow-sm: 0 5px 20px rgba(0,0,0,0.08);
-    --shadow-md: 0 10px 40px rgba(0,0,0,0.1);
-    --shadow-lg: 0 20px 60px rgba(0,0,0,0.15);
+    --bg-white-transparent: rgba(255, 255, 255, 0.3);
+    --bg-overlay: rgba(255, 255, 255, 0.4);
+    
+    /* Тени */
+    --shadow-sm: 0 5px 20px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 10px 40px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.15);
+    --shadow-blue: 0 5px 15px rgba(52, 152, 219, 0.3);
+    --shadow-blue-hover: 0 8px 20px rgba(52, 152, 219, 0.4);
+    
+    /* Границы */
+    --border-light: 1px solid #eee;
+    --border-white-transparent: 1px solid rgba(255, 255, 255, 0.2);
+    
+    /* Размеры и отступы */
     --border-radius: 16px;
-    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --border-radius-lg: 20px;
+    --border-radius-btn: 50px;
+    
+    /* Анимации */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Общие стили страницы */
+/* ========================================
+   БАЗОВЫЕ СТИЛИ И ФОН
+   ======================================== */
+body {
+    position: relative;
+    z-index: 0;
+}
+
+/* Размытый фоновый слой с изображением */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    background: inherit;
+    background-size: cover;
+    background-position: center;
+    filter: blur(40px);
+    transform: scale(1.1);
+}
+
+/* Полупрозрачный оверлей для читаемости */
+body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background: var(--bg-overlay);
+    backdrop-filter: blur(10px);
+}
+
+/* ========================================
+   ОБЩИЕ СТИЛИ СТРАНИЦ
+   ======================================== */
 .articles-page,
 .article-detail {
     padding: 120px 0 60px;
-    background: var(--bg-gradient);
     min-height: 100vh;
+    position: relative;
+    z-index: 1;
 }
 
 .container {
@@ -26,7 +80,9 @@
     padding: 0 20px;
 }
 
-/* Шапка страницы */
+/* ========================================
+   ШАПКА СТРАНИЦЫ
+   ======================================== */
 .page-header {
     text-align: center;
     margin-bottom: 70px;
@@ -52,49 +108,55 @@
     line-height: 1.6;
 }
 
-/* Контейнер для стопки статей */
+/* ========================================
+   СПИСОК СТАТЕЙ (СТОПКА)
+   ======================================== */
 .articles-stack {
     max-width: 900px;
     margin: 0 auto 3rem;
     position: relative;
 }
 
-/* Карточка статьи в стопке */
+/* Карточка статьи */
 .article-card-stack {
-    background: white;
+    background-color: var(--bg-white-transparent);
+    backdrop-filter: blur(10px);
     border-radius: var(--border-radius);
     overflow: hidden;
     box-shadow: var(--shadow-sm);
     margin-bottom: 2rem;
     opacity: 0;
     transform: translateY(30px);
-    transition: var(--transition);
-    border: 1px solid rgba(0,0,0,0.05);
+    transition: var(--transition-smooth);
+    border: var(--border-white-transparent);
 }
 
+/* Показ карточки с анимацией */
 .article-card-stack.visible {
     opacity: 1;
     transform: translateY(0);
 }
 
+/* Эффект при наведении на карточку */
 .article-card-stack:hover {
     transform: translateY(-5px);
     box-shadow: var(--shadow-lg);
 }
 
+/* Ссылка-обёртка карточки */
 .article-link-stack {
     display: flex;
     min-height: 250px;
     text-decoration: none;
     color: inherit;
-    transition: var(--transition);
+    transition: var(--transition-smooth);
 }
 
 .article-link-stack:hover {
     text-decoration: none;
 }
 
-/* Изображение статьи */
+/* Контейнер изображения */
 .article-image-container {
     flex: 0 0 40%;
     position: relative;
@@ -108,11 +170,12 @@
     transition: transform 0.8s ease;
 }
 
+/* Увеличение изображения при наведении */
 .article-card-stack:hover .article-image-container img {
     transform: scale(1.1);
 }
 
-/* Контент карточки */
+/* Контентная часть карточки */
 .article-content-stack {
     flex: 1;
     padding: 2.5rem;
@@ -126,29 +189,33 @@
     margin-bottom: 1rem;
     line-height: 1.4;
     font-weight: 600;
+    transition: color 0.3s ease;
 }
 
+/* Подсветка заголовка при наведении */
 .article-card-stack:hover .article-title-stack {
     color: var(--primary-blue);
 }
 
 .article-excerpt-stack {
-    color: #666;
+    color: var(--text-gray);
     font-size: 1rem;
     line-height: 1.7;
     margin-bottom: 1.5rem;
     flex-grow: 1;
 }
 
-/* Мета-информация */
+/* ========================================
+   МЕТА-ИНФОРМАЦИЯ СТАТЬИ
+   ======================================== */
 .article-meta-stack {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding-top: 1.5rem;
-    border-top: 1px solid #eee;
+    border-top: var(--border-light);
     font-size: 0.875rem;
-    color: #95a5a6;
+    color: var(--text-meta);
 }
 
 .read-more {
@@ -160,11 +227,13 @@
     transition: gap 0.3s;
 }
 
+/* Стрелка для кнопки "Читать далее" */
 .read-more::after {
     content: '→';
     transition: transform 0.3s;
 }
 
+/* Анимация стрелки при наведении */
 .article-card-stack:hover .read-more {
     gap: 0.75rem;
 }
@@ -173,23 +242,26 @@
     transform: translateX(5px);
 }
 
-/* Страница отдельной статьи */
+/* ========================================
+   СТРАНИЦА ОТДЕЛЬНОЙ СТАТЬИ
+   ======================================== */
 .article-container {
     max-width: 900px;
     margin: 0 auto;
-    background: white;
-    border-radius: 20px;
+    border-radius: var(--border-radius-lg);
     overflow: hidden;
     box-shadow: var(--shadow-md);
-    animation: slideUp 0.8s ease;
+    background-color: var(--bg-white-transparent);
+    backdrop-filter: blur(10px);
 }
 
 .article-header {
     padding: 3rem 3rem 2rem;
     text-align: center;
-    border-bottom: 1px solid #eee;
+    border-bottom: var(--border-light);
 }
 
+/* Изображение внутри статьи */
 .article-detail-image {
     width: 100%;
     height: 400px;
@@ -201,20 +273,16 @@
     transform: scale(1.02);
 }
 
+/* Тело статьи */
 .article-body {
     padding: 2.5rem 3rem 3rem;
     line-height: 1.8;
     font-size: 1.125rem;
 }
 
-.article-body p {
-    margin-bottom: 1.5rem;
-    opacity: 0;
-    transform: translateY(20px);
-    animation: fadeInUp 0.6s forwards;
-}
-
-/* Кнопка "Назад" */
+/* ========================================
+   КНОПКА "НАЗАД"
+   ======================================== */
 .back-link-container {
     text-align: center;
     padding: 2rem 0;
@@ -228,39 +296,23 @@
     background: var(--primary-blue);
     color: white;
     text-decoration: none;
-    border-radius: 50px;
+    border-radius: var(--border-radius-btn);
     font-weight: 500;
-    transition: var(--transition);
-    box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+    transition: var(--transition-smooth);
+    box-shadow: var(--shadow-blue);
 }
 
+/* Эффекты при наведении */
 .back-link:hover {
     background: var(--dark-blue);
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(52, 152, 219, 0.4);
+    box-shadow: var(--shadow-blue-hover);
     gap: 1rem;
 }
 
-/* Анимации */
-@keyframes fadeInUp {
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes slideUp {
-    from {
-        opacity: 0;
-        transform: translateY(50px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Пустая страница */
+/* ========================================
+   СОСТОЯНИЕ БЕЗ СТАТЕЙ
+   ======================================== */
 .no-articles {
     text-align: center;
     padding: 5rem 1.25rem;
@@ -271,7 +323,19 @@
     color: var(--text-light);
 }
 
-/* Адаптивность */
+/* ========================================
+   АНИМАЦИИ
+   ======================================== */
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ========================================
+   АДАПТИВНОСТЬ
+   ======================================== */
 @media (max-width: 992px) {
     .articles-stack {
         max-width: 95%;

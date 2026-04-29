@@ -1,13 +1,94 @@
 :root {
+    /* Основные цвета */
+    --primary-blue: #3498db;
+    --dark-blue: #2980b9;
+    
+    /* Новостные цвета */
+    --news-primary: #e74c3c;
+    --news-dark: #c0392b;
+    --news-light: #ffebe9;
+    
+    /* Цвета контактов */
+    --contacts-primary: #9b59b6;
+    --contacts-dark: #8e44ad;
+    --contacts-light: #f4ecf7;
+    
+    /* FAQ цвета */
     --faq-primary: #f39c12;
     --faq-dark: #d68910;
     --faq-light: #fef5e7;
+    
+    /* Текст */
+    --text-dark: #2c3e50;
+    --text-light: #7f8c8d;
+    
+    /* Фоны */
+    --bg-white-semi: rgba(255, 255, 255, 0.3);
+    --bg-white-strong: rgba(255, 255, 255, 0.4);
+    --bg-white-card: rgba(255, 255, 255, 0.5);
+    --bg-white-form: rgba(255, 255, 255, 0.8);
+    --bg-overlay: rgba(255, 255, 255, 0.4);
+    
+    /* Тени */
+    --shadow-sm: 0 5px 20px rgba(0, 0, 0, 0.08);
+    --shadow-form: 0 10px 30px rgba(0, 0, 0, 0.1);
+    --shadow-btn: 0 10px 20px rgba(243, 156, 18, 0.3);
+    
+    /* Границы */
+    --border-light: 1px solid rgba(0, 0, 0, 0.1);
+    --border-input: 2px solid rgba(0, 0, 0, 0.1);
+    --border-faq: 2px solid var(--faq-primary);
+    --border-category: 2px solid rgba(243, 156, 18, 0.5);
+    
+    /* Скругления */
+    --radius-sm: 8px;
+    --radius-card: 12px;
+    --radius-lg: 16px;
+    --radius-btn: 50px;
+    
+    /* Анимации */
+    --transition-smooth: all 0.3s;
+    --transition-answer: max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Общие стили */
+/* ========================================
+   БАЗОВЫЕ СТИЛИ И ФОН
+   ======================================== */
+body {
+    position: relative;
+    z-index: 0;
+    min-height: 100vh;
+    background: url('/static/background.jpg') center/cover no-repeat fixed;
+}
+
+/* Размытый фоновый слой */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    background: inherit;
+    background-size: cover;
+    background-position: center;
+    filter: blur(40px);
+    transform: scale(1.1);
+}
+
+/* Полупрозрачный оверлей */
+body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background: var(--bg-overlay);
+    backdrop-filter: blur(10px);
+}
+
+/* Основной контент */
 .faq-page {
+    position: relative;
+    z-index: 1;
     padding: 120px 0 60px;
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
     min-height: 100vh;
 }
 
@@ -17,7 +98,9 @@
     padding: 0 20px;
 }
 
-/* Шапка страницы */
+/* ========================================
+   ШАПКА СТРАНИЦЫ
+   ======================================== */
 .page-header {
     text-align: center;
     margin-bottom: 70px;
@@ -26,13 +109,14 @@
 
 .page-title {
     font-size: 3rem;
-    color: #2c3e50;
+    color: var(--text-dark);
     margin-bottom: 1rem;
     font-weight: 700;
     position: relative;
     display: inline-block;
 }
 
+/* Декоративная линия */
 .page-title::after {
     content: '';
     position: absolute;
@@ -47,20 +131,22 @@
 
 .page-description {
     font-size: 1.125rem;
-    color: #7f8c8d;
+    color: var(--text-dark);
     max-width: 600px;
     margin: 2rem auto 0;
     line-height: 1.6;
 }
 
-/* Категории */
+/* ========================================
+   КАТЕГОРИИ ВОПРОСОВ
+   ======================================== */
 .categories-section {
     margin-bottom: 3rem;
 }
 
 .categories-title {
     font-size: 1.5rem;
-    color: #2c3e50;
+    color: var(--text-dark);
     margin-bottom: 1.5rem;
 }
 
@@ -71,19 +157,22 @@
     justify-content: center;
 }
 
+/* Кнопка категории */
 .category-btn {
     padding: 0.75rem 1.5rem;
-    background: white;
-    border: 2px solid var(--faq-light);
-    color: #666;
-    border-radius: 50px;
+    background: var(--bg-white-semi);
+    backdrop-filter: blur(5px);
+    border: var(--border-category);
+    color: var(--text-dark);
+    border-radius: var(--radius-btn);
     font-weight: 500;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: var(--transition-smooth);
     text-decoration: none;
     display: inline-block;
 }
 
+/* Активная категория и ховер */
 .category-btn:hover,
 .category-btn.active {
     background: var(--faq-primary);
@@ -92,54 +181,62 @@
     transform: translateY(-2px);
 }
 
+/* Кнопка "Все вопросы" */
 .category-btn.all {
-    background: var(--faq-light);
+    background: rgba(254, 245, 231, 0.8);
     border-color: var(--faq-primary);
     color: var(--faq-dark);
 }
 
-/* FAQ список */
+/* ========================================
+   СПИСОК FAQ
+   ======================================== */
 .faq-list {
     max-width: 800px;
     margin: 0 auto;
 }
 
+/* Элемент FAQ */
 .faq-item {
     margin-bottom: 1rem;
-    background: white;
-    border-radius: 12px;
+    background: var(--bg-white-semi);
+    backdrop-filter: blur(10px);
+    border-radius: var(--radius-card);
     overflow: hidden;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
-    animation: slideUp 0.6s ease;
-    animation-fill-mode: both;
+    box-shadow: var(--shadow-sm);
+    animation: slideUp 0.6s ease both;
 }
 
+/* Задержки для каскадной анимации */
 .faq-item:nth-child(1) { animation-delay: 0.1s; }
 .faq-item:nth-child(2) { animation-delay: 0.2s; }
 .faq-item:nth-child(3) { animation-delay: 0.3s; }
 .faq-item:nth-child(4) { animation-delay: 0.4s; }
 .faq-item:nth-child(5) { animation-delay: 0.5s; }
 
+/* Скрытый чекбокс для аккордеона */
 .faq-toggle {
     display: none;
 }
 
+/* Заголовок вопроса */
 .faq-question {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 1.5rem;
-    background: white;
+    background: var(--bg-white-card);
     cursor: pointer;
     font-size: 1.125rem;
     font-weight: 600;
-    color: #2c3e50;
-    transition: all 0.3s;
+    color: var(--text-dark);
+    transition: var(--transition-smooth);
     user-select: none;
 }
 
+/* Ховер на вопросе */
 .faq-question:hover {
-    background: var(--faq-light);
+    background: rgba(243, 156, 18, 0.2);
 }
 
 .faq-icon {
@@ -148,37 +245,43 @@
     flex-shrink: 0;
 }
 
+/* Стрелка */
 .faq-arrow {
     font-size: 0.875rem;
     transition: transform 0.3s;
     flex-shrink: 0;
 }
 
+/* Поворот стрелки при открытии */
 .faq-toggle:checked ~ .faq-question .faq-arrow {
     transform: rotate(180deg);
 }
 
+/* Активный вопрос */
 .faq-toggle:checked ~ .faq-question {
-    background: var(--faq-light);
-    border-bottom: 2px solid var(--faq-primary);
+    background: rgba(243, 156, 18, 0.3);
+    border-bottom: var(--border-faq);
 }
 
+/* Скрытый ответ */
 .faq-answer {
     max-height: 0;
     overflow: hidden;
-    transition: max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-    background: white;
+    transition: var(--transition-answer);
+    background: rgba(255, 255, 255, 0.2);
 }
 
+/* Раскрытый ответ */
 .faq-toggle:checked ~ .faq-answer {
     max-height: 1000px;
 }
 
+/* Контент ответа */
 .faq-answer-content {
     padding: 1.5rem;
-    color: #666;
+    color: var(--text-dark);
     line-height: 1.7;
-    border-top: 1px solid #eee;
+    border-top: var(--border-light);
 }
 
 .faq-answer-content p {
@@ -194,18 +297,21 @@
     margin-bottom: 0.5rem;
 }
 
-/* Форма вопроса */
+/* ========================================
+   ФОРМА ВОПРОСА
+   ======================================== */
 .question-form-section {
     margin-top: 4rem;
-    background: white;
-    border-radius: 16px;
+    background: var(--bg-white-semi);
+    backdrop-filter: blur(10px);
+    border-radius: var(--radius-lg);
     padding: 3rem;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    box-shadow: var(--shadow-form);
 }
 
 .form-title {
     font-size: 2rem;
-    color: #2c3e50;
+    color: var(--text-dark);
     margin-bottom: 2rem;
     text-align: center;
 }
@@ -215,6 +321,7 @@
     margin: 0 auto;
 }
 
+/* Группы полей */
 .form-group {
     margin-bottom: 1.5rem;
 }
@@ -222,24 +329,28 @@
 .form-label {
     display: block;
     margin-bottom: 0.5rem;
-    color: #2c3e50;
+    color: var(--text-dark);
     font-weight: 500;
 }
 
+/* Поля ввода */
 .form-input,
 .form-textarea {
     width: 100%;
     padding: 0.75rem 1rem;
-    border: 2px solid #e0e0e0;
-    border-radius: 8px;
+    background: var(--bg-white-form);
+    border: var(--border-input);
+    border-radius: var(--radius-sm);
     font-size: 1rem;
-    transition: all 0.3s;
+    transition: var(--transition-smooth);
 }
 
+/* Фокус */
 .form-input:focus,
 .form-textarea:focus {
     outline: none;
     border-color: var(--faq-primary);
+    background: white;
     box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.1);
 }
 
@@ -248,25 +359,41 @@
     resize: vertical;
 }
 
+/* Кнопка отправки */
 .submit-btn {
     background: linear-gradient(135deg, var(--faq-primary), var(--faq-dark));
     color: white;
     border: none;
     padding: 1rem 2rem;
-    border-radius: 50px;
+    border-radius: var(--radius-btn);
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: var(--transition-smooth);
     width: 100%;
 }
 
 .submit-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(243, 156, 18, 0.3);
+    box-shadow: var(--shadow-btn);
 }
 
-/* Анимации */
+/* ========================================
+   ПУСТОЕ СОСТОЯНИЕ
+   ======================================== */
+.faq-empty {
+    text-align: center;
+    padding: 4rem 1rem;
+}
+
+.faq-empty p {
+    font-size: 1.125rem;
+    color: var(--text-light);
+}
+
+/* ========================================
+   АНИМАЦИИ
+   ======================================== */
 @keyframes fadeInUp {
     from {
         opacity: 0;
@@ -289,7 +416,9 @@
     }
 }
 
-/* Адаптивность */
+/* ========================================
+   АДАПТИВНОСТЬ
+   ======================================== */
 @media (max-width: 992px) {
     .faq-list {
         max-width: 100%;
@@ -332,6 +461,7 @@
         padding: 1.5rem;
     }
     
+    /* Горизонтальный скролл для категорий */
     .categories-grid {
         justify-content: flex-start;
         overflow-x: auto;

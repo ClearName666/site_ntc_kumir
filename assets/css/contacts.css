@@ -1,14 +1,90 @@
 :root {
+    /* Основные цвета */
+    --primary-blue: #3498db;
+    --dark-blue: #2980b9;
+    
+    /* Новостные цвета */
+    --news-primary: #e74c3c;
+    --news-dark: #c0392b;
+    --news-light: #ffebe9;
+    
+    /* Цвета контактов */
     --contacts-primary: #9b59b6;
     --contacts-dark: #8e44ad;
     --contacts-light: #f4ecf7;
+    
+    /* Текст */
+    --text-dark: #2c3e50;
+    --text-light: #7f8c8d;
+    --text-gray: #666;
+    
+    /* Фоны */
+    --bg-white-semi: rgba(255, 255, 255, 0.3);
+    --bg-white-strong: rgba(255, 255, 255, 0.4);
+    --bg-white-card: rgba(255, 255, 255, 0.9);
+    --bg-overlay: rgba(255, 255, 255, 0.4);
+    
+    /* Тени */
+    --shadow-sm: 0 5px 20px rgba(0, 0, 0, 0.08);
+    --shadow-map: 0 10px 30px rgba(0, 0, 0, 0.1);
+    --shadow-purple: 0 15px 30px rgba(155, 89, 182, 0.15);
+    --shadow-btn: 0 10px 20px rgba(155, 89, 182, 0.3);
+    
+    /* Границы */
+    --border-light: 2px solid #e0e0e0;
+    --border-section: 2px solid var(--contacts-light);
+    --border-purple: 2px solid var(--contacts-primary);
+    
+    /* Скругления */
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-card: 12px;
+    --radius-lg: 16px;
+    --radius-badge: 20px;
+    --radius-btn: 50px;
+    
+    /* Анимации */
+    --transition-smooth: all 0.3s ease;
+    --transition-card: all 0.3s ease;
 }
 
-/* Общие стили */
-.contacts-page {
-    padding: 120px 0 60px;
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+/* ========================================
+   БАЗОВЫЕ СТИЛИ И ФОН
+   ======================================== */
+body {
+    position: relative;
+    z-index: 0;
     min-height: 100vh;
+}
+
+/* Размытый фоновый слой */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    background: inherit;
+    background-size: cover;
+    background-position: center;
+    filter: blur(40px);
+    transform: scale(1.1);
+}
+
+/* Полупрозрачный оверлей */
+body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background: var(--bg-overlay);
+    backdrop-filter: blur(10px);
+}
+
+/* Контент поверх фона */
+.contacts-page {
+    position: relative;
+    z-index: 1;
+    padding: 120px 0 60px;
 }
 
 .container {
@@ -17,7 +93,9 @@
     padding: 0 20px;
 }
 
-/* Шапка страницы */
+/* ========================================
+   ШАПКА СТРАНИЦЫ
+   ======================================== */
 .page-header {
     text-align: center;
     margin-bottom: 70px;
@@ -26,13 +104,14 @@
 
 .page-title {
     font-size: 3rem;
-    color: #2c3e50;
+    color: var(--text-dark);
     margin-bottom: 1rem;
     font-weight: 700;
     position: relative;
     display: inline-block;
 }
 
+/* Декоративная линия */
 .page-title::after {
     content: '';
     position: absolute;
@@ -47,25 +126,31 @@
 
 .page-description {
     font-size: 1.125rem;
-    color: #7f8c8d;
+    color: var(--text-light);
     max-width: 600px;
     margin: 2rem auto 0;
     line-height: 1.6;
 }
 
-/* Сетка контактов */
-.contacts-section {
+/* ========================================
+   ОБЩИЕ СТИЛИ СЕКЦИЙ
+   ======================================== */
+.contacts-section,
+.map-section {
     margin-bottom: 4rem;
 }
 
 .section-title {
     font-size: 2rem;
-    color: #2c3e50;
+    color: var(--text-dark);
     margin-bottom: 2rem;
     padding-bottom: 0.5rem;
-    border-bottom: 2px solid var(--contacts-light);
+    border-bottom: var(--border-section);
 }
 
+/* ========================================
+   СЕТКА КОНТАКТОВ
+   ======================================== */
 .contacts-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -74,20 +159,22 @@
 
 /* Карточка контакта */
 .contact-item {
-    background: white;
-    border-radius: 12px;
+    background: var(--bg-white-semi);
+    backdrop-filter: blur(10px);
+    border-radius: var(--radius-card);
     padding: 1.5rem;
     display: flex;
     gap: 1rem;
     align-items: flex-start;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
-    transition: all 0.3s ease;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition-card);
     border-left: 4px solid var(--contacts-primary);
 }
 
+/* Эффект при наведении */
 .contact-item:hover {
     transform: translateY(-5px);
-    box-shadow: 0 15px 30px rgba(155, 89, 182, 0.15);
+    box-shadow: var(--shadow-purple);
     border-left-width: 8px;
 }
 
@@ -102,32 +189,31 @@
 
 .contact-title {
     font-size: 1.125rem;
-    color: #2c3e50;
+    color: var(--text-dark);
     margin-bottom: 0.5rem;
     font-weight: 600;
 }
 
 .contact-value {
-    color: #666;
+    color: var(--text-gray);
     text-decoration: none;
     font-size: 1rem;
     line-height: 1.5;
     transition: color 0.3s;
 }
 
+/* Подсветка при наведении */
 .contact-value:hover {
     color: var(--contacts-primary);
 }
 
-/* Карта */
-.map-section {
-    margin-bottom: 4rem;
-}
-
+/* ========================================
+   КАРТА
+   ======================================== */
 .map-container {
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
     overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    box-shadow: var(--shadow-map);
     height: 400px;
     position: relative;
 }
@@ -137,45 +223,46 @@
     height: 100%;
 }
 
-
-
+/* Оверлей с информацией */
 .map-overlay {
     position: absolute;
-    top: 20px;          
-    left: 20px;         
-    right: auto;        
-    bottom: auto;       
-    width: auto;        
-    padding: 0;         
-    background: none;   
+    top: 20px;
+    left: 20px;
+    right: auto;
+    bottom: auto;
+    width: auto;
+    padding: 0;
+    background: none;
     pointer-events: none;
     z-index: 10;
 }
 
-/* Сама карточка */
+/* Карточка на карте */
 .map-info-card {
-    background: white;
-    border-radius: 12px;
+    background: var(--bg-white-card);
+    backdrop-filter: blur(5px);
+    border-radius: var(--radius-card);
     padding: 1.5rem;
-    width: 300px;       /* Задаем фиксированную ширину карточке */
-    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-    pointer-events: auto; /* Возвращаем возможность кликать по кнопкам */
+    width: 300px;
+    box-shadow: var(--shadow-sm);
+    pointer-events: auto;
 }
 
 .map-info-title {
     font-size: 1.25rem;
-    color: #2c3e50;
+    color: var(--text-dark);
     margin-bottom: 0.75rem;
     font-weight: 600;
 }
 
 .map-address {
-    color: #666;
+    color: var(--text-gray);
     font-size: 0.9375rem;
     line-height: 1.5;
     margin-bottom: 1rem;
 }
 
+/* Кнопки действий */
 .map-actions {
     display: flex;
     gap: 0.75rem;
@@ -187,11 +274,11 @@
     background: var(--contacts-primary);
     color: white;
     border: none;
-    border-radius: 6px;
+    border-radius: var(--radius-sm);
     font-size: 0.875rem;
     font-weight: 500;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: var(--transition-smooth);
     text-decoration: none;
     display: inline-block;
 }
@@ -201,35 +288,38 @@
     transform: translateY(-2px);
 }
 
-/* Офисы */
-.offices-section {
-    margin-bottom: 4rem;
-}
-
+/* ========================================
+   ОФИСЫ
+   ======================================== */
 .offices-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 2rem;
 }
 
+/* Карточка офиса */
 .office-card {
-    background: white;
-    border-radius: 12px;
+    background: var(--bg-white-semi);
+    backdrop-filter: blur(10px);
+    border-radius: var(--radius-card);
     overflow: hidden;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
-    transition: all 0.3s ease;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition-card);
 }
 
+/* Главный офис */
 .office-card.main-office {
-    border: 2px solid var(--contacts-primary);
+    border: var(--border-purple);
     transform: scale(1.02);
 }
 
+/* Эффект при наведении */
 .office-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 15px 30px rgba(155, 89, 182, 0.15);
+    box-shadow: var(--shadow-purple);
 }
 
+/* Шапка карточки офиса */
 .office-header {
     background: linear-gradient(135deg, var(--contacts-primary), var(--contacts-dark));
     color: white;
@@ -243,6 +333,7 @@
     font-weight: 600;
 }
 
+/* Бейдж "Главный офис" */
 .office-badge {
     position: absolute;
     top: 1rem;
@@ -250,11 +341,12 @@
     background: white;
     color: var(--contacts-primary);
     padding: 0.25rem 0.75rem;
-    border-radius: 20px;
+    border-radius: var(--radius-badge);
     font-size: 0.75rem;
     font-weight: 600;
 }
 
+/* Содержимое карточки */
 .office-content {
     padding: 1.5rem;
 }
@@ -264,7 +356,7 @@
     display: flex;
     align-items: flex-start;
     gap: 0.5rem;
-    color: #666;
+    color: var(--text-gray);
 }
 
 .office-content a {
@@ -278,18 +370,21 @@
     text-decoration: underline;
 }
 
-/* Форма обратной связи */
+/* ========================================
+   ФОРМА ОБРАТНОЙ СВЯЗИ
+   ======================================== */
 .contact-form-section {
-    background: white;
-    border-radius: 16px;
+    background: var(--bg-white-semi);
+    backdrop-filter: blur(10px);
+    border-radius: var(--radius-lg);
     padding: 3rem;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    box-shadow: var(--shadow-map);
     margin-bottom: 4rem;
 }
 
 .form-title {
     font-size: 2rem;
-    color: #2c3e50;
+    color: var(--text-dark);
     margin-bottom: 2rem;
     text-align: center;
 }
@@ -299,6 +394,7 @@
     margin: 0 auto;
 }
 
+/* Группы полей */
 .form-group {
     margin-bottom: 1.5rem;
 }
@@ -306,20 +402,22 @@
 .form-label {
     display: block;
     margin-bottom: 0.5rem;
-    color: #2c3e50;
+    color: var(--text-dark);
     font-weight: 500;
 }
 
+/* Поля ввода */
 .form-input,
 .form-textarea {
     width: 100%;
     padding: 0.75rem 1rem;
-    border: 2px solid #e0e0e0;
-    border-radius: 8px;
+    border: var(--border-light);
+    border-radius: var(--radius-md);
     font-size: 1rem;
-    transition: all 0.3s;
+    transition: var(--transition-smooth);
 }
 
+/* Фокус */
 .form-input:focus,
 .form-textarea:focus {
     outline: none;
@@ -332,25 +430,28 @@
     resize: vertical;
 }
 
+/* Кнопка отправки */
 .submit-btn {
     background: linear-gradient(135deg, var(--contacts-primary), var(--contacts-dark));
     color: white;
     border: none;
     padding: 1rem 2rem;
-    border-radius: 50px;
+    border-radius: var(--radius-btn);
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: var(--transition-smooth);
     width: 100%;
 }
 
 .submit-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(155, 89, 182, 0.3);
+    box-shadow: var(--shadow-btn);
 }
 
-/* Анимации */
+/* ========================================
+   АНИМАЦИИ
+   ======================================== */
 @keyframes fadeInUp {
     from {
         opacity: 0;
@@ -362,33 +463,35 @@
     }
 }
 
-@keyframes slideInLeft {
-    from {
-        opacity: 0;
-        transform: translateX(-30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-/* Адаптивность */
+/* ========================================
+   АДАПТИВНОСТЬ
+   ======================================== */
 @media (max-width: 992px) {
     .contacts-grid,
     .offices-grid {
         grid-template-columns: 1fr;
     }
     
-    .map-overlay {
-        position: relative;
-        top: 0;
-        left: 0;
-        right: 0;
-        margin-bottom: 1rem;
+    /* Карта на мобильных */
+    .map-container {
+        height: auto;
+        display: flex;
+        flex-direction: column;
     }
-    
+
+    #yandex-map {
+        height: 400px;
+        order: 2;
+    }
+
+    .map-overlay {
+        position: static;
+        margin-bottom: 20px;
+        order: 1;
+    }
+
     .map-info-card {
+        width: 100%;
         max-width: 100%;
     }
 }
@@ -426,29 +529,5 @@
     
     .map-actions {
         flex-direction: column;
-    }
-}
-
-@media (max-width: 992px) {
-    .map-container {
-        height: auto; /* Позволяем контейнеру расти вниз */
-        display: flex;
-        flex-direction: column;
-    }
-
-    #yandex-map {
-        height: 400px; /* Фиксируем высоту карты */
-        order: 2;
-    }
-
-    .map-overlay {
-        position: static; /* Выбиваем из абсолютного позиционирования */
-        margin-bottom: 20px;
-        order: 1;
-    }
-
-    .map-info-card {
-        width: 100%;
-        max-width: 100%;
     }
 }

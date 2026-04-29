@@ -1,6 +1,7 @@
 <?php
 // Подключаем функции
 require_once __DIR__. '/includes/functions.php';
+require_once __DIR__. '/config/config.php';
 
 // подключаемся к базе 
 $conn = getDBConnection();
@@ -68,10 +69,13 @@ $footerPath = __DIR__. '/includes/footer.php';
     <link rel="icon" href="<?= getSetting($conn, 'favicon_path') ?>" type="image/x-icon">
     
     <!-- Стили для страницы новостей -->
-    <link rel="stylesheet" href="assets/css/news.css">
+    <link rel="stylesheet" href="assets/css/news.css?version=<?php echo $version_code; ?>">
 
 </head>
-<body>
+<body style="<?php if (!empty($newsItem['image_path'])): ?>
+    background: url('<?= htmlspecialchars($newsItem['image_path']) ?>') center/cover no-repeat fixed;
+<?php else: ?>background: url('/static/background.jpg') center/cover no-repeat fixed;<?php endif; ?>">
+    <!-- Header -->
     <!-- Header -->
     <?php include $headerPath; ?>
     
