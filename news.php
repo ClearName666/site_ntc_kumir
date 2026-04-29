@@ -80,20 +80,155 @@ $footerPath = __DIR__. '/includes/footer.php';
     <?php include $headerPath; ?>
     
     <?php if ($newsItem): ?>
-        <!-- Страница отдельной новости -->
+        <style>
+        /* ===== Skeleton контейнер (повторяет news-detail-container) ===== */
+        .skeleton-news {
+            max-width: 900px;
+            margin: 0 auto;
+            border-radius: var(--border-radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            background-color: var(--bg-white-transparent);
+            backdrop-filter: blur(10px);
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+        }
+
+        /* header */
+        .skeleton-news-header {
+            padding: 3rem 3rem 2rem;
+            border-bottom: var(--border-light);
+            text-align: center;
+        }
+
+        /* body */
+        .skeleton-news-body {
+            padding: 2.5rem 3rem 3rem;
+        }
+
+        /* элементы */
+        .skeleton-item {
+            position: relative;
+            overflow: hidden;
+            background: #e5e7eb;
+            border-radius: 8px;
+        }
+
+        /* shimmer */
+        .skeleton-item::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                100deg,
+                transparent 20%,
+                rgba(255,255,255,0.6) 50%,
+                transparent 80%
+            );
+            transform: translateX(-100%);
+            animation: shimmer 1.4s infinite;
+        }
+
+        @keyframes shimmer {
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        /* размеры */
+        .skeleton-title {
+            height: 34px;
+            width: 65%;
+            margin: 0 auto 20px;
+        }
+
+        .skeleton-meta {
+            height: 14px;
+            width: 50%;
+            margin: 0 auto;
+        }
+
+        .skeleton-image {
+            width: 100%;
+            height: 400px;
+        }
+
+        .skeleton-text {
+            height: 16px;
+            margin-bottom: 12px;
+        }
+
+        .skeleton-text.short {
+            width: 60%;
+        }
+
+        /* ===== Анимации ===== */
+        .skeleton-hide {
+            animation: skeletonFadeOut 0.6s ease forwards;
+        }
+
+        @keyframes skeletonFadeOut {
+            to {
+                opacity: 0;
+            }
+        }
+
+        .content-show {
+            animation: contentFadeIn 0.6s ease forwards;
+        }
+
+        @keyframes contentFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+                filter: blur(4px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+                filter: blur(0);
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+        </style>
+
+
         <section class="news-detail-page">
-            <div class="container">
-                <article class="news-detail-container">
+            <div class="container" style="position: relative;">
+
+                <!-- ===== Skeleton ===== -->
+                <div id="skeleton" class="skeleton-news">
+
+                    <div class="skeleton-news-header">
+                        <div class="skeleton-item skeleton-title"></div>
+                        <div class="skeleton-item skeleton-meta"></div>
+                    </div>
+
+                    <div class="skeleton-item skeleton-image"></div>
+
+                    <div class="skeleton-news-body">
+                        <div class="skeleton-item skeleton-text"></div>
+                        <div class="skeleton-item skeleton-text"></div>
+                        <div class="skeleton-item skeleton-text short"></div>
+                    </div>
+
+                </div>
+
+
+                <!-- ===== РЕАЛЬНЫЙ КОНТЕНТ ===== -->
+                <article id="realContent" class="news-detail-container hidden">
+
                     <header class="news-detail-header">
                         <h1 class="news-detail-title"><?= htmlspecialchars($newsItem['title']) ?></h1>
                         
                         <div class="news-detail-meta">
                             <?php if (!empty($newsItem['published_at'])): ?>
                                 <div class="news-date">
-                                    <span class="date-icon">📅</span>
-                                    <time datetime="<?= date('Y-m-d', strtotime($newsItem['published_at'])) ?>">
-                                        <?= date('d.m.Y H:i', strtotime($newsItem['published_at'])) ?>
-                                    </time>
+                                    📅 <?= date('d.m.Y H:i', strtotime($newsItem['published_at'])) ?>
                                 </div>
                             <?php endif; ?>
                             
@@ -101,32 +236,56 @@ $footerPath = __DIR__. '/includes/footer.php';
                                 <span class="news-author">👤 <?= htmlspecialchars($newsItem['author']) ?></span>
                             <?php endif; ?>
                             
-                            <span class="news-views">👁 <?= 
-                            // $newsItem['views'] 
-                            $currentViews ?? '-'
-                            ?> просмотров</span>
+                            <span class="news-views">👁 <?= $currentViews ?? '-' ?> просмотров</span>
                         </div>
                     </header>
-                    
+
                     <?php if (!empty($newsItem['image_path'])): ?>
-                        <img src="<?= $newsItem['image_path'] ?>" 
-                             alt="<?= htmlspecialchars($newsItem['title']) ?>" 
-                             class="news-detail-image"
-                             loading="lazy">
+                        <img src="<?= $newsItem['image_path'] ?>"
+                            alt="<?= htmlspecialchars($newsItem['title']) ?>"
+                            class="news-detail-image"
+                            loading="lazy">
                     <?php endif; ?>
-                    
+
                     <div class="news-detail-body">
                         <?= $newsItem['content'] ?>
                     </div>
-                    
+
                     <div class="back-to-news">
                         <a href="news.php" class="btn">
                             ← К списку новостей
                         </a>
                     </div>
+
                 </article>
+
             </div>
         </section>
+
+
+        <script>
+        window.addEventListener("load", () => {
+            const skeleton = document.getElementById("skeleton");
+            const content = document.getElementById("realContent");
+
+            // показываем контент под skeleton
+            content.classList.remove("hidden");
+            content.style.opacity = "0";
+
+            requestAnimationFrame(() => {
+                content.classList.add("content-show");
+            });
+
+            // плавно убираем skeleton
+            setTimeout(() => {
+                skeleton.classList.add("skeleton-hide");
+
+                setTimeout(() => {
+                    skeleton.remove();
+                }, 600);
+            }, 200);
+        });
+        </script>
     <?php else: ?>
         <!-- Список всех новостей -->
         <section class="news-page">

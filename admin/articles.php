@@ -297,6 +297,9 @@ require_once __DIR__. '/includes/menu.php';
                 <button class="builder-btn builder-btn-primary" onclick="addImageBlock()">
                     <i class="fas fa-image"></i> Блок изображения
                 </button>
+                <button class="builder-btn builder-btn-primary" onclick="addSliderBlock()">
+                    <i class="fas fa-images"></i> Слайдер
+                </button>
                 <button class="builder-btn builder-btn-danger" onclick="clearAllBlocks()">
                     <i class="fas fa-trash-alt"></i> Очистить всё
                 </button>

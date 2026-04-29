@@ -441,9 +441,10 @@ main {
     color: white;
     margin-bottom: 30px;
     line-height: 1.2;
-    opacity: 0;
-    transform: translateY(-30px);
-    animation: slideDown 1s forwards 0.3s;
+    /* Убираем анимацию, которая смещает текст */
+    /* opacity: 0; */
+    /* transform: translateY(-30px); */
+    /* animation: slideDown 1s forwards 0.3s; */
 }
 
 /* Список характеристик */

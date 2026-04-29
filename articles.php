@@ -76,44 +76,233 @@ $footerPath = __DIR__. '/includes/footer.php';
     
     <!-- Основной контент -->
     <?php if ($article): ?>
-        <!-- Страница отдельной статьи -->
+        <style>
+        /* плавное исчезновение skeleton */
+        .skeleton-hide {
+            animation: skeletonFadeOut 0.6s ease forwards;
+        }
+
+        @keyframes skeletonFadeOut {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+            }
+        }
+
+        /* контент появляется мягче */
+        .content-show {
+            animation: contentFadeIn 0.6s ease forwards;
+        }
+
+        @keyframes contentFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+                filter: blur(4px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+                filter: blur(0);
+            }
+        }
+
+        /* ===== Skeleton ===== */
+        .skeleton-container {
+            max-width: 900px;
+            margin: 0 auto;
+            border-radius: var(--border-radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            background-color: var(--bg-white-transparent);
+            backdrop-filter: blur(10px);
+        }
+
+        /* header */
+        .skeleton-header {
+            padding: 3rem 3rem 2rem;
+            border-bottom: var(--border-light);
+            text-align: center;
+        }
+
+        /* body */
+        .skeleton-body {
+            padding: 2.5rem 3rem 3rem;
+        }
+
+        /* элементы */
+        .skeleton-item {
+            position: relative;
+            overflow: hidden;
+            background: #e5e7eb;
+            border-radius: 8px;
+        }
+
+        /* shimmer */
+        .skeleton-item::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                100deg,
+                transparent 20%,
+                rgba(255,255,255,0.6) 50%,
+                transparent 80%
+            );
+            transform: translateX(-100%);
+            animation: shimmer 1.4s infinite;
+        }
+
+        @keyframes shimmer {
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        /* размеры */
+        .skeleton-title {
+            height: 36px;
+            width: 60%;
+            margin: 0 auto 20px;
+        }
+
+        .skeleton-meta {
+            height: 14px;
+            width: 40%;
+            margin: 0 auto;
+        }
+
+        .skeleton-image {
+            width: 100%;
+            height: 400px;
+        }
+
+        .skeleton-text {
+            height: 16px;
+            margin-bottom: 12px;
+        }
+
+        .skeleton-text.short {
+            width: 60%;
+        }
+
+        /* плавное появление */
+        .fade-in {
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        #skeleton {
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+        }
+        </style>
+
+
         <section class="article-detail">
-            <div class="container">
-                <article class="article-container">
+            <div class="container"  style="position: relative;">
+
+                <!-- ===== Skeleton ===== -->
+                <div id="skeleton" class="skeleton-container">
+
+                    <div class="skeleton-header">
+                        <div class="skeleton-item skeleton-title"></div>
+                        <div class="skeleton-item skeleton-meta"></div>
+                    </div>
+
+                    <div class="skeleton-item skeleton-image"></div>
+
+                    <div class="skeleton-body">
+                        <div class="skeleton-item skeleton-text"></div>
+                        <div class="skeleton-item skeleton-text"></div>
+                        <div class="skeleton-item skeleton-text short"></div>
+                    </div>
+
+                </div>
+
+
+                <!-- ===== Реальный контент ===== -->
+                <article id="realContent" class="article-container hidden">
                     <header class="article-header">
                         <h1 class="page-title"><?= htmlspecialchars($article['title']) ?></h1>
+
                         <div class="article-meta-stack">
                             <?php if (!empty($article['author'])): ?>
                                 <span class="article-author">👤 <?= htmlspecialchars($article['author']) ?></span>
                             <?php endif; ?>
+
                             <?php if (!empty($article['published_at'])): ?>
                                 <span class="article-date">
                                     📅 <?= date('d.m.Y', strtotime($article['published_at'])) ?>
                                 </span>
                             <?php endif; ?>
+
                             <span class="article-views">👁 <?= $article['views'] ?> просмотров</span>
                         </div>
                     </header>
-                    
+
                     <?php if (!empty($article['image_path'])): ?>
-                        <img src="<?= htmlspecialchars($article['image_path']) ?>" 
-                             alt="<?= htmlspecialchars($article['title']) ?>" 
-                             class="article-detail-image"
-                             loading="lazy">
+                        <img src="<?= htmlspecialchars($article['image_path']) ?>"
+                            alt="<?= htmlspecialchars($article['title']) ?>"
+                            class="article-detail-image"
+                            loading="lazy">
                     <?php endif; ?>
-                    
+
                     <div class="article-body">
                         <?php echo $article['content']; ?>
                     </div>
-                    
+
                     <div class="back-link-container">
-                        <a href="articles.php" class="back-link" aria-label="Вернуться к списку статей">
+                        <a href="articles.php" class="back-link">
                             ← Назад к статьям
                         </a>
                     </div>
                 </article>
+
             </div>
         </section>
+
+
+        <script>
+            window.addEventListener("load", () => {
+                const skeleton = document.getElementById("skeleton");
+                const content = document.getElementById("realContent");
+
+                // сначала показываем контент (но прозрачный)
+                content.classList.remove("hidden");
+                content.style.opacity = "0";
+
+                requestAnimationFrame(() => {
+                    content.classList.add("content-show");
+                });
+
+                // через небольшую задержку убираем skeleton
+                setTimeout(() => {
+                    skeleton.classList.add("skeleton-hide");
+
+                    setTimeout(() => {
+                        skeleton.remove();
+                    }, 600);
+                }, 200);
+            });
+        </script>
     <?php else: ?>
         <!-- Список всех статей -->
         <section class="articles-page">

@@ -98,8 +98,7 @@ $mapLng = $mainOffice ? $mainOffice['longitude'] : 104.278817;
                 <h2 class="section-title">Мы на карте</h2>
                 <div class="map-container">
                     <div id="yandex-map"></div>
-                    <div class="map-overlay">
-                        <div class="map-info-card">
+                        <div class="map-info-card map-overlay">
                             <h3 class="map-info-title"><?= $mainOffice ? htmlspecialchars($mainOffice['city']) : 'Иркутск' ?></h3>
                             <p class="map-address">
                                 <?= $mainOffice ? htmlspecialchars($mainOffice['address']) : 'г. Иркутск, Университетский микрорайон, 114/1' ?>
@@ -114,7 +113,6 @@ $mapLng = $mainOffice ? $mainOffice['longitude'] : 104.278817;
                                 </button>
                             </div>
                         </div>
-                    </div>
                 </div>
             </section>
             
