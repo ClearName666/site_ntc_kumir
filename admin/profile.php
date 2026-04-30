@@ -55,7 +55,7 @@ require_once __DIR__. '/includes/menu.php';
     <!-- Шапка -->
     <header class="header">
         <div class="header-left">
-            <button class="toggle-sidebar" id="toggleSidebar">
+            <button class="toggle-sidebar" id="toggleSidebar" style="display: none;">
                 <i class="fas fa-bars"></i>
             </button>
             <h1 class="header-title">Мой профиль</h1>

@@ -84,7 +84,7 @@ require_once __DIR__. '/includes/menu.php';
     <!-- Шапка -->
     <header class="header">
         <div class="header-left">
-            <button class="toggle-sidebar" id="toggleSidebar">
+            <button class="toggle-sidebar" id="toggleSidebar"  style="display: none;">
                 <i class="fas fa-bars"></i>
             </button>
             <h1 class="header-title">
@@ -116,7 +116,7 @@ require_once __DIR__. '/includes/menu.php';
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="data-table">
+                    <table class="data-table responsive-table">
                         <thead>
                             <tr>
                                 <th>ID</th>
@@ -135,16 +135,20 @@ require_once __DIR__. '/includes/menu.php';
                             foreach ($admins as $admin):
                             ?>
                             <tr>
-                                <td><?php echo $admin['id']; ?></td>
-                                <td>
+                                <td data-label="ID"><?php echo $admin['id']; ?></td>
+                                
+                                <td data-label="Имя пользователя">
                                     <strong><?php echo htmlspecialchars($admin['username']); ?></strong>
                                     <?php if ($admin['id'] == $_SESSION['admin_id']): ?>
                                     <span class="badge badge-primary ml-2">Вы</span>
                                     <?php endif; ?>
                                 </td>
-                                <td><?php echo htmlspecialchars($admin['email']); ?></td>
-                                <td><?php echo htmlspecialchars($admin['full_name'] ?? '—'); ?></td>
-                                <td>
+                                
+                                <td data-label="Email"><?php echo htmlspecialchars($admin['email']); ?></td>
+                                
+                                <td data-label="Полное имя"><?php echo htmlspecialchars($admin['full_name'] ?? '—'); ?></td>
+                                
+                                <td data-label="Роль">
                                     <span class="role-badge role-<?php echo $admin['role']; ?>">
                                         <?php 
                                         $roleNames = [
@@ -156,15 +160,18 @@ require_once __DIR__. '/includes/menu.php';
                                         ?>
                                     </span>
                                 </td>
-                                <td>
+                                
+                                <td data-label="Статус">
                                     <span class="status-badge <?php echo $admin['is_active'] ? 'active' : 'inactive'; ?>">
                                         <?php echo $admin['is_active'] ? 'Активен' : 'Неактивен'; ?>
                                     </span>
                                 </td>
-                                <td>
+                                
+                                <td data-label="Последний вход">
                                     <?php echo $admin['last_login'] ? date('d.m.Y H:i', strtotime($admin['last_login'])) : '—'; ?>
                                 </td>
-                                <td>
+                                
+                                <td data-label="Действия">
                                     <div class="action-buttons">
                                         <a href="admins.php?action=edit&id=<?php echo $admin['id']; ?>" class="btn btn-sm btn-edit">
                                             <i class="fas fa-edit"></i>

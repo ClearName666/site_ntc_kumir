@@ -55,7 +55,7 @@ require_once __DIR__. '/includes/menu.php';
 <div class="main-content">
     <header class="header">
         <div class="header-left">
-            <button class="toggle-sidebar" id="toggleSidebar"><i class="fas fa-bars"></i></button>
+            <button class="toggle-sidebar" id="toggleSidebar"><i class="fas fa-bars"  style="display: none;"></i></button>
             <h1 class="header-title">
                 <?php echo $action === 'add' ? 'Новая карточка' : ($action === 'edit' ? 'Редактирование карточки' : 'Карточки (продукты)'); ?>
             </h1>
@@ -74,7 +74,7 @@ require_once __DIR__. '/includes/menu.php';
         <div class="card">
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="data-table">
+                    <table class="data-table responsive-table">
                         <thead>
                             <tr>
                                 <th>Сорт.</th>
@@ -92,23 +92,23 @@ require_once __DIR__. '/includes/menu.php';
                             foreach ($cards as $row): 
                             ?>
                             <tr>
-                                <td><?php echo $row['sort_order']; ?></td>
-                                <td>
+                                <td data-label="Сорт."><?php echo $row['sort_order']; ?></td>
+                                <td data-label="Иконка">
                                     <?php if($row['image_path']): ?>
                                         <img src="../<?php echo $row['image_path']; ?>" alt="" style="width: 40px; height: 40px; object-fit: contain;">
                                     <?php endif; ?>
                                 </td>
-                                <td><strong><?php echo htmlspecialchars($row['title']); ?></strong></td>
-                                <td>
+                                <td data-label="Заголовок"><strong><?php echo htmlspecialchars($row['title']); ?></strong></td>
+                                <td data-label="Цвет">
                                     <span style="display:inline-block; width:20px; height:20px; background:<?php echo $row['color']; ?>; border-radius:3px; vertical-align:middle;"></span>
                                     <code><?php echo $row['color']; ?></code>
                                 </td>
-                                <td>
+                                <td data-label="Статус">
                                     <span class="status-badge <?php echo $row['is_active'] ? 'published' : 'draft'; ?>">
                                         <?php echo $row['is_active'] ? 'Активно' : 'Скрыто'; ?>
                                     </span>
                                 </td>
-                                <td>
+                                <td data-label="Действия">
                                     <div class="action-buttons">
                                         <a href="cards.php?action=edit&id=<?php echo $row['id']; ?>" class="btn btn-sm btn-edit"><i class="fas fa-edit"></i></a>
                                         <a href="cards.php?action=delete&id=<?php echo $row['id']; ?>" class="btn btn-sm btn-delete"><i class="fas fa-trash"></i></a>

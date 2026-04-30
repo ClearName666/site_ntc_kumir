@@ -71,14 +71,14 @@ require_once __DIR__. '/includes/header.php';
 require_once __DIR__. '/includes/menu.php';
 ?>
 
-<link rel="stylesheet" href="assets/css/redactor.css">
+<link rel="stylesheet" href="assets/css/redactor.css?version=<?php echo $version_code; ?>">
 
 <!-- Основной контент -->
 <div class="main-content">
     <!-- Шапка -->
     <header class="header">
         <div class="header-left">
-            <button class="toggle-sidebar" id="toggleSidebar">
+            <button class="toggle-sidebar" id="toggleSidebar" style="display: none;">
                 <i class="fas fa-bars"></i>
             </button>
             <h1 class="header-title">
@@ -110,7 +110,7 @@ require_once __DIR__. '/includes/menu.php';
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="data-table">
+                    <table class="data-table responsive-table">
                         <thead>
                             <tr>
                                 <th>ID</th>
@@ -130,28 +130,28 @@ require_once __DIR__. '/includes/menu.php';
                             foreach ($newsList as $row): 
                             ?>
                             <tr>
-                                <td><?php echo $row['id']; ?></td>
-                                <td>
+                                <td data-label="ID"><?php echo $row['id']; ?></td>
+                                <td data-label="Заголовок">
                                     <a href="../news.php?news=<?php echo $row['slug']; ?>" target="_blank">
                                         <?php echo htmlspecialchars($row['title']); ?>
                                     </a>
                                 </td>
-                                <td><?php echo htmlspecialchars($row['author']); ?></td>
-                                <td><?php echo $row['views']; ?></td>
-                                <td>
+                                <td data-label="Автор"><?php echo htmlspecialchars($row['author']); ?></td>
+                                <td data-label="Просмотры"><?php echo $row['views']; ?></td>
+                                <td data-label="Статус">
                                     <span class="status-badge <?php echo $row['is_published'] ? 'published' : 'draft'; ?>">
                                         <?php echo $row['is_published'] ? 'Опубликовано' : 'Черновик'; ?>
                                     </span>
                                 </td>
-                                <td><?php echo $row['published_at'] ? date('d.m.Y H:i', strtotime($row['published_at'])) : '—'; ?></td>
-                                <td>
+                                <td data-label="Дата публикации"><?php echo $row['published_at'] ? date('d.m.Y H:i', strtotime($row['published_at'])) : '—'; ?></td>
+                                <td data-label="Действия">
                                     <div class="action-buttons">
                                         <a href="news.php?action=edit&id=<?php echo $row['id']; ?>" class="btn btn-sm btn-edit">
                                             <i class="fas fa-edit"></i>
                                         </a>
                                         <a href="news.php?action=delete&id=<?php echo $row['id']; ?>" 
-                                           class="btn btn-sm btn-delete" 
-                                           onclick="return confirm('Удалить эту новость?')">
+                                        class="btn btn-sm btn-delete" 
+                                        onclick="return confirm('Удалить эту новость?')">
                                             <i class="fas fa-trash"></i>
                                         </a>
                                     </div>

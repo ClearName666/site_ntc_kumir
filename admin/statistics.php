@@ -49,7 +49,7 @@ require_once __DIR__. '/includes/menu.php';
 <div class="main-content">
     <header class="header">
         <div class="header-left">
-            <button class="toggle-sidebar" id="toggleSidebar"><i class="fas fa-bars"></i></button>
+            <button class="toggle-sidebar" id="toggleSidebar"><i class="fas fa-bars" style="display: none;"></i></button>
             <h1 class="header-title">
                 <?php echo $action === 'add' ? 'Добавить показатель' : ($action === 'edit' ? 'Редактировать показатель' : 'Статистика'); ?>
             </h1>
@@ -70,45 +70,45 @@ require_once __DIR__. '/includes/menu.php';
         <div class="card">
             <div class="card-header"><h3>Показатели на сайте</h3></div>
             <div class="card-body">
-                <div class="table-responsive">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Сорт.</th>
-                                <th>Заголовок</th>
-                                <th>Значение</th>
-                                <th>Описание</th>
-                                <th>Статус</th>
-                                <th>Действия</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php
-                            $pagination = getPagination($conn, 'statistics', 20);
-                            $stats = getStatsList($conn, $pagination['perPage'], $pagination['offset']);
-                            foreach ($stats as $row): 
-                            ?>
-                            <tr>
-                                <td><?php echo $row['sort_order']; ?></td>
-                                <td><strong><?php echo htmlspecialchars($row['title']); ?></strong></td>
-                                <td><?php echo htmlspecialchars($row['value']); ?></td>
-                                <td><small><?php echo htmlspecialchars($row['description']); ?></small></td>
-                                <td>
-                                    <span class="status-badge <?php echo $row['is_active'] ? 'published' : 'draft'; ?>">
-                                        <?php echo $row['is_active'] ? 'Активно' : 'Скрыто'; ?>
-                                    </span>
-                                </td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <a href="statistics.php?action=edit&id=<?php echo $row['id']; ?>" class="btn btn-sm btn-edit"><i class="fas fa-edit"></i></a>
-                                        <a href="statistics.php?action=delete&id=<?php echo $row['id']; ?>" class="btn btn-sm btn-delete"><i class="fas fa-trash"></i></a>
-                                    </div>
-                                </td>
-                            </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
+            <div class="table-responsive">
+                <table class="data-table responsive-table">
+                    <thead>
+                        <tr>
+                            <th>Сорт.</th>
+                            <th>Заголовок</th>
+                            <th>Значение</th>
+                            <th>Описание</th>
+                            <th>Статус</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $pagination = getPagination($conn, 'statistics', 20);
+                        $stats = getStatsList($conn, $pagination['perPage'], $pagination['offset']);
+                        foreach ($stats as $row): 
+                        ?>
+                        <tr>
+                            <td data-label="Сорт."><?php echo $row['sort_order']; ?></td>
+                            <td data-label="Заголовок"><strong><?php echo htmlspecialchars($row['title']); ?></strong></td>
+                            <td data-label="Значение"><?php echo htmlspecialchars($row['value']); ?></td>
+                            <td data-label="Описание"><small><?php echo htmlspecialchars($row['description']); ?></small></td>
+                            <td data-label="Статус">
+                                <span class="status-badge <?php echo $row['is_active'] ? 'published' : 'draft'; ?>">
+                                    <?php echo $row['is_active'] ? 'Активно' : 'Скрыто'; ?>
+                                </span>
+                            </td>
+                            <td data-label="Действия">
+                                <div class="action-buttons">
+                                    <a href="statistics.php?action=edit&id=<?php echo $row['id']; ?>" class="btn btn-sm btn-edit"><i class="fas fa-edit"></i></a>
+                                    <a href="statistics.php?action=delete&id=<?php echo $row['id']; ?>" class="btn btn-sm btn-delete"><i class="fas fa-trash"></i></a>
+                                </div>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
                 <?php echo generatePaginationLinks($pagination); ?>
             </div>
         </div>

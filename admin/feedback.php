@@ -45,7 +45,7 @@ require_once __DIR__. '/includes/menu.php';
 <div class="main-content">
     <header class="header">
         <div class="header-left">
-            <button class="toggle-sidebar" id="toggleSidebar">
+            <button class="toggle-sidebar" id="toggleSidebar"  style="display: none;">
                 <i class="fas fa-bars"></i>
             </button>
             <h1 class="header-title">Обращения с сайта</h1>
@@ -64,7 +64,8 @@ require_once __DIR__. '/includes/menu.php';
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="data-table">
+                    <!-- Добавляем класс responsive-table для адаптивности -->
+                    <table class="data-table responsive-table">
                         <thead>
                             <tr>
                                 <th>Дата</th>
@@ -84,28 +85,39 @@ require_once __DIR__. '/includes/menu.php';
                             <?php else: ?>
                                 <?php foreach ($feedbacks as $item): ?>
                                     <tr class="<?php echo !$item['is_read'] ? 'unread-row' : ''; ?>">
-                                        <td style="white-space: nowrap;">
+                                        <!-- Добавляем data-label для мобильной версии -->
+                                        <td data-label="Дата" style="white-space: nowrap;">
                                             <?php echo date('d.m.Y H:i', strtotime($item['created_at'])); ?>
                                         </td>
-                                        <td><strong><?php echo htmlspecialchars($item['name']); ?></strong></td>
-                                        <td>
+                                        
+                                        <td data-label="Отправитель">
+                                            <strong><?php echo htmlspecialchars($item['name']); ?></strong>
+                                        </td>
+                                        
+                                        <td data-label="Контакты">
                                             <small>
-                                                Email: <?php echo htmlspecialchars($item['email']); ?><br>
-                                                Тел: <?php echo htmlspecialchars($item['phone'] ?: '-'); ?>
+                                                <i class="fas fa-envelope"></i> <?php echo htmlspecialchars($item['email']); ?><br>
+                                                <i class="fas fa-phone"></i> <?php echo htmlspecialchars($item['phone'] ?: '-'); ?>
                                             </small>
                                         </td>
-                                        <td><?php echo htmlspecialchars($item['subject'] ?: 'Не указана'); ?></td>
-                                        <td>
-                                            <div style="max-width: 300px; font-size: 0.9em;">
+                                        
+                                        <td data-label="Тема">
+                                            <?php echo htmlspecialchars($item['subject'] ?: 'Не указана'); ?>
+                                        </td>
+                                        
+                                        <td data-label="Сообщение">
+                                            <div style="font-size: 0.9em;">
                                                 <?php echo nl2br(htmlspecialchars($item['message'])); ?>
                                             </div>
                                         </td>
-                                        <td>
+                                        
+                                        <td data-label="Статус">
                                             <span class="status-badge <?php echo $item['is_read'] ? 'active' : 'inactive'; ?>">
-                                                <?php echo $item['is_read'] ? 'Прочитано' : 'Новое'; ?>
+                                                <?php echo $item['is_read'] ? '<i class="fas fa-check-circle"></i> Прочитано' : '<i class="fas fa-clock"></i> Новое'; ?>
                                             </span>
                                         </td>
-                                        <td>
+                                        
+                                        <td data-label="Действия">
                                             <div class="action-buttons">
                                                 <?php if (!$item['is_read']): ?>
                                                     <a href="feedback.php?action=read&id=<?php echo $item['id']; ?>" 
@@ -115,6 +127,7 @@ require_once __DIR__. '/includes/menu.php';
                                                 <?php endif; ?>
                                                 <a href="feedback.php?action=delete&id=<?php echo $item['id']; ?>" 
                                                    class="btn btn-sm btn-delete" 
+                                                   onclick="return confirm('Вы уверены, что хотите удалить это обращение?')"
                                                    title="Удалить">
                                                     <i class="fas fa-trash"></i>
                                                 </a>
@@ -129,6 +142,7 @@ require_once __DIR__. '/includes/menu.php';
             </div>
         </div>
     </div>
+</div>
 </div>
 
 <script src="assets/js/miniAdminstration.js"></script>

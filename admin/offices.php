@@ -55,7 +55,7 @@ require_once __DIR__. '/includes/menu.php';
 <div class="main-content">
     <header class="header">
         <div class="header-left">
-            <button class="toggle-sidebar" id="toggleSidebar">
+            <button class="toggle-sidebar" id="toggleSidebar" style="display: none;">
                 <i class="fas fa-bars"></i>
             </button>
             <h1 class="header-title">
@@ -82,7 +82,7 @@ require_once __DIR__. '/includes/menu.php';
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="data-table">
+                    <table class="data-table responsive-table">
                         <thead>
                             <tr>
                                 <th>ID</th>
@@ -102,25 +102,25 @@ require_once __DIR__. '/includes/menu.php';
                             foreach ($offices as $row):
                             ?>
                             <tr>
-                                <td><?php echo $row['id']; ?></td>
-                                <td><strong><?php echo htmlspecialchars($row['city']); ?></strong></td>
-                                <td><?php echo htmlspecialchars($row['address']); ?></td>
-                                <td><?php echo htmlspecialchars($row['phone']); ?></td>
-                                <td>
+                                <td data-label="ID"><?php echo $row['id']; ?></td>
+                                <td data-label="Город"><strong><?php echo htmlspecialchars($row['city']); ?></strong></td>
+                                <td data-label="Адрес"><?php echo htmlspecialchars($row['address']); ?></td>
+                                <td data-label="Телефон"><?php echo htmlspecialchars($row['phone']); ?></td>
+                                <td data-label="Статус">
                                     <?php if ($row['is_main']): ?>
                                         <span class="badge badge-primary">Главный</span>
                                     <?php else: ?>
                                         <span class="badge badge-secondary">Филиал</span>
                                     <?php endif; ?>
                                 </td>
-                                <td><?php echo $row['sort_order']; ?></td>
-                                <td>
+                                <td data-label="Сорт."><?php echo $row['sort_order']; ?></td>
+                                <td data-label="Действия">
                                     <div class="action-buttons">
                                         <a href="offices.php?action=edit&id=<?php echo $row['id']; ?>" class="btn btn-sm btn-edit">
                                             <i class="fas fa-edit"></i>
                                         </a>
                                         <a href="offices.php?action=delete&id=<?php echo $row['id']; ?>" 
-                                           class="btn btn-sm btn-delete">
+                                        class="btn btn-sm btn-delete">
                                             <i class="fas fa-trash"></i>
                                         </a>
                                     </div>

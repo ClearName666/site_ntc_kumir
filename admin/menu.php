@@ -66,8 +66,8 @@ require_once __DIR__. '/includes/menu.php';
 <div class="main-content">
     <!-- Шапка -->
     <header class="header">
-        <div class="header-left">
-            <button class="toggle-sidebar" id="toggleSidebar">
+        <div class="header-left"> 
+            <button class="toggle-sidebar" id="toggleSidebar"  style="display: none;">
                 <i class="fas fa-bars"></i>
             </button>
             <h1 class="header-title">
@@ -106,7 +106,7 @@ require_once __DIR__. '/includes/menu.php';
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="data-table">
+                    <table class="data-table responsive-table">
                         <thead>
                             <tr>
                                 <th>ID</th>
@@ -125,35 +125,35 @@ require_once __DIR__. '/includes/menu.php';
                                     $paddingLeft = $level * 20;
                                     ?>
                                     <tr>
-                                        <td><?php echo $item['id']; ?></td>
-                                        <td style="padding-left: <?php echo $paddingLeft; ?>px;">
+                                        <td data-label="ID"><?php echo $item['id']; ?></td>
+                                        <td data-label="Название" style="padding-left: <?php echo $paddingLeft; ?>px;">
                                             <?php if ($level > 0): ?>
                                             <i class="fas fa-level-up-alt fa-rotate-90 text-muted mr-2"></i>
                                             <?php endif; ?>
                                             <?php echo htmlspecialchars($item['title']); ?>
                                         </td>
-                                        <td><?php echo htmlspecialchars($item['url']); ?></td>
-                                        <td>
+                                        <td data-label="URL"><?php echo htmlspecialchars($item['url']); ?></td>
+                                        <td data-label="Родитель">
                                             <?php if ($item['parent_id'] > 0): ?>
                                             <span class="badge badge-secondary">Подпункт</span>
                                             <?php else: ?>
                                             <span class="badge badge-primary">Основной</span>
                                             <?php endif; ?>
                                         </td>
-                                        <td><?php echo $item['sort_order']; ?></td>
-                                        <td>
+                                        <td data-label="Сортировка"><?php echo $item['sort_order']; ?></td>
+                                        <td data-label="Статус">
                                             <span class="status-badge <?php echo $item['is_active'] ? 'active' : 'inactive'; ?>">
                                                 <?php echo $item['is_active'] ? 'Активен' : 'Неактивен'; ?>
                                             </span>
                                         </td>
-                                        <td>
+                                        <td data-label="Действия">
                                             <div class="action-buttons">
                                                 <a href="menu.php?action=edit&id=<?php echo $item['id']; ?>" class="btn btn-sm btn-edit">
                                                     <i class="fas fa-edit"></i>
                                                 </a>
                                                 <a href="menu.php?action=delete&id=<?php echo $item['id']; ?>" 
-                                                   class="btn btn-sm btn-delete" 
-                                                   onclick="return confirm('Удалить этот пункт меню?')">
+                                                class="btn btn-sm btn-delete" 
+                                                onclick="return confirm('Удалить этот пункт меню?')">
                                                     <i class="fas fa-trash"></i>
                                                 </a>
                                             </div>

@@ -1,36 +1,86 @@
+/* ==========================================================================
+   СТРАНИЦА АВТОРИЗАЦИИ (LOGIN PAGE)
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   ПЕРЕМЕННЫЕ (ЦВЕТОВАЯ СХЕМА)
+   -------------------------------------------------------------------------- */
+
+:root {
+    /* Основные цвета бренда */
+    --primary-color: #3498db;        /* Акцентный цвет (кнопки, иконки, ссылки) */
+    --primary-dark: #2980b9;         /* Темный оттенок primary для наведения */
+    --secondary-color: #2c3e50;      /* Вторичный цвет (заголовки, текст) */
+    
+    /* Цвета статусов и сообщений */
+    --error-color: #e74c3c;          /* Цвет ошибки (сообщения об ошибке) */
+    
+    /* Нейтральные цвета */
+    --text-dark: #2c3e50;            /* Темный текст (заголовки, подписи) */
+    --text-muted: #7f8c8d;           /* Приглушенный текст (подписи, описания) */
+    --text-light: #95a5a6;           /* Светлый текст (иконки в полях) */
+    --border-light: #e0e0e0;         /* Светлые границы (поля ввода, разделители) */
+    --background-white: white;        /* Белый фон (контейнер, body) */
+    
+    /* Градиенты */
+    --gradient-bg: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); /* Градиент фона страницы */
+    
+    /* Эффекты */
+    --shadow-large: 0 15px 35px rgba(0,0,0,0.2); /* Тень контейнера */
+    --focus-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1); /* Тень при фокусе на поле */
+    --transition: all 0.3s ease;      /* Плавность переходов */
+}
+
+/* --------------------------------------------------------------------------
+   СБРОС И БАЗОВЫЕ СТИЛИ
+   -------------------------------------------------------------------------- */
+
+/* Сброс отступов и установка box-sizing для всех элементов */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
+/* Основные стили страницы авторизации */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #3498db, #2c3e50);
+    background: var(--gradient-bg);
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
+/* --------------------------------------------------------------------------
+   КОМПОНЕНТ: КОНТЕЙНЕР АВТОРИЗАЦИИ (LOGIN CONTAINER)
+   -------------------------------------------------------------------------- */
+
+/* Основной контейнер формы входа (белая карточка) */
 .login-container {
-    background: white;
+    background: var(--background-white);
     border-radius: 15px;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+    box-shadow: var(--shadow-large);
     width: 100%;
     max-width: 400px;
     padding: 40px;
 }
 
+/* --------------------------------------------------------------------------
+   КОМПОНЕНТ: ШАПКА АВТОРИЗАЦИИ (LOGIN HEADER)
+   -------------------------------------------------------------------------- */
+
+/* Шапка контейнера (логотип и заголовок) */
 .login-header {
     text-align: center;
     margin-bottom: 30px;
 }
 
+/* Круглый логотип с иконкой */
 .login-logo {
     width: 80px;
     height: 80px;
-    background: #3498db;
+    background: var(--primary-color);
     border-radius: 50%;
     margin: 0 auto 20px;
     display: flex;
@@ -40,76 +90,99 @@ body {
     font-size: 2rem;
 }
 
+/* Заголовок формы входа */
 .login-header h1 {
-    color: #2c3e50;
+    color: var(--secondary-color);
     font-size: 1.5rem;
     margin-bottom: 5px;
 }
 
+/* Подзаголовок формы */
 .login-header p {
-    color: #7f8c8d;
+    color: var(--text-muted);
     font-size: 0.875rem;
 }
 
+/* --------------------------------------------------------------------------
+   КОМПОНЕНТ: ФОРМА (FORM)
+   -------------------------------------------------------------------------- */
+
+/* Группа полей формы */
 .form-group {
     margin-bottom: 20px;
 }
 
+/* Подпись к полю ввода */
 .form-group label {
     display: block;
     margin-bottom: 8px;
-    color: #2c3e50;
+    color: var(--secondary-color);
     font-weight: 600;
     font-size: 0.875rem;
 }
 
+/* Контейнер для поля с иконкой внутри */
 .input-with-icon {
     position: relative;
 }
 
+/* Иконка внутри поля ввода */
 .input-with-icon i {
     position: absolute;
     left: 15px;
     top: 50%;
     transform: translateY(-50%);
-    color: #95a5a6;
+    color: var(--text-light);
 }
 
+/* Поле ввода с отступом под иконку */
 .input-with-icon input {
     width: 100%;
     padding: 12px 15px 12px 45px;
-    border: 2px solid #e0e0e0;
+    border: 2px solid var(--border-light);
     border-radius: 8px;
     font-size: 1rem;
-    transition: all 0.3s;
+    transition: var(--transition);
 }
 
+/* Состояние фокуса для поля ввода */
 .input-with-icon input:focus {
-    border-color: #3498db;
+    border-color: var(--primary-color);
     outline: none;
-    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    box-shadow: var(--focus-shadow);
 }
 
+/* --------------------------------------------------------------------------
+   КОМПОНЕНТ: КНОПКИ (BUTTONS)
+   -------------------------------------------------------------------------- */
+
+/* Кнопка входа (основное действие) */
 .btn-login {
     width: 100%;
     padding: 14px;
-    background: #3498db;
+    background: var(--primary-color);
     color: white;
     border: none;
     border-radius: 8px;
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: var(--transition);
 }
 
+/* Эффект при наведении на кнопку входа */
 .btn-login:hover {
-    background: #2980b9;
+    background: var(--primary-dark);
     transform: translateY(-2px);
 }
 
+/* --------------------------------------------------------------------------
+   КОМПОНЕНТ: СООБЩЕНИЯ ОБ ОШИБКЕ (ERROR MESSAGE)
+   -------------------------------------------------------------------------- */
+
+/* Блок сообщения об ошибке */
 .error-message {
-    background: #e74c3c;
+    background: var(--error-color);
     color: white;
     padding: 12px;
     border-radius: 8px;
@@ -120,24 +193,32 @@ body {
     gap: 10px;
 }
 
+/* Иконка внутри сообщения об ошибке */
 .error-message i {
     font-size: 1.25rem;
 }
 
+/* --------------------------------------------------------------------------
+   КОМПОНЕНТ: ПОДВАЛ ФОРМЫ (LOGIN FOOTER)
+   -------------------------------------------------------------------------- */
+
+/* Нижняя часть контейнера (ссылки, доп. информация) */
 .login-footer {
     text-align: center;
     margin-top: 30px;
     padding-top: 20px;
-    border-top: 1px solid #e0e0e0;
-    color: #7f8c8d;
+    border-top: 1px solid var(--border-light);
+    color: var(--text-muted);
     font-size: 0.875rem;
 }
 
+/* Ссылки в подвале */
 .login-footer a {
-    color: #3498db;
+    color: var(--primary-color);
     text-decoration: none;
 }
 
+/* Эффект при наведении на ссылки */
 .login-footer a:hover {
     text-decoration: underline;
 }

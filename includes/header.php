@@ -1,4 +1,7 @@
 <?php
+
+require_once __DIR__ . '/../config/config.php';
+
 // Если сессия еще не запущена
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -18,9 +21,6 @@ $isAdmin = isset($_SESSION['admin_id']);
     <link rel="stylesheet" href="assets/css/responsive.css?version=<?php echo $version_code; ?>">
     <link rel="stylesheet" href="assets/css/header.css?version=<?php echo $version_code; ?>">
     <link rel="icon" href="<?php echo getSetting($conn, 'favicon_path'); ?>" type="image/x-icon">
-    <style>
-
-    </style>
 </head>
 <body>
     <header class="main-header">

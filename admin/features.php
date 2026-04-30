@@ -49,7 +49,7 @@ require_once __DIR__. '/includes/menu.php';
 <div class="main-content">
     <header class="header">
         <div class="header-left">
-            <button class="toggle-sidebar" id="toggleSidebar"><i class="fas fa-bars"></i></button>
+            <button class="toggle-sidebar" id="toggleSidebar"><i class="fas fa-bars"  style="display: none;"></i></button>
             <h1 class="header-title">
                 <?php echo $action === 'add' ? 'Новое преимущество' : ($action === 'edit' ? 'Редактирование' : 'Преимущества (Features)'); ?>
             </h1>
@@ -70,7 +70,7 @@ require_once __DIR__. '/includes/menu.php';
         <div class="card">
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="data-table">
+                    <table class="data-table responsive-table">
                         <thead>
                             <tr>
                                 <th>ID</th>
@@ -87,18 +87,18 @@ require_once __DIR__. '/includes/menu.php';
                             foreach ($features as $row):
                             ?>
                             <tr>
-                                <td><?php echo $row['id']; ?></td>
-                                <td><strong><?php echo htmlspecialchars($row['title']); ?></strong></td>
-                                <td><?php echo $row['sort_order']; ?></td>
-                                <td>
+                                <td data-label="ID"><?php echo $row['id']; ?></td>
+                                <td data-label="Заголовок"><strong><?php echo htmlspecialchars($row['title']); ?></strong></td>
+                                <td data-label="Порядок"><?php echo $row['sort_order']; ?></td>
+                                <td data-label="Статус">
                                     <span class="status-badge <?php echo $row['is_active'] ? 'active' : 'inactive'; ?>">
                                         <?php echo $row['is_active'] ? 'Активен' : 'Скрыт'; ?>
                                     </span>
                                 </td>
-                                <td>
+                                <td data-label="Действия">
                                     <div class="action-buttons">
                                         <a href="features.php?action=edit&id=<?php echo $row['id']; ?>" class="btn btn-sm btn-edit"><i class="fas fa-edit"></i></a>
-                                        <a href="features.php?action=delete&id=<?php echo $row['id']; ?>" class="btn btn-sm btn-delete"><i class="fas fa-trash"></i></a>
+                                        <a href="features.php?action=delete&id=<?php echo $row['id']; ?>" class="btn btn-sm btn-delete" onclick="return confirm('Удалить эту запись?')"><i class="fas fa-trash"></i></a>
                                     </div>
                                 </td>
                             </tr>

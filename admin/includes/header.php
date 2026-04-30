@@ -1,3 +1,7 @@
+<?php
+    require_once __DIR__ . '/../../config/config.php'; 
+?>
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -12,7 +16,8 @@
     <link rel="stylesheet" href="assets/fontawesome-free-7.2.0-web/css/all.css">
 
     <!-- Стили -->
-    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/style.css?version=<?php echo $version_code; ?>">
+    <link rel="stylesheet" href="assets/css/mobile.css?version=<?php echo $version_code; ?>">
     
 </head>
 <body>

@@ -70,14 +70,14 @@ require_once __DIR__. '/includes/header.php';
 require_once __DIR__. '/includes/menu.php';
 ?>
 
-<link rel="stylesheet" href="assets/css/redactor.css">
+<link rel="stylesheet" href="assets/css/redactor.css?version=<?php echo $version_code; ?>">
 
 <!-- Основной контент -->
 <div class="main-content">
     <!-- Шапка -->
     <header class="header">
         <div class="header-left">
-            <button class="toggle-sidebar" id="toggleSidebar">
+            <button class="toggle-sidebar" id="toggleSidebar"  style="display: none;">
                 <i class="fas fa-bars"></i>
             </button>
             <h1 class="header-title">
@@ -108,58 +108,57 @@ require_once __DIR__. '/includes/menu.php';
                 <h3>Список статей</h3>
             </div>
             <div class="card-body">
-                <div class="table-responsive">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Заголовок</th>
-                                <th>Автор</th>
-                                <th>Просмотры</th>
-                                <th>Статус</th>
-                                <th>Дата публикации</th>
-                                <th>Действия</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php
-                            $pagination = getPagination($conn, 'articles', 10);
-                            // Теперь $result — это массив данных
-                            $articles = getArticlesList($conn, $pagination['perPage'], $pagination['offset']);
+            <div class="table-responsive">
+                <table class="data-table responsive-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Заголовок</th>
+                            <th>Автор</th>
+                            <th>Просмотры</th>
+                            <th>Статус</th>
+                            <th>Дата публикации</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $pagination = getPagination($conn, 'articles', 10);
+                        $articles = getArticlesList($conn, $pagination['perPage'], $pagination['offset']);
 
-                            // Используем foreach для обхода массива
-                            foreach ($articles as $row): 
-                            ?>
-                            <tr>
-                                <td><?php echo $row['id']; ?></td>
-                                <td>
-                                    <a href="../articles.php?article=<?php echo $row['slug']; ?>" target="_blank">
-                                        <?php echo htmlspecialchars($row['title']); ?>
+                        foreach ($articles as $row): 
+                        ?>
+                        <tr>
+                            <td data-label="ID"><?php echo $row['id']; ?></td>
+                            <td data-label="Заголовок">
+                                <a href="../articles.php?article=<?php echo $row['slug']; ?>" target="_blank">
+                                    <?php echo htmlspecialchars($row['title']); ?>
+                                </a>
+                            </td>
+                            <td data-label="Автор"><?php echo htmlspecialchars($row['author']); ?></td>
+                            <td data-label="Просмотры"><?php echo $row['views']; ?></td>
+                            <td data-label="Статус">
+                                <span class="status-badge <?php echo $row['is_published'] ? 'published' : 'draft'; ?>">
+                                    <?php echo $row['is_published'] ? 'Опубликовано' : 'Черновик'; ?>
+                                </span>
+                            </td>
+                            <td data-label="Дата публикации"><?php echo $row['published_at'] ? date('d.m.Y H:i', strtotime($row['published_at'])) : '—'; ?></td>
+                            <td data-label="Действия">
+                                <div class="action-buttons">
+                                    <a href="articles.php?action=edit&id=<?php echo $row['id']; ?>" class="btn btn-sm btn-edit">
+                                        <i class="fas fa-edit"></i>
                                     </a>
-                                </td>
-                                <td><?php echo htmlspecialchars($row['author']); ?></td>
-                                <td><?php echo $row['views']; ?></td>
-                                <td>
-                                    <span class="status-badge <?php echo $row['is_published'] ? 'published' : 'draft'; ?>">
-                                        <?php echo $row['is_published'] ? 'Опубликовано' : 'Черновик'; ?>
-                                    </span>
-                                </td>
-                                <td><?php echo $row['published_at'] ? date('d.m.Y H:i', strtotime($row['published_at'])) : '—'; ?></td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <a href="articles.php?action=edit&id=<?php echo $row['id']; ?>" class="btn btn-sm btn-edit">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        <a href="articles.php?action=delete&id=<?php echo $row['id']; ?>" 
-                                        class="btn btn-sm btn-delete">
-                                            <i class="fas fa-trash"></i>
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                </div>
+                                    <a href="articles.php?action=delete&id=<?php echo $row['id']; ?>" 
+                                    class="btn btn-sm btn-delete">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
                 
                 <?php echo generatePaginationLinks($pagination); ?>
             </div>

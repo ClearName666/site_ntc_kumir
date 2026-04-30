@@ -118,7 +118,7 @@ require_once __DIR__. '/includes/menu.php';
     <!-- Шапка -->
     <header class="header">
         <div class="header-left">
-            <button class="toggle-sidebar" id="toggleSidebar">
+            <button class="toggle-sidebar" id="toggleSidebar" style="display: none;">
                 <i class="fas fa-bars"></i>
             </button>
             <h1 class="header-title">
@@ -146,14 +146,14 @@ require_once __DIR__. '/includes/menu.php';
                 </a>
             </div>
         </div>
-        
+
         <div class="card">
             <div class="card-header">
                 <h3>Список товаров</h3>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="data-table">
+                    <table class="data-table responsive-table">
                         <thead>
                             <tr>
                                 <th>ID</th>
@@ -175,43 +175,45 @@ require_once __DIR__. '/includes/menu.php';
                             foreach ($products as $row):
                             ?>
                             <tr>
-                                <td><?php echo $row['id']; ?></td>
-                                <td>
+                                <td data-label="ID"><?php echo $row['id']; ?></td>
+                                <td data-label="Изображение">
                                     <?php if ($row['image_path']): ?>
                                     <img src="../<?php echo $row['image_path']; ?>" alt="<?php echo htmlspecialchars($row['name']); ?>" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
+                                    <?php else: ?>
+                                    <span style="color: #999;">—</span>
                                     <?php endif; ?>
                                 </td>
-                                <td>
+                                <td data-label="Название">
                                     <strong><?php echo htmlspecialchars($row['name']); ?></strong>
                                     <small class="text-muted d-block"><?php echo htmlspecialchars(safeSubstr($row['description'], 0, 50)) . '...'; ?></small>
                                 </td>
-                                <td><?php echo htmlspecialchars($row['category_name'] ?? '—'); ?></td>
-                                <td>
+                                <td data-label="Категория"><?php echo htmlspecialchars($row['category_name'] ?? '—'); ?></td>
+                                <td data-label="Цена">
                                     <?php if ($row['price']): ?>
                                     <?php echo number_format($row['price'], 2, '.', ' '); ?> ₽
                                     <?php else: ?>
                                     —
                                     <?php endif; ?>
                                 </td>
-                                <td>
+                                <td data-label="Наличие">
                                     <span class="status-badge <?php echo $row['is_available'] ? 'available' : 'not-available'; ?>">
                                         <?php echo $row['is_available'] ? 'В наличии' : 'Нет в наличии'; ?>
                                     </span>
                                 </td>
-                                <td><?php echo $row['sort_order']; ?></td>
-                                <td>
+                                <td data-label="Сортировка"><?php echo $row['sort_order']; ?></td>
+                                <td data-label="Статус">
                                     <span class="status-badge <?php echo $row['is_active'] ? 'active' : 'inactive'; ?>">
                                         <?php echo $row['is_active'] ? 'Активен' : 'Неактивен'; ?>
                                     </span>
                                 </td>
-                                <td>
+                                <td data-label="Действия">
                                     <div class="action-buttons">
                                         <a href="products.php?action=edit&id=<?php echo $row['id']; ?>" class="btn btn-sm btn-edit">
                                             <i class="fas fa-edit"></i>
                                         </a>
                                         <a href="products.php?action=delete&id=<?php echo $row['id']; ?>" 
-                                           class="btn btn-sm btn-delete" 
-                                           onclick="return confirm('Удалить этот товар?')">
+                                        class="btn btn-sm btn-delete" 
+                                        onclick="return confirm('Удалить этот товар?')">
                                             <i class="fas fa-trash"></i>
                                         </a>
                                     </div>

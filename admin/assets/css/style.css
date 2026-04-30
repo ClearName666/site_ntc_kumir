@@ -1,34 +1,63 @@
+/* ==========================================================================
+   ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ (ЦВЕТОВАЯ СХЕМА)
+   ========================================================================== */
+
 :root {
-    --sidebar-width: 250px;
-    --header-height: 70px;
-    --primary-color: #3498db;
-    --secondary-color: #2c3e50;
-    --success-color: #27ae60;
-    --warning-color: #f39c12;
-    --danger-color: #e74c3c;
-    --info-color: #17a2b8;
-    --light-color: #f8f9fa;
-    --dark-color: #343a40;
-    --border-color: #dee2e6;
-    --shadow: 0 5px 15px rgba(0,0,0,0.08);
-    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    /* Размеры и геометрия */
+    --sidebar-width: 250px;          /* Ширина бокового меню в десктопной версии */
+    --sidebar-width-collapsed: 70px; /* Ширина свернутого бокового меню */
+    --header-height: 70px;           /* Высота верхней панели навигации */
+
+    /* Основные цвета бренда */
+    --primary-color: #3498db;        /* Основной акцентный цвет (кнопки, ссылки, активные элементы) */
+    --secondary-color: #2c3e50;      /* Вторичный цвет (сайдбар, заголовки) */
+    --success-color: #27ae60;        /* Цвет успеха (активные статусы, положительные действия) */
+    --warning-color: #f39c12;        /* Цвет предупреждения (внимание, важные уведомления) */
+    --danger-color: #e74c3c;         /* Цвет опасности/ошибки (удаление, критические действия) */
+    --info-color: #17a2b8;           /* Информационный цвет (подсказки, системные сообщения) */
+
+    /* Нейтральные и служебные цвета */
+    --light-color: #f8f9fa;          /* Светлый фон (для наведений, подсветок) */
+    --dark-color: #343a40;           /* Темный текст/фон */
+    --border-color: #dee2e6;         /* Цвет границ и разделителей */
+    --text-color: #333;              /* Основной цвет текста */
+    --text-muted: #6c757d;           /* Приглушенный текст (подписи, даты) */
+    --text-light: #95a5a6;           /* Очень светлый текст (неактивные элементы) */
+    --background-body: #f5f7fa;      /* Фон всей страницы */
+    --background-dark-overlay: rgba(0,0,0,0.5); /* Затемнение для модальных окон */
+
+    /* Эффекты и анимации */
+    --shadow: 0 5px 15px rgba(0,0,0,0.08);        /* Стандартная тень для карточек */
+    --shadow-large: 0 15px 30px rgba(0,0,0,0.15); /* Увеличенная тень при наведении */
+    --shadow-dropdown: 0 10px 30px rgba(0,0,0,0.1); /* Тень для выпадающих меню */
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* Плавность всех переходов */
 }
 
+/* ==========================================================================
+   СБРОС И БАЗОВЫЕ СТИЛИ
+   ========================================================================== */
+
+/* Сброс отступов и установка box-sizing для всех элементов */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
+/* Основные стили тела документа */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #f5f7fa;
-    color: #333;
+    background: var(--background-body);
+    color: var(--text-color);
     display: flex;
     min-height: 100vh;
 }
 
-/* Сайдбар */
+/* ==========================================================================
+   КОМПОНЕНТ: САЙДБАР (БОКОВОЕ МЕНЮ)
+   ========================================================================== */
+
+/* Основной контейнер сайдбара */
 .sidebar {
     width: var(--sidebar-width);
     background: var(--secondary-color);
@@ -40,12 +69,14 @@ body {
     z-index: 1000;
 }
 
+/* Шапка сайдбара с логотипом */
 .sidebar-header {
     padding: 25px 20px;
     background: rgba(0,0,0,0.2);
     border-bottom: 1px solid rgba(255,255,255,0.1);
 }
 
+/* Контейнер логотипа и ссылка */
 .sidebar-logo {
     display: flex;
     align-items: center;
@@ -54,11 +85,13 @@ body {
     color: white;
 }
 
+/* Изображение логотипа */
 .sidebar-logo img {
     width: 40px;
     height: 40px;
 }
 
+/* Текстовая часть логотипа */
 .logo-text h2 {
     font-size: 1.25rem;
     margin-bottom: 5px;
@@ -69,10 +102,12 @@ body {
     opacity: 0.8;
 }
 
+/* Контейнер пунктов меню */
 .sidebar-menu {
     padding: 20px 0;
 }
 
+/* Заголовок группы пунктов меню */
 .menu-title {
     padding: 10px 20px;
     font-size: 0.75rem;
@@ -82,6 +117,7 @@ body {
     margin-bottom: 10px;
 }
 
+/* Отдельный пункт меню */
 .menu-item {
     display: flex;
     align-items: center;
@@ -93,27 +129,32 @@ body {
     border-left: 3px solid transparent;
 }
 
+/* Эффект при наведении на пункт меню */
 .menu-item:hover {
     background: rgba(255,255,255,0.1);
     color: white;
     border-left-color: var(--primary-color);
 }
 
+/* Активный пункт меню */
 .menu-item.active {
     background: rgba(52, 152, 219, 0.2);
     color: white;
     border-left-color: var(--primary-color);
 }
 
+/* Иконка в пункте меню */
 .menu-item i {
     width: 20px;
     text-align: center;
 }
 
+/* Текст пункта меню (занимает все свободное пространство) */
 .menu-item span {
     flex: 1;
 }
 
+/* Бейдж с числом/количеством в меню */
 .menu-badge {
     background: var(--primary-color);
     color: white;
@@ -122,14 +163,22 @@ body {
     font-size: 0.75rem;
 }
 
-/* Основной контент */
+/* ==========================================================================
+   КОМПОНЕНТ: ОСНОВНОЙ КОНТЕНТ
+   ========================================================================== */
+
+/* Обертка основного контента (отступ под сайдбар) */
 .main-content {
     flex: 1;
     margin-left: var(--sidebar-width);
     min-height: 100vh;
 }
 
-/* Шапка */
+/* ==========================================================================
+   КОМПОНЕНТ: ВЕРХНЯЯ ШАПКА (HEADER)
+   ========================================================================== */
+
+/* Верхняя панель навигации */
 .header {
     height: var(--header-height);
     background: white;
@@ -143,12 +192,14 @@ body {
     z-index: 100;
 }
 
+/* Левая часть шапки (кнопка и заголовок) */
 .header-left {
     display: flex;
     align-items: center;
     gap: 20px;
 }
 
+/* Кнопка сворачивания/разворачивания сайдбара (по умолчанию скрыта) */
 .toggle-sidebar {
     background: none;
     border: none;
@@ -158,18 +209,21 @@ body {
     display: none;
 }
 
+/* Заголовок текущей страницы */
 .header-title {
     font-size: 1.5rem;
     font-weight: 600;
     color: var(--secondary-color);
 }
 
+/* Правая часть шапки (пользовательское меню) */
 .header-right {
     display: flex;
     align-items: center;
     gap: 20px;
 }
 
+/* Меню пользователя */
 .user-menu {
     display: flex;
     align-items: center;
@@ -179,6 +233,7 @@ body {
     position: relative;
 }
 
+/* Аватар пользователя (круг с инициалами) */
 .user-avatar {
     width: 40px;
     height: 40px;
@@ -191,6 +246,7 @@ body {
     font-weight: 600;
 }
 
+/* Текстовая информация о пользователе */
 .user-info h4 {
     font-size: 0.9375rem;
     font-weight: 600;
@@ -198,33 +254,36 @@ body {
 
 .user-info span {
     font-size: 0.8125rem;
-    color: #6c757d;
+    color: var(--text-muted);
 }
 
+/* Выпадающее меню пользователя */
 .user-dropdown {
     position: absolute;
     top: 100%;
     right: 0;
     background: white;
     min-width: 200px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    box-shadow: var(--shadow-dropdown);
     border-radius: 10px;
     overflow: hidden;
     display: none;
     z-index: 100;
 }
 
+/* Показываем дропдаун при наведении */
 .user-menu:hover .user-dropdown {
     display: block;
     animation: fadeIn 0.3s ease;
 }
 
+/* Пункт выпадающего меню */
 .dropdown-item {
     display: flex;
     align-items: center;
     gap: 10px;
     padding: 15px;
-    color: #333;
+    color: var(--text-color);
     text-decoration: none;
     transition: var(--transition);
 }
@@ -235,15 +294,19 @@ body {
 
 .dropdown-item i {
     width: 20px;
-    color: #6c757d;
+    color: var(--text-muted);
 }
 
-/* Контейнер контента */
+/* ==========================================================================
+   КОМПОНЕНТ: КОНТЕЙНЕРЫ И КАРТОЧКИ
+   ========================================================================== */
+
+/* Основной контейнер для контента внутри main-content */
 .content-container {
     padding: 30px;
 }
 
-/* Карточки */
+/* Базовая карточка (белый фон, скругление, тень) */
 .card {
     background: white;
     border-radius: 15px;
@@ -252,6 +315,7 @@ body {
     overflow: hidden;
 }
 
+/* Заголовок карточки */
 .card-header {
     padding: 25px;
     border-bottom: 1px solid var(--border-color);
@@ -264,11 +328,16 @@ body {
     font-size: 1.5rem;
 }
 
+/* Тело карточки */
 .card-body {
     padding: 25px;
 }
 
-/* Кнопки */
+/* ==========================================================================
+   КОМПОНЕНТ: КНОПКИ (BUTTONS)
+   ========================================================================== */
+
+/* Базовая кнопка */
 .btn {
     display: inline-flex;
     align-items: center;
@@ -283,19 +352,21 @@ body {
     text-decoration: none;
 }
 
+/* Основная акцентная кнопка */
 .btn-primary {
     background: var(--primary-color);
     color: white;
 }
 
 .btn-primary:hover {
-    background: #2980b9;
+    background: #2980b9; /* Темный оттенок primary-color */
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
 }
 
+/* Вторичная кнопка */
 .btn-secondary {
-    background: #6c757d;
+    background: var(--text-muted);
     color: white;
 }
 
@@ -303,16 +374,19 @@ body {
     background: #5a6268;
 }
 
+/* Кнопка успеха */
 .btn-success {
     background: var(--success-color);
     color: white;
 }
 
+/* Кнопка предупреждения */
 .btn-warning {
     background: var(--warning-color);
     color: white;
 }
 
+/* Кнопка опасности (удаление) */
 .btn-danger {
     background: var(--danger-color);
     color: white;
@@ -322,16 +396,22 @@ body {
     background: #c0392b;
 }
 
+/* Маленькая кнопка */
 .btn-sm {
     padding: 8px 16px;
     font-size: 0.875rem;
 }
 
-/* Формы */
+/* ==========================================================================
+   КОМПОНЕНТ: ФОРМЫ (FORMS)
+   ========================================================================== */
+
+/* Группа полей формы */
 .form-group {
     margin-bottom: 20px;
 }
 
+/* Подпись к полю */
 .form-group label {
     display: block;
     margin-bottom: 8px;
@@ -340,6 +420,7 @@ body {
     font-size: 0.9375rem;
 }
 
+/* Стили для полей ввода */
 .form-group input[type="text"],
 .form-group input[type="email"],
 .form-group input[type="password"],
@@ -356,6 +437,7 @@ body {
     transition: var(--transition);
 }
 
+/* Фокус на поле ввода */
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
@@ -364,30 +446,61 @@ body {
     box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
 }
 
+/* Горизонтальный ряд формы (сетка) */
 .form-row {
     display: flex;
     flex-wrap: wrap;
     margin: 0 -10px;
 }
 
+/* Колонка на 6 сеточных единиц (50% ширины) */
 .form-group.col-md-6 {
     flex: 0 0 50%;
     max-width: 50%;
     padding: 0 10px;
 }
 
-/* Таблицы */
+/* Метка для чекбокса с выравниванием */
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+
+.checkbox-label input[type="checkbox"] {
+    margin-right: 10px;
+    width: 18px;
+    height: 18px;
+}
+
+/* Контейнер для кнопок действий формы */
+.form-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+}
+
+/* ==========================================================================
+   КОМПОНЕНТ: ТАБЛИЦЫ (TABLES)
+   ========================================================================== */
+
+/* Адаптивный контейнер для таблицы (горизонтальный скролл) */
 .table-responsive {
     overflow-x: auto;
 }
 
+/* Основная таблица данных */
 .data-table {
     width: 100%;
     border-collapse: collapse;
 }
 
+/* Заголовок таблицы */
 .data-table th {
-    background: #f8f9fa;
+    background: var(--light-color);
     padding: 15px;
     text-align: left;
     font-weight: 600;
@@ -395,17 +508,23 @@ body {
     border-bottom: 2px solid var(--border-color);
 }
 
+/* Ячейка таблицы */
 .data-table td {
     padding: 15px;
     border-bottom: 1px solid var(--border-color);
     vertical-align: middle;
 }
 
+/* Подсветка строки при наведении */
 .data-table tr:hover {
-    background: #f8f9fa;
+    background: var(--light-color);
 }
 
-/* Бейджи статусов */
+/* ==========================================================================
+   КОМПОНЕНТ: БЕЙДЖИ И СТАТУСЫ
+   ========================================================================== */
+
+/* Базовый бейдж статуса */
 .status-badge {
     display: inline-block;
     padding: 5px 12px;
@@ -416,6 +535,7 @@ body {
     letter-spacing: 0.5px;
 }
 
+/* Успешный статус (опубликовано, активно, доступно) */
 .status-badge.published,
 .status-badge.active,
 .status-badge.available {
@@ -423,14 +543,58 @@ body {
     color: var(--success-color);
 }
 
+/* Неактивный/черновой статус */
 .status-badge.draft,
 .status-badge.inactive,
 .status-badge.not-available {
     background: rgba(108, 117, 125, 0.1);
-    color: #6c757d;
+    color: var(--text-muted);
 }
 
-/* Пагинация */
+/* Базовый бейдж */
+.badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+/* Бейдж основного цвета */
+.badge-primary {
+    background: rgba(52, 152, 219, 0.1);
+    color: var(--primary-color);
+}
+
+/* Бейдж вторичного цвета */
+.badge-secondary {
+    background: rgba(108, 117, 125, 0.1);
+    color: var(--text-muted);
+}
+
+/* Бейдж успеха */
+.badge-success {
+    background: rgba(39, 174, 96, 0.1);
+    color: var(--success-color);
+}
+
+/* Бейдж предупреждения */
+.badge-warning {
+    background: rgba(243, 156, 18, 0.1);
+    color: var(--warning-color);
+}
+
+/* Бейдж опасности */
+.badge-danger {
+    background: rgba(231, 76, 60, 0.1);
+    color: var(--danger-color);
+}
+
+/* ==========================================================================
+   КОМПОНЕНТ: ПАГИНАЦИЯ
+   ========================================================================== */
+
+/* Контейнер пагинации */
 .pagination {
     display: flex;
     gap: 5px;
@@ -438,6 +602,7 @@ body {
     justify-content: center;
 }
 
+/* Ссылка пагинации */
 .page-link {
     display: flex;
     align-items: center;
@@ -457,13 +622,18 @@ body {
     border-color: var(--primary-color);
 }
 
+/* Активная страница пагинации */
 .page-link.active {
     background: var(--primary-color);
     color: white;
     border-color: var(--primary-color);
 }
 
-/* Уведомления */
+/* ==========================================================================
+   КОМПОНЕНТ: УВЕДОМЛЕНИЯ (NOTIFICATIONS)
+   ========================================================================== */
+
+/* Уведомление (фиксированное, всплывающее) */
 .notification {
     position: fixed;
     top: 20px;
@@ -479,40 +649,418 @@ body {
     gap: 10px;
 }
 
+/* Успешное уведомление */
 .notification.success {
     background: var(--success-color);
 }
 
+/* Уведомление об ошибке */
 .notification.error {
     background: var(--danger-color);
 }
 
+/* Предупреждающее уведомление */
 .notification.warning {
     background: var(--warning-color);
 }
 
+/* Информационное уведомление */
 .notification.info {
     background: var(--primary-color);
 }
 
-.notification i {
-    font-size: 1.2rem;
+/* ==========================================================================
+   КОМПОНЕНТ: МОДАЛЬНЫЕ ОКНА (MODALS)
+   ========================================================================== */
+
+/* Затемнение фона модального окна */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--background-dark-overlay);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
 }
 
-.notification.success i {
-    color: var(--success-color, #28a745);
+/* Активное модальное окно */
+.modal.active {
+    display: flex;
 }
 
-.notification.error i {
-    color: var(--danger-color, #dc3545);
+/* Контент модального окна */
+.modal-content {
+    background: white;
+    border-radius: 15px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
 }
 
-.notification.info i {
-    color: var(--info-color, #17a2b8);
+/* Заголовок модального окна */
+.modal-header {
+    padding: 20px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
+.modal-header h5 {
+    margin: 0;
+    color: var(--secondary-color);
+}
 
-/* Сетка контент-блоков */
+/* Кнопка закрытия модального окна */
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--text-muted);
+}
+
+/* Тело модального окна */
+.modal-body {
+    padding: 20px;
+}
+
+/* Нижняя часть (футер) модального окна */
+.modal-footer {
+    padding: 20px;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+/* ==========================================================================
+   КОМПОНЕНТ: ПРОГРЕСС-БАР
+   ========================================================================== */
+
+/* Контейнер прогресс-бара */
+.progress {
+    height: 10px;
+    background: var(--light-color);
+    border-radius: 5px;
+    overflow: hidden;
+    margin: 10px 0;
+}
+
+/* Заполненная часть прогресс-бара */
+.progress-bar {
+    height: 100%;
+    background: var(--primary-color);
+    border-radius: 5px;
+    transition: width 0.3s ease;
+}
+
+/* ==========================================================================
+   КОМПОНЕНТ: КАРТОЧКИ СТАТИСТИКИ (DASHBOARD)
+   ========================================================================== */
+
+/* Сетка статистических карточек */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+/* Карточка статистики */
+.stat-card {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+    border-left: 4px solid var(--primary-color);
+    animation: fadeIn 0.6s ease;
+}
+
+/* Индивидуальные цвета для карточек */
+.stat-card:nth-child(2) { border-left-color: var(--success-color); }
+.stat-card:nth-child(3) { border-left-color: var(--warning-color); }
+.stat-card:nth-child(4) { border-left-color: var(--danger-color); }
+
+/* Эффект при наведении */
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-large);
+}
+
+/* Шапка карточки статистики */
+.stat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+/* Иконка статистики */
+.stat-icon {
+    width: 50px;
+    height: 50px;
+    background: rgba(52, 152, 219, 0.1);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-color);
+    font-size: 1.5rem;
+}
+
+/* Заголовок статистики */
+.stat-title {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Числовое значение статистики */
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--secondary-color);
+    margin-bottom: 5px;
+}
+
+/* Изменение показателя (рост/падение) */
+.stat-change {
+    font-size: 0.875rem;
+    color: var(--success-color);
+}
+
+/* ==========================================================================
+   КОМПОНЕНТ: БЫСТРЫЕ ДЕЙСТВИЯ (QUICK ACTIONS)
+   ========================================================================== */
+
+/* Блок быстрых действий */
+.quick-actions {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: var(--shadow);
+    margin-bottom: 30px;
+}
+
+/* Заголовок секции */
+.section-title {
+    font-size: 1.5rem;
+    color: var(--secondary-color);
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.section-title i {
+    color: var(--primary-color);
+}
+
+/* Сетка кнопок действий */
+.actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+/* Кнопка быстрого действия */
+.action-btn {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 20px;
+    background: var(--light-color);
+    border: 2px solid transparent;
+    border-radius: 10px;
+    text-decoration: none;
+    color: var(--secondary-color);
+    transition: var(--transition);
+}
+
+.action-btn:hover {
+    background: white;
+    border-color: var(--primary-color);
+    transform: translateY(-3px);
+}
+
+/* Иконка действия */
+.action-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--primary-color);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.25rem;
+}
+
+/* Текст действия */
+.action-text h4 {
+    font-size: 1rem;
+    margin-bottom: 5px;
+}
+
+.action-text p {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+}
+
+/* ==========================================================================
+   КОМПОНЕНТ: ПОСЛЕДНИЕ ДЕЙСТВИЯ (RECENT ACTIVITY)
+   ========================================================================== */
+
+/* Блок последних действий */
+.recent-activity {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: var(--shadow);
+}
+
+/* Список действий */
+.activity-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+/* Элемент действия */
+.activity-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    border-bottom: 1px solid var(--border-color);
+    transition: var(--transition);
+}
+
+.activity-item:hover {
+    background: var(--light-color);
+}
+
+/* Иконка действия */
+.activity-icon {
+    width: 40px;
+    height: 40px;
+    background: rgba(52, 152, 219, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-color);
+}
+
+/* Контент действия */
+.activity-content {
+    flex: 1;
+}
+
+.activity-title {
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.activity-desc {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+}
+
+.activity-time {
+    font-size: 0.75rem;
+    color: var(--text-light);
+}
+
+/* ==========================================================================
+   КОМПОНЕНТ: ПРИВЕТСТВИЕ (WELCOME SECTION)
+   ========================================================================== */
+
+/* Секция приветствия с градиентом */
+.welcome-section {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    padding: 30px;
+    border-radius: 15px;
+    margin-bottom: 30px;
+    animation: slideUp 0.6s ease;
+}
+
+/* Шапка секции приветствия */
+.welcome-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.welcome-text h1 {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.welcome-text p {
+    opacity: 0.9;
+    font-size: 1rem;
+}
+
+.welcome-icon {
+    font-size: 4rem;
+    opacity: 0.2;
+}
+
+/* ==========================================================================
+   КОМПОНЕНТ: КНОПКИ ДЕЙСТВИЙ В ТАБЛИЦАХ
+   ========================================================================== */
+
+/* Контейнер для кнопок действий */
+.action-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+/* Кнопка редактирования */
+.btn-edit {
+    background: rgba(52, 152, 219, 0.1);
+    color: var(--primary-color);
+    border: none;
+    padding: 8px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.btn-edit:hover {
+    background: var(--primary-color);
+    color: white;
+}
+
+/* Кнопка удаления */
+.btn-delete {
+    background: rgba(231, 76, 60, 0.1);
+    color: var(--danger-color);
+    border: none;
+    padding: 8px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.btn-delete:hover {
+    background: var(--danger-color);
+    color: white;
+}
+
+/* ==========================================================================
+   КОМПОНЕНТ: СЕТКА КОНТЕНТ-БЛОКОВ
+   ========================================================================== */
+
+/* Сетка блоков контента */
 .content-blocks-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -520,6 +1068,7 @@ body {
     margin-top: 20px;
 }
 
+/* Карточка контент-блока */
 .content-block-card {
     background: white;
     border: 1px solid var(--border-color);
@@ -533,6 +1082,7 @@ body {
     box-shadow: var(--shadow);
 }
 
+/* Шапка блока */
 .block-header {
     display: flex;
     justify-content: space-between;
@@ -545,25 +1095,141 @@ body {
     color: var(--secondary-color);
 }
 
+/* Категория блока */
 .block-category {
     font-size: 0.75rem;
     background: var(--light-color);
-    color: #6c757d;
+    color: var(--text-muted);
     padding: 3px 8px;
     border-radius: 4px;
 }
 
+/* Содержимое блока */
 .block-content {
     margin-bottom: 15px;
     color: #666;
 }
 
-/* Анимации */
+/* ==========================================================================
+   КОМПОНЕНТ: РОЛИ И СТАТУСЫ
+   ========================================================================== */
+
+/* Бейдж суперадмина */
+.role-superadmin {
+    background: rgba(231, 76, 60, 0.1);
+    color: var(--danger-color);
+}
+
+/* Бейдж администратора */
+.role-admin {
+    background: rgba(52, 152, 219, 0.1);
+    color: var(--primary-color);
+}
+
+/* Бейдж редактора */
+.role-editor {
+    background: rgba(39, 174, 96, 0.1);
+    color: var(--success-color);
+}
+
+/* Бейдж для действий в логах */
+.badge-action {
+    background: rgba(52, 152, 219, 0.1);
+    color: var(--primary-color);
+    font-family: 'Courier New', monospace;
+    font-size: 0.75rem;
+}
+
+/* ==========================================================================
+   КОМПОНЕНТ: ЗАГРУЗКА ИЗОБРАЖЕНИЙ (DROPZONE)
+   ========================================================================== */
+
+/* Контейнер для загрузки изображений */
+.image-upload-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Контейнер для трех полей изображений */
+.form-row.images-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 25px;
+    margin-top: 15px;
+}
+
+/* Колонка поля загрузки изображения */
+.image-field-col {
+    flex: 1;
+    min-width: 250px;
+}
+
+/* Зона перетаскивания файла */
+.drop-zone {
+    width: 100%;
+    height: 150px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border: 2px dashed #ccc;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: #f9f9f9;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+/* Эффект при наведении на зону загрузки */
+.drop-zone:hover, .drop-zone--over {
+    border-color: #007bff;
+    background: #f0f7ff;
+}
+
+/* Скрытый input для выбора файла */
+.drop-zone__input {
+    display: none;
+}
+
+/* Миниатюра загруженного изображения */
+.drop-zone__thumb {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* Текст-подсказка в зоне загрузки */
+.drop-zone__prompt {
+    font-size: 14px;
+    color: #777;
+}
+
+.drop-zone__prompt i {
+    display: block;
+    font-size: 30px;
+    margin-bottom: 10px;
+}
+
+.drop-zone:hover {
+    border-color: #4a90e2;
+    transform: translateY(-2px);
+}
+
+/* ==========================================================================
+   АНИМАЦИИ (ANIMATIONS)
+   ========================================================================== */
+
+/* Анимация появления (fade in) */
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
 }
 
+/* Анимация выезда справа */
 @keyframes slideInRight {
     from {
         opacity: 0;
@@ -575,6 +1241,7 @@ body {
     }
 }
 
+/* Анимация подъема */
 @keyframes slideUp {
     from {
         opacity: 0;
@@ -586,12 +1253,17 @@ body {
     }
 }
 
-/* Адаптивность */
+/* ==========================================================================
+   АДАПТИВНОСТЬ (MEDIA QUERIES)
+   ========================================================================== */
+
+/* Планшеты и маленькие ноутбуки (до 992px) - сворачиваем сайдбар */
 @media (max-width: 992px) {
     :root {
-        --sidebar-width: 70px;
+        --sidebar-width: var(--sidebar-width-collapsed);
     }
     
+    /* Скрываем текстовые элементы в свернутом сайдбаре */
     .logo-text,
     .menu-item span,
     .menu-badge,
@@ -615,7 +1287,7 @@ body {
     }
     
     .main-content {
-        margin-left: 70px;
+        margin-left: var(--sidebar-width-collapsed);
     }
     
     .header-title {
@@ -623,11 +1295,14 @@ body {
     }
 }
 
+/* Мобильные устройства (до 768px) - гамбургер-меню */
 @media (max-width: 768px) {
+    /* Сайдбар скрыт за экраном */
     .sidebar {
         transform: translateX(-100%);
     }
     
+    /* Показываем сайдбар при активном классе */
     .sidebar.active {
         transform: translateX(0);
     }
@@ -636,6 +1311,7 @@ body {
         margin-left: 0;
     }
     
+    /* Показываем кнопку-гамбургер */
     .toggle-sidebar {
         display: block;
     }
@@ -644,12 +1320,14 @@ body {
         padding: 20px;
     }
     
+    /* Колонки формы становятся на 100% ширины */
     .form-group.col-md-6 {
         flex: 0 0 100%;
         max-width: 100%;
     }
 }
 
+/* Маленькие мобильные устройства (до 480px) */
 @media (max-width: 480px) {
     .header {
         padding: 0 15px;
@@ -662,510 +1340,4 @@ body {
     .pagination {
         flex-wrap: wrap;
     }
-}
-
-/* Дополнительные стили для форм */
-.checkbox-label {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    margin-bottom: 10px;
-}
-
-.checkbox-label input[type="checkbox"] {
-    margin-right: 10px;
-    width: 18px;
-    height: 18px;
-}
-
-.form-actions {
-    display: flex;
-    gap: 15px;
-    margin-top: 30px;
-    padding-top: 20px;
-    border-top: 1px solid var(--border-color);
-}
-
-/* Бейджи для разных типов */
-.badge {
-    display: inline-block;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 0.75rem;
-    font-weight: 600;
-}
-
-.badge-primary {
-    background: rgba(52, 152, 219, 0.1);
-    color: var(--primary-color);
-}
-
-.badge-secondary {
-    background: rgba(108, 117, 125, 0.1);
-    color: #6c757d;
-}
-
-.badge-success {
-    background: rgba(39, 174, 96, 0.1);
-    color: var(--success-color);
-}
-
-.badge-warning {
-    background: rgba(243, 156, 18, 0.1);
-    color: var(--warning-color);
-}
-
-.badge-danger {
-    background: rgba(231, 76, 60, 0.1);
-    color: var(--danger-color);
-}
-
-/* Иконки действий */
-.action-buttons {
-    display: flex;
-    gap: 8px;
-}
-
-.btn-edit {
-    background: rgba(52, 152, 219, 0.1);
-    color: var(--primary-color);
-    border: none;
-    padding: 8px;
-    border-radius: 6px;
-    cursor: pointer;
-}
-
-.btn-edit:hover {
-    background: var(--primary-color);
-    color: white;
-}
-
-.btn-delete {
-    background: rgba(231, 76, 60, 0.1);
-    color: var(--danger-color);
-    border: none;
-    padding: 8px;
-    border-radius: 6px;
-    cursor: pointer;
-}
-
-.btn-delete:hover {
-    background: var(--danger-color);
-    color: white;
-}
-
-/* Заголовки страниц */
-.page-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 30px;
-}
-
-.page-header h2 {
-    margin: 0;
-    color: var(--secondary-color);
-}
-
-/* Модальные окна */
-.modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.5);
-    z-index: 1000;
-    align-items: center;
-    justify-content: center;
-}
-
-.modal.active {
-    display: flex;
-}
-
-.modal-content {
-    background: white;
-    border-radius: 15px;
-    max-width: 500px;
-    width: 90%;
-    max-height: 90vh;
-    overflow-y: auto;
-}
-
-.modal-header {
-    padding: 20px;
-    border-bottom: 1px solid var(--border-color);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.modal-header h5 {
-    margin: 0;
-    color: var(--secondary-color);
-}
-
-.modal-close {
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-    color: #6c757d;
-}
-
-.modal-body {
-    padding: 20px;
-}
-
-.modal-footer {
-    padding: 20px;
-    border-top: 1px solid var(--border-color);
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-}
-
-/* Прогресс-бар */
-.progress {
-    height: 10px;
-    background: var(--light-color);
-    border-radius: 5px;
-    overflow: hidden;
-    margin: 10px 0;
-}
-
-.progress-bar {
-    height: 100%;
-    background: var(--primary-color);
-    border-radius: 5px;
-    transition: width 0.3s ease;
-}
-
-/* Карточки статистики на главной */
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px;
-    margin-bottom: 30px;
-}
-
-.stat-card {
-    background: white;
-    border-radius: 15px;
-    padding: 25px;
-    box-shadow: var(--shadow);
-    transition: var(--transition);
-    border-left: 4px solid var(--primary-color);
-    animation: fadeIn 0.6s ease;
-}
-
-.stat-card:nth-child(2) { border-left-color: var(--success-color); }
-.stat-card:nth-child(3) { border-left-color: var(--warning-color); }
-.stat-card:nth-child(4) { border-left-color: var(--danger-color); }
-
-.stat-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 30px rgba(0,0,0,0.15);
-}
-
-.stat-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 15px;
-}
-
-.stat-icon {
-    width: 50px;
-    height: 50px;
-    background: rgba(52, 152, 219, 0.1);
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--primary-color);
-    font-size: 1.5rem;
-}
-
-.stat-title {
-    font-size: 0.875rem;
-    color: #6c757d;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.stat-value {
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--secondary-color);
-    margin-bottom: 5px;
-}
-
-.stat-change {
-    font-size: 0.875rem;
-    color: #27ae60;
-}
-
-/* Быстрые действия */
-.quick-actions {
-    background: white;
-    border-radius: 15px;
-    padding: 25px;
-    box-shadow: var(--shadow);
-    margin-bottom: 30px;
-}
-
-.section-title {
-    font-size: 1.5rem;
-    color: var(--secondary-color);
-    margin-bottom: 25px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.section-title i {
-    color: var(--primary-color);
-}
-
-.actions-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 15px;
-}
-
-.action-btn {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    padding: 20px;
-    background: var(--light-color);
-    border: 2px solid transparent;
-    border-radius: 10px;
-    text-decoration: none;
-    color: var(--secondary-color);
-    transition: var(--transition);
-}
-
-.action-btn:hover {
-    background: white;
-    border-color: var(--primary-color);
-    transform: translateY(-3px);
-}
-
-.action-icon {
-    width: 40px;
-    height: 40px;
-    background: var(--primary-color);
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 1.25rem;
-}
-
-.action-text h4 {
-    font-size: 1rem;
-    margin-bottom: 5px;
-}
-
-.action-text p {
-    font-size: 0.8125rem;
-    color: #6c757d;
-}
-
-/* Последние действия */
-.recent-activity {
-    background: white;
-    border-radius: 15px;
-    padding: 25px;
-    box-shadow: var(--shadow);
-}
-
-.activity-list {
-    max-height: 300px;
-    overflow-y: auto;
-}
-
-.activity-item {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    padding: 15px;
-    border-bottom: 1px solid var(--border-color);
-    transition: var(--transition);
-}
-
-.activity-item:hover {
-    background: var(--light-color);
-}
-
-.activity-icon {
-    width: 40px;
-    height: 40px;
-    background: rgba(52, 152, 219, 0.1);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--primary-color);
-}
-
-.activity-content {
-    flex: 1;
-}
-
-.activity-title {
-    font-weight: 600;
-    margin-bottom: 5px;
-}
-
-.activity-desc {
-    font-size: 0.875rem;
-    color: #6c757d;
-}
-
-.activity-time {
-    font-size: 0.75rem;
-    color: #95a5a6;
-}
-
-/* Приветствие */
-.welcome-section {
-    background: linear-gradient(135deg, var(--primary-color), #2c3e50);
-    color: white;
-    padding: 30px;
-    border-radius: 15px;
-    margin-bottom: 30px;
-    animation: slideUp 0.6s ease;
-}
-
-.welcome-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 20px;
-}
-
-.welcome-text h1 {
-    font-size: 2rem;
-    margin-bottom: 10px;
-}
-
-.welcome-text p {
-    opacity: 0.9;
-    font-size: 1rem;
-}
-
-.welcome-icon {
-    font-size: 4rem;
-    opacity: 0.2;
-}
-
-/* Роли администраторов */
-.role-badge {
-    display: inline-block;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-}
-
-.role-superadmin {
-    background: rgba(231, 76, 60, 0.1);
-    color: var(--danger-color);
-}
-
-.role-admin {
-    background: rgba(52, 152, 219, 0.1);
-    color: var(--primary-color);
-}
-
-.role-editor {
-    background: rgba(39, 174, 96, 0.1);
-    color: var(--success-color);
-}
-
-/* Бейджи действий в логах */
-.badge-action {
-    background: rgba(52, 152, 219, 0.1);
-    color: var(--primary-color);
-    font-family: 'Courier New', monospace;
-    font-size: 0.75rem;
-}
-
-
-/* Область для перетаскивания */
-.image-upload-container {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-/* Контейнер для всех трех полей */
-.form-row.images-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 25px; /* Вот этот отступ между карточками */
-    margin-top: 15px;
-}
-
-/* Стили для каждой колонки, чтобы они не слипались */
-.image-field-col {
-    flex: 1; /* Распределяем поровну */
-    min-width: 250px; /* Чтобы на мобилках они прыгали друг под друга */
-}
-
-.drop-zone {
-    width: 100%;
-    height: 150px;
-    padding: 15px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    border: 2px dashed #ccc;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    background: #f9f9f9;
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-}
-
-.drop-zone:hover, .drop-zone--over {
-    border-color: #007bff;
-    background: #f0f7ff;
-}
-
-.drop-zone__input {
-    display: none;
-}
-
-.drop-zone__thumb {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-}
-
-.drop-zone__prompt {
-    font-size: 14px;
-    color: #777;
-}
-
-.drop-zone__prompt i {
-    display: block;
-    font-size: 30px;
-    margin-bottom: 10px;
-}
-
-.drop-zone:hover {
-    border-color: #4a90e2;
-    transform: translateY(-2px);
-    transition: all 0.2s ease;
 }

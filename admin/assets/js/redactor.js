@@ -429,8 +429,7 @@ class ArticleBuilder {
             
             if (block.type === 'text') {
                 const controlsContainer = document.createElement('div');
-                controlsContainer.style.cssText = 'position: absolute; bottom: 10px; left: -12px; display: flex; flex-direction: column; gap: 8px; z-index: 20;';
-                
+                controlsContainer.style.cssText = 'position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: row; gap: 8px; z-index: 20; background: rgba(0,0,0,0.6); padding: 6px 12px; border-radius: 30px; backdrop-filter: blur(4px);';                
                 const glassCheckbox = document.createElement('div');
                 glassCheckbox.style.cssText = 'background: #f3f4f6; padding: 6px 10px; border-radius: 20px; font-size: 12px; display: flex; align-items: center; gap: 6px; cursor: pointer;';
                 glassCheckbox.innerHTML = `
@@ -495,7 +494,7 @@ class ArticleBuilder {
                 
             } else if (block.type === 'image') {
                 const controlsContainer = document.createElement('div');
-                controlsContainer.style.cssText = 'position: absolute; bottom: 10px; left: -12px; display: flex; flex-direction: column; gap: 8px; z-index: 20;';
+                controlsContainer.style.cssText = 'position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: row; gap: 8px; z-index: 20; background: rgba(0,0,0,0.6); padding: 6px 12px; border-radius: 30px; backdrop-filter: blur(4px);';                
                 
                 const wideToggle = document.createElement('div');
                 wideToggle.style.cssText = 'background: rgba(0,0,0,0.6); padding: 6px 10px; border-radius: 20px; font-size: 12px; display: flex; align-items: center; gap: 6px; cursor: pointer; color: white;';
@@ -566,7 +565,7 @@ class ArticleBuilder {
                 
             } else if (block.type === 'slider') {
                 const controlsContainer = document.createElement('div');
-                controlsContainer.style.cssText = 'position: absolute; bottom: 10px; left: -12px; display: flex; flex-direction: column; gap: 8px; z-index: 20;';
+                controlsContainer.style.cssText = 'position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: row; gap: 8px; z-index: 20; background: rgba(0,0,0,0.6); padding: 6px 12px; border-radius: 30px; backdrop-filter: blur(4px);';                
                 
                 const wideToggle = document.createElement('div');
                 wideToggle.style.cssText = 'background: rgba(0,0,0,0.6); padding: 6px 10px; border-radius: 20px; font-size: 12px; display: flex; align-items: center; gap: 6px; cursor: pointer; color: white;';

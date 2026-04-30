@@ -75,7 +75,7 @@ require_once __DIR__. '/includes/menu.php';
     <!-- Шапка -->
     <header class="header">
         <div class="header-left">
-            <button class="toggle-sidebar" id="toggleSidebar">
+            <button class="toggle-sidebar" id="toggleSidebar"  style="display: none;">
                 <i class="fas fa-bars"></i>
             </button>
             <h1 class="header-title">
@@ -107,7 +107,7 @@ require_once __DIR__. '/includes/menu.php';
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="data-table">
+                    <table class="data-table responsive-table">
                         <thead>
                             <tr>
                                 <th>ID</th>
@@ -122,25 +122,25 @@ require_once __DIR__. '/includes/menu.php';
                         </thead>
                         <tbody>
                             <?php
-                            // ПОЛУЧАЕМ ДАННЫЕ ЧЕРЕЗ ФУНКЦИЮ:
                             $categories = getAllCategoriesWithCount($conn);
                             
                             foreach ($categories as $category):
                             ?>
                             <tr>
-                                <td><?php echo $category['id']; ?></td>
-                                <td>
+                                <td data-label="ID"><?php echo $category['id']; ?></td>
+                                <td data-label="Изображение">
                                     <?php if ($category['image_path']): ?>
                                     <img src="../<?php echo $category['image_path']; ?>" alt="<?php echo htmlspecialchars($category['name']); ?>" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
+                                    <?php else: ?>
+                                    <span style="color: #999;">—</span>
                                     <?php endif; ?>
                                 </td>
-                                <td>
+                                <td data-label="Название">
                                     <strong><?php echo htmlspecialchars($category['name']); ?></strong>
                                     <small class="text-muted d-block"><?php echo $category['slug']; ?></small>
                                 </td>
-                                <td>
+                                <td data-label="Описание">
                                     <?php 
-                                    // Используем safeSubstr вместо mb_substr
                                     if (!empty($category['description'])) {
                                         echo htmlspecialchars(safeSubstr($category['description'], 0, 50)) . '...';
                                     } else {
@@ -148,21 +148,21 @@ require_once __DIR__. '/includes/menu.php';
                                     }
                                     ?>
                                 </td>
-                                <td><?php echo $category['product_count']; ?></td>
-                                <td><?php echo $category['sort_order']; ?></td>
-                                <td>
+                                <td data-label="Кол-во товаров"><?php echo $category['product_count']; ?></td>
+                                <td data-label="Сортировка"><?php echo $category['sort_order']; ?></td>
+                                <td data-label="Статус">
                                     <span class="status-badge <?php echo $category['is_active'] ? 'active' : 'inactive'; ?>">
                                         <?php echo $category['is_active'] ? 'Активна' : 'Неактивна'; ?>
                                     </span>
                                 </td>
-                                <td>
+                                <td data-label="Действия">
                                     <div class="action-buttons">
                                         <a href="categories.php?action=edit&id=<?php echo $category['id']; ?>" class="btn btn-sm btn-edit">
                                             <i class="fas fa-edit"></i>
                                         </a>
                                         <a href="categories.php?action=delete&id=<?php echo $category['id']; ?>" 
-                                           class="btn btn-sm btn-delete" 
-                                           onclick="return confirm('Удалить эту категорию?')">
+                                        class="btn btn-sm btn-delete" 
+                                        onclick="return confirm('Удалить эту категорию?')">
                                             <i class="fas fa-trash"></i>
                                         </a>
                                     </div>

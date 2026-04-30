@@ -38,7 +38,7 @@ require_once __DIR__. '/includes/menu.php';
     <!-- Шапка -->
     <header class="header">
         <div class="header-left">
-            <button class="toggle-sidebar" id="toggleSidebar">
+            <button class="toggle-sidebar" id="toggleSidebar" > 
                 <i class="fas fa-bars"></i>
             </button>
             <h1 class="header-title">Логи действий</h1>
@@ -107,7 +107,7 @@ require_once __DIR__. '/includes/menu.php';
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="data-table">
+                    <table class="data-table responsive-table">
                         <thead>
                             <tr>
                                 <th>ID</th>
@@ -121,25 +121,25 @@ require_once __DIR__. '/includes/menu.php';
                         <tbody>
                             <?php while ($row = $logsResult->fetch_assoc()): ?>
                             <tr>
-                                <td><?php echo $row['id']; ?></td>
-                                <td>
+                                <td data-label="ID"><?php echo $row['id']; ?></td>
+                                <td data-label="Время">
                                     <?php echo date('d.m.Y', strtotime($row['created_at'])); ?><br>
                                     <small class="text-muted"><?php echo date('H:i:s', strtotime($row['created_at'])); ?></small>
                                 </td>
-                                <td>
+                                <td data-label="Администратор">
                                     <?php if ($row['username']): ?>
                                         <strong><?php echo htmlspecialchars($row['username']); ?></strong>
                                     <?php else: ?>
                                         <span class="text-muted">Система</span>
                                     <?php endif; ?>
                                 </td>
-                                <td>
+                                <td data-label="Действие">
                                     <span class="badge badge-action badge-<?php echo $row['action']; ?>">
                                         <?php echo htmlspecialchars($row['action']); ?>
                                     </span>
                                 </td>
-                                <td><?php echo htmlspecialchars($row['description'] ?? '—'); ?></td>
-                                <td><code><?php echo htmlspecialchars($row['ip_address']); ?></code></td>
+                                <td data-label="Описание"><?php echo htmlspecialchars($row['description'] ?? '—'); ?></td>
+                                <td data-label="IP-адрес"><code><?php echo htmlspecialchars($row['ip_address']); ?></code></td>
                             </tr>
                             <?php endwhile; ?>
                         </tbody>

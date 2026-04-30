@@ -55,7 +55,7 @@ require_once __DIR__. '/includes/menu.php';
 <div class="main-content">
     <header class="header">
         <div class="header-left">
-            <button class="toggle-sidebar" id="toggleSidebar"><i class="fas fa-bars"></i></button>
+            <button class="toggle-sidebar" id="toggleSidebar"><i class="fas fa-bars" style="display: none;"></i></button>
             <h1 class="header-title">Дашборд</h1>
         </div>
         <?php require_once __DIR__. '/includes/header-right.php'; ?>

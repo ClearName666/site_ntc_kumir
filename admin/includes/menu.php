@@ -4,11 +4,10 @@ if (!isset($stats)) {
     $stats = getDashboardStats($conn);
 }
 
-
-
 // Определяем активную страницу
 $current_page = basename($_SERVER['PHP_SELF']);
 ?>
+
 <!-- Сайдбар -->
 <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
@@ -20,7 +19,6 @@ $current_page = basename($_SERVER['PHP_SELF']);
             </div>
         </a>
     </div>
-    
     <nav class="sidebar-menu">
         <div class="menu-title">Главная</div>
         <a href="index.php" class="menu-item <?php echo ($current_page == 'index.php') ? 'active' : ''; ?>">
@@ -135,4 +133,11 @@ $current_page = basename($_SERVER['PHP_SELF']);
         </a>
     </nav>
 </aside>
+
+<!-- Подключаем стили для мобильного меню -->
+<link rel="stylesheet" href="assets/css/mobile-menu.css">
+
+<!-- Подключаем скрипты -->
 <script src="assets/js/setPositionScroll.js"></script>
+<script src="assets/js/mobile-menu.js"></script>
+<script src="assets/js/menu.js"></script>

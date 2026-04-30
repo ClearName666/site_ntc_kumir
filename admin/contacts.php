@@ -54,7 +54,7 @@ require_once __DIR__. '/includes/menu.php';
     <!-- Шапка -->
     <header class="header">
         <div class="header-left">
-            <button class="toggle-sidebar" id="toggleSidebar">
+            <button class="toggle-sidebar" id="toggleSidebar"  style="display: none;">
                 <i class="fas fa-bars"></i>
             </button>
             <h1 class="header-title">
@@ -79,14 +79,14 @@ require_once __DIR__. '/includes/menu.php';
                 </a>
             </div>
         </div>
-        
+
         <div class="card">
             <div class="card-header">
                 <h3>Список контактов</h3>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="data-table">
+                    <table class="data-table responsive-table">
                         <thead>
                             <tr>
                                 <th>ID</th>
@@ -107,8 +107,8 @@ require_once __DIR__. '/includes/menu.php';
                             foreach ($contacts as $row):
                             ?>
                             <tr>
-                                <td><?php echo $row['id']; ?></td>
-                                <td>
+                                <td data-label="ID"><?php echo $row['id']; ?></td>
+                                <td data-label="Тип">
                                     <span class="badge badge-<?php echo $row['contact_type']; ?>">
                                         <?php 
                                         $typeNames = [
@@ -123,27 +123,27 @@ require_once __DIR__. '/includes/menu.php';
                                         ?>
                                     </span>
                                 </td>
-                                <td><?php echo htmlspecialchars($row['title']); ?></td>
-                                <td><?php echo htmlspecialchars($row['value']); ?></td>
-                                <td>
+                                <td data-label="Название"><?php echo htmlspecialchars($row['title']); ?></td>
+                                <td data-label="Значение"><?php echo htmlspecialchars($row['value']); ?></td>
+                                <td data-label="Иконка">
                                     <?php if ($row['icon']): ?>
                                     <i class="fas fa-<?php echo $row['icon']; ?>"></i>
                                     <?php endif; ?>
                                 </td>
-                                <td><?php echo $row['sort_order']; ?></td>
-                                <td>
+                                <td data-label="Сортировка"><?php echo $row['sort_order']; ?></td>
+                                <td data-label="Статус">
                                     <span class="status-badge <?php echo $row['is_active'] ? 'active' : 'inactive'; ?>">
                                         <?php echo $row['is_active'] ? 'Активен' : 'Неактивен'; ?>
                                     </span>
                                 </td>
-                                <td>
+                                <td data-label="Действия">
                                     <div class="action-buttons">
                                         <a href="contacts.php?action=edit&id=<?php echo $row['id']; ?>" class="btn btn-sm btn-edit">
                                             <i class="fas fa-edit"></i>
                                         </a>
                                         <a href="contacts.php?action=delete&id=<?php echo $row['id']; ?>" 
-                                           class="btn btn-sm btn-delete" 
-                                           onclick="return confirm('Удалить этот контакт?')">
+                                        class="btn btn-sm btn-delete" 
+                                        onclick="return confirm('Удалить этот контакт?')">
                                             <i class="fas fa-trash"></i>
                                         </a>
                                     </div>

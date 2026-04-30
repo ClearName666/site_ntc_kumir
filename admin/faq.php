@@ -53,7 +53,7 @@ require_once __DIR__. '/includes/menu.php';
     <!-- Шапка -->
     <header class="header">
         <div class="header-left">
-            <button class="toggle-sidebar" id="toggleSidebar">
+            <button class="toggle-sidebar" id="toggleSidebar"  style="display: none;">
                 <i class="fas fa-bars"></i>
             </button>
             <h1 class="header-title">
@@ -85,7 +85,7 @@ require_once __DIR__. '/includes/menu.php';
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="data-table">
+                    <table class="data-table responsive-table">
                         <thead>
                             <tr>
                                 <th>ID</th>
@@ -105,25 +105,25 @@ require_once __DIR__. '/includes/menu.php';
                             foreach ($faqs as $row):
                             ?>
                             <tr>
-                                <td><?php echo $row['id']; ?></td>
-                                <td><?php echo htmlspecialchars($row['question']); ?></td>
-                                <td>
+                                <td data-label="ID"><?php echo $row['id']; ?></td>
+                                <td data-label="Вопрос"><?php echo htmlspecialchars($row['question']); ?></td>
+                                <td data-label="Категория">
                                     <span class="category-badge"><?php echo htmlspecialchars($row['category']); ?></span>
                                 </td>
-                                <td><?php echo htmlspecialchars(safeSubstr($row['answer'], 0, 50)) . '...'; ?></td>
-                                <td><?php echo $row['sort_order']; ?></td>
-                                <td>
+                                <td data-label="Ответ"><?php echo htmlspecialchars(safeSubstr($row['answer'], 0, 50)) . '...'; ?></td>
+                                <td data-label="Сортировка"><?php echo $row['sort_order']; ?></td>
+                                <td data-label="Статус">
                                     <span class="status-badge <?php echo $row['is_active'] ? 'active' : 'inactive'; ?>">
                                         <?php echo $row['is_active'] ? 'Активен' : 'Неактивен'; ?>
                                     </span>
                                 </td>
-                                <td>
+                                <td data-label="Действия">
                                     <div class="action-buttons">
                                         <a href="faq.php?action=edit&id=<?php echo $row['id']; ?>" class="btn btn-sm btn-edit">
                                             <i class="fas fa-edit"></i>
                                         </a>
                                         <a href="faq.php?action=delete&id=<?php echo $row['id']; ?>" 
-                                           class="btn btn-sm btn-delete">
+                                        class="btn btn-sm btn-delete">
                                             <i class="fas fa-trash"></i>
                                         </a>
                                     </div>

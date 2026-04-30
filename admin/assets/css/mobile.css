@@ -1,0 +1,169 @@
+/* ==========================================================================
+   АДАПТИВНЫЕ ТАБЛИЦЫ (MOBILE-FIRST CARDS)
+   Преобразует таблицы в карточки на мобильных устройствах
+   ========================================================================== */
+
+/* Базовый класс для адаптивной таблицы */
+.responsive-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+/* Десктопная версия - обычная таблица */
+@media (min-width: 769px) {
+    .responsive-table {
+        display: table;
+    }
+}
+
+/* Мобильная версия - карточки */
+@media (max-width: 768px) {
+    .responsive-table,
+    .responsive-table thead,
+    .responsive-table tbody,
+    .responsive-table tr,
+    .responsive-table th,
+    .responsive-table td {
+        display: block;
+    }
+    
+    /* Скрываем заголовки таблицы */
+    .responsive-table thead {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+    }
+    
+    /* Каждая строка становится карточкой */
+    .responsive-table tr {
+        margin-bottom: 20px;
+        border: 1px solid var(--border-color, #dee2e6);
+        border-radius: 12px;
+        background: white;
+        box-shadow: var(--shadow, 0 2px 8px rgba(0,0,0,0.08));
+        overflow: hidden;
+        transition: var(--transition, all 0.3s ease);
+    }
+    
+    .responsive-table tr:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-large, 0 8px 20px rgba(0,0,0,0.12));
+    }
+    
+    /* Ячейка становится строчным блоком */
+    .responsive-table td {
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--border-color, #eee);
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        font-size: 14px;
+    }
+    
+    /* Убираем нижнюю границу у последней ячейки */
+    .responsive-table td:last-child {
+        border-bottom: none;
+    }
+    
+    /* Псевдоэлемент для подписи поля (берем из data-label) */
+    .responsive-table td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        min-width: 100px;
+        color: var(--secondary-color, #2c3e50);
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    /* Стили для блоков действий в карточке */
+    .responsive-table td .action-buttons {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-start;
+    }
+    
+    /* Стили для статус-бейджей в карточке */
+    .responsive-table td .status-badge {
+        display: inline-block;
+    }
+    
+    /* Обрезаем длинные сообщения */
+    .responsive-table td div {
+        max-width: 100% !important;
+    }
+    
+    /* Стили для ссылок и кнопок в карточке */
+    .responsive-table td a,
+    .responsive-table td button {
+        white-space: nowrap;
+    }
+}
+
+/* Для очень маленьких экранов (до 480px) */
+@media (max-width: 480px) {
+    .responsive-table td {
+        flex-direction: column;
+        gap: 6px;
+        padding: 12px;
+    }
+    
+    .responsive-table td::before {
+        min-width: auto;
+        margin-bottom: 4px;
+    }
+    
+    .responsive-table td .action-buttons {
+        justify-content: flex-start;
+        margin-top: 5px;
+    }
+
+    .user-info {
+        display: none;
+    }
+}
+
+/* Стили для непрочитанных строк */
+.responsive-table tr.unread-row {
+    background-color: rgba(52, 152, 219, 0.05);
+    border-left: 3px solid var(--primary-color, #3498db);
+}
+
+/* Анимация появления карточек */
+@media (max-width: 768px) {
+    .responsive-table tr {
+        animation: cardFadeIn 0.3s ease-out;
+    }
+
+    .user-info {
+        display: none;
+    }
+    
+    /* Можно также уменьшить отступы в меню пользователя */
+    .user-menu {
+        gap: 5px;
+        padding: 5px;
+    }
+    
+    @keyframes cardFadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+}
+
+/* Для экранов от 481px до 768px - сокращенный текст */
+@media (min-width: 481px) and (max-width: 768px) {
+    .user-info span {
+        display: none; /* Скрываем роль, оставляем только имя */
+    }
+    
+    .user-info h4 {
+        font-size: 0.875rem; /* Уменьшаем размер имени */
+    }
+}
