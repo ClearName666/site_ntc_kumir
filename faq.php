@@ -106,6 +106,49 @@ $footerPath = __DIR__. '/includes/footer.php';
             </section>
             
             <!-- Форма своего вопроса -->
+            <section class="question-form-section">
+                <h2 class="form-title">Задайте свой вопрос</h2>
+                <form class="question-form" id="questionForm">
+                    <div class="form-group">
+                        <label class="form-label" for="question_name">Ваше имя *</label>
+                        <input type="text" id="question_name" name="name" class="form-input" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="question_email">Email *</label>
+                        <input type="email" id="question_email" name="email" class="form-input" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="question_category">Категория вопроса</label>
+                        <select id="question_category" name="category" class="form-input">
+                            <option value="">Выберите категорию</option>
+                            <?php foreach ($categories as $category): ?>
+                                <option value="<?= htmlspecialchars($category) ?>">
+                                    <?= htmlspecialchars($category) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="question_text">Ваш вопрос *</label>
+                        <textarea id="question_text" name="question" class="form-textarea" required></textarea>
+                    </div>
+
+                    <div class="custom-checkbox-wrapper">
+                        <label class="custom-checkbox-label">
+                            <input type="checkbox" name="agreement" required>
+                            <span class="checkmark"></span>
+                            <span class="label-text">
+                                Я согласен с <a href="/privacy.php" target="_blank"">политикой конфиденциальности</a> *
+                            </span>
+                        </label>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">Задать вопрос</button>
+                </form>
+            </section>
         </div>
     </section>
     

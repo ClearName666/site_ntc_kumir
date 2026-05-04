@@ -125,7 +125,55 @@ $mapLng = $mainOffice ? $mainOffice['longitude'] : 104.278817;
             </section><br>
             
             <!-- Форма обратной связи -->
-            <!-- Сделать импорт -->
+            <section class="contact-form-section">
+                <h2 class="form-title">Обратная связь</h2>
+                <form class="contact-form" id="contactForm">
+                    
+                    <input type="hidden" name="action" value="send_feedback">
+
+                    <div class="form-group">
+                        <label class="form-label" for="name">Ваше имя *</label>
+                        <input type="text" id="name" name="name" class="form-input" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="email">Email *</label>
+                        <input type="email" id="email" name="email" class="form-input" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="phone">Телефон</label>
+                        <input type="tel" id="phone" name="phone" class="form-input">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="subject">Тема обращения</label>
+                        <select id="subject" name="subject" class="form-input">
+                            <option value="">Выберите тему</option>
+                            <option value="general">Общий вопрос</option>
+                            <option value="technical">Техническая поддержка</option>
+                            <option value="commercial">Коммерческое предложение</option>
+                            <option value="partnership">Сотрудничество</option>
+                            <option value="other">Другое</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="message">Сообщение *</label>
+                        <textarea id="message" name="message" class="form-textarea" required></textarea>
+                    </div>
+                    <div class="custom-checkbox-wrapper">
+                        <label class="custom-checkbox-label">
+                            <input type="checkbox" name="agreement" required>
+                            <span class="checkmark"></span>
+                            <span class="label-text">
+                                Я согласен с <a href="/privacy.php" target="_blank">политикой конфиденциальности</a> *
+                            </span>
+                        </label>
+                    </div>
+                    <button type="submit" class="submit-btn">Отправить сообщение</button>
+                </form>
+            </section>
         </div>
     </section>
     

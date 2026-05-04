@@ -16,6 +16,7 @@ $conn = getDBConnection();
                             echo '<li><a href="' . $row['url'] . '">' . trim($row['title']) . '</a></li>';
                         }
                         ?>
+                        <li><a href="/../privacy.php">Политика обработки персональных данных</a></li>
                     </ul>
                 </div>
                 
