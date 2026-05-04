@@ -137,9 +137,7 @@ $footerPath = 'includes/footer.php';
                                 <div class="product-availability">
                                     <?= $productData['is_available'] ? 'В наличии' : 'Под заказ' ?>
                                 </div>
-                                <button class="request-button open-kp-modal" data-product="<?= htmlspecialchars($productData['name']) ?>">
-                                    Запросить КП →
-                                </button>
+                                <!--тут должна быть кнопка запросить кп-->
                             </div>
                             
                             <!-- Спецификации -->
@@ -277,47 +275,5 @@ $footerPath = 'includes/footer.php';
     <script src="assets/js/products.js"></script>
 </body>
 
-<div id="kpModal" class="modal">
-    <div class="modal-content">
-        <span class="close-modal">&times;</span>
-        <div class="modal-header">
-            <h3>Запрос коммерческого предложения</h3>
-            <p id="modalProductName">Товар: <?= htmlspecialchars($productData['name'] ?? '') ?></p>
-        </div>
-        <form id="kpForm" class="modal-form">
-            <input type="hidden" name="product_name" id="kpProductInput" value="<?= htmlspecialchars($productData['name'] ?? '') ?>">
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="kp_name">Ваше имя *</label>
-                    <input type="text" id="kp_name" name="name" placeholder="Иван Иванов" required>
-                </div>
-                <div class="form-group">
-                    <label for="kp_phone">Телефон *</label>
-                    <input type="tel" id="kp_phone" name="phone" placeholder="+7 (___) ___-__-__" required>
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="kp_email">Email</label>
-                    <input type="email" id="kp_email" name="email" placeholder="example@mail.ru">
-                </div>
-                <div class="form-group">
-                    <label for="kp_quantity">Количество (шт.)</label>
-                    <input type="number" id="kp_quantity" name="quantity" value="1" min="1">
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="kp_message">Комментарий к заказу</label>
-                <textarea id="kp_message" name="message" rows="3" placeholder="Укажите дополнительные пожелания или реквизиты организации"></textarea>
-            </div>
-
-            <button type="submit" class="submit-kp-btn">Отправить запрос</button>
-            <p class="form-note">* — поля, обязательные для заполнения</p>
-        </form>
-    </div>
-</div>
-
+<!--тут должна быть модальное окно-->
 </html>
