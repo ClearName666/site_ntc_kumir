@@ -158,28 +158,29 @@ require_once __DIR__. '/includes/menu.php';
                 </button>
             </div>
         </section>
-
-        <section class="recent-activity">
-            <h2 class="section-title"><i class="fas fa-history"></i> Последние действия</h2>
-            <div class="activity-list">
-                <?php if (!empty($recentLogs)): ?>
-                    <?php foreach ($recentLogs as $log): ?>
-                        <div class="activity-item">
-                            <div class="activity-icon">
-                                <i class="fas <?php echo getLogIcon($log['action']); ?>"></i>
+        <?php if (hasPermission($conn, 'superadmin')): ?>
+            <section class="recent-activity">
+                <h2 class="section-title"><i class="fas fa-history"></i> Последние действия</h2>
+                <div class="activity-list">
+                    <?php if (!empty($recentLogs)): ?>
+                        <?php foreach ($recentLogs as $log): ?>
+                            <div class="activity-item">
+                                <div class="activity-icon">
+                                    <i class="fas <?php echo getLogIcon($log['action']); ?>"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title"><?php echo htmlspecialchars($log['username'] ?? 'Система'); ?></div>
+                                    <div class="activity-desc"><?php echo htmlspecialchars($log['description'] ?? $log['action']); ?></div>
+                                </div>
+                                <div class="activity-time"><?php echo date('d.m.Y H:i', strtotime($log['created_at'])); ?></div>
                             </div>
-                            <div class="activity-content">
-                                <div class="activity-title"><?php echo htmlspecialchars($log['username'] ?? 'Система'); ?></div>
-                                <div class="activity-desc"><?php echo htmlspecialchars($log['description'] ?? $log['action']); ?></div>
-                            </div>
-                            <div class="activity-time"><?php echo date('d.m.Y H:i', strtotime($log['created_at'])); ?></div>
-                        </div>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <p>Нет последних действий</p>
-                <?php endif; ?>
-            </div>
-        </section>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <p>Нет последних действий</p>
+                    <?php endif; ?>
+                </div>
+            </section>
+        <?php endif; ?>
     </div>
     
 </div>
