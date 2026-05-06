@@ -17,9 +17,9 @@ $isAdmin = isset($_SESSION['admin_id']);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo getSetting($conn, 'site_title'); ?></title>
-    <link rel="stylesheet" href="assets/css/style.css?version=<?php echo $version_code; ?>">
-    <link rel="stylesheet" href="assets/css/responsive.css?version=<?php echo $version_code; ?>">
-    <link rel="stylesheet" href="assets/css/header.css?version=<?php echo $version_code; ?>">
+    <link rel="stylesheet" href="/assets/css/style.css?version=<?php echo $version_code; ?>">
+    <link rel="stylesheet" href="/assets/css/responsive.css?version=<?php echo $version_code; ?>">
+    <link rel="stylesheet" href="/assets/css/header.css?version=<?php echo $version_code; ?>">
     <link rel="icon" href="<?php echo getSetting($conn, 'favicon_path'); ?>" type="image/x-icon">
 </head>
 <body>
@@ -28,7 +28,7 @@ $isAdmin = isset($_SESSION['admin_id']);
             <div class="header-content">
                 <!-- Логотип -->
                 <a href="/index.php" class="logo">
-                    <img src="<?php echo getSetting($conn, 'logo_path'); ?>" alt="<?php echo getSetting($conn, 'company_name'); ?>">
+                    <img src="/<?php echo getSetting($conn, 'logo_path'); ?>" alt="<?php echo getSetting($conn, 'company_name'); ?>">
                 </a>
                 
                 <!-- Основная навигация -->

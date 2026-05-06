@@ -7,6 +7,7 @@ require_once __DIR__. '/config/config.php';
 // подключаемся к базе 
 $conn = getDBConnection();
 
+
 // Определяем пути
 $headerPath = __DIR__. '/includes/header.php';
 $footerPath = __DIR__. '/includes/footer.php';
@@ -18,8 +19,8 @@ $footerPath = __DIR__. '/includes/footer.php';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>404 — Страница ушла на кофе</title>
-    <!-- Ваши стили -->
-    <link rel="stylesheet" href="assets/css/faq.css?version=<?php echo $version_code; ?>">
+    <!-- стили -->
+    <link rel="stylesheet" href="/assets/css/faq.css?version=<?php echo $version_code; ?>">
     <style>
         body {
             font-family: 'Segoe UI', 'Arial', sans-serif;
@@ -140,6 +141,7 @@ $footerPath = __DIR__. '/includes/footer.php';
 <body>
     <!-- Header -->
     <?php include $headerPath; ?>
+
     <div class="error-page">
         <div class="creative-card">
             <!-- Забавная иконка "документ убежал" -->
@@ -161,6 +163,7 @@ $footerPath = __DIR__. '/includes/footer.php';
             </div>
         </div>
     </div>
+
     <!-- Footer -->
     <?php include $footerPath; ?>
 </body>
