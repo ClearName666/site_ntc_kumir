@@ -6,6 +6,7 @@ require_once __DIR__. '/config/config.php';
 
 // подключаемся к базе 
 $conn = getDBConnection();
+$showForm = (getSetting($conn, 'form_view') == 1);
 
 // --- БЛОК ОБРАБОТКИ AJAX ЗАПРОСА ---
 if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest') {
@@ -106,6 +107,7 @@ $footerPath = __DIR__. '/includes/footer.php';
             </section>
             
             <!-- Форма своего вопроса -->
+              <?php if ($showForm): ?>
             <section class="question-form-section">
                 <h2 class="form-title">Задайте свой вопрос</h2>
                 <form class="question-form" id="questionForm">
@@ -149,6 +151,7 @@ $footerPath = __DIR__. '/includes/footer.php';
                     <button type="submit" class="submit-btn">Задать вопрос</button>
                 </form>
             </section>
+             <?php endif; ?>
         </div>
     </section>
     

@@ -6,6 +6,7 @@ require_once __DIR__. '/config/config.php';
 
 // подключаемся к базе 
 $conn = getDBConnection();
+$showForm = (getSetting($conn, 'form_view') == 1);
 
 if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest' && isset($_POST['phone'])) {
     header('Content-Type: application/json');
@@ -137,9 +138,11 @@ $footerPath = 'includes/footer.php';
                                 <div class="product-availability">
                                     <?= $productData['is_available'] ? 'В наличии' : 'Под заказ' ?>
                                 </div>
+                                <?php if ($showForm): ?>
                                 <button class="request-button open-kp-modal" data-product="<?= htmlspecialchars($productData['name']) ?>">
                                     Запросить КП →
                                 </button>
+                                 <?php endif; ?>
                             </div>
                             
                             <!-- Спецификации -->
@@ -277,6 +280,7 @@ $footerPath = 'includes/footer.php';
     <script src="assets/js/products.js"></script>
 </body>
 
+<?php if ($showForm): ?>
 <div id="kpModal" class="modal">
     <div class="modal-content">
         <span class="close-modal">&times;</span>
@@ -330,6 +334,6 @@ $footerPath = 'includes/footer.php';
         </form>
     </div>
 </div>
-
+<?php endif; ?>
 <!--тут должна быть модальное окно-->
 </html>

@@ -36,6 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 $contacts = getContactsByType($conn);
 $offices = getOffices($conn);
 $mainOffice = getMainOffice($conn);
+$showForm = (getSetting($conn, 'form_view') == 1);
 
 // Устанавливаем мета-данные
 $pageTitle = 'Контакты - ' . getSetting($conn, 'site_title');
@@ -125,6 +126,7 @@ $mapLng = $mainOffice ? $mainOffice['longitude'] : 104.278817;
             </section><br>
             
             <!-- Форма обратной связи -->
+             <?php if ($showForm): ?>
             <section class="contact-form-section">
                 <h2 class="form-title">Обратная связь</h2>
                 <form class="contact-form" id="contactForm">
@@ -174,6 +176,7 @@ $mapLng = $mainOffice ? $mainOffice['longitude'] : 104.278817;
                     <button type="submit" class="submit-btn">Отправить сообщение</button>
                 </form>
             </section>
+            <?php endif; ?>
         </div>
     </section>
     
