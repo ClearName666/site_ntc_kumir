@@ -6,7 +6,7 @@ require_once __DIR__. '/config/config.php';
 
 // подключаемся к базе 
 $conn = getDBConnection();
-
+$mainBg = getImage($conn, 'image_background_all');
 
 // Определяем пути
 $headerPath = __DIR__. '/includes/header.php';
@@ -30,7 +30,6 @@ $footerPath = __DIR__. '/includes/footer.php';
             position: relative;
             z-index: 0;
             min-height: 100vh;
-            background: url('/static/background.jpg') center/cover no-repeat fixed;
         }
         /* Дополнительные стили для деловой креативной 404 */
         .error-page {
@@ -138,7 +137,7 @@ $footerPath = __DIR__. '/includes/footer.php';
         }
     </style>
 </head>
-<body>
+<body style="background: url('<?php echo $mainBg['image_path']; ?>') center/cover no-repeat fixed;">
     <!-- Header -->
     <?php include $headerPath; ?>
 

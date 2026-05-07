@@ -7,9 +7,8 @@ require_once __DIR__. '/config/config.php';
 
 // подключаемся к базе 
 $conn = getDBConnection();
-
 $mainTitle = getContentBlock($conn, 'main_title');
-$mainBg = getImage($conn, 'main_background');
+$mainBgStart = getImage($conn, 'main_background');
 $heroImage = getImage($conn, 'hero_foreground');
 $mapLocation = getMapLocation($conn);
 
@@ -21,7 +20,7 @@ require_once __DIR__. '/includes/header.php';
     <!-- Hero Section - обновляем верхний отступ -->
     <section class="hero">
         <div class="hero-background">
-            <img src="<?php echo $mainBg['image_path']; ?>" alt="<?php echo $mainBg['alt_text']; ?>">
+            <img src="<?php echo $mainBgStart['image_path']; ?>" alt="<?php echo $mainBgStart['alt_text']; ?>">
         </div>
         
         <div class="container">
@@ -50,22 +49,22 @@ require_once __DIR__. '/includes/header.php';
                         </div>
                     </div>
                     
-                    <div class="hero-visual">
-                        <div class="hero-image-container">
-                            <img src="<?php echo $heroImage['image_path']; ?>" alt="<?php echo $heroImage['alt_text']; ?>" class="hero-image">
-                            <div class="map-overlay">
-                                <div class="map-content">
-                                    <div class="map-icon">
-                                        📍
-                                    </div>
-                                    <div class="map-text map-text-location">
-                                        <h3>«НТЦ «КУМИР» на карте</h3>
-                                        <p>№<?php echo $mapLocation['latitude']; ?>, E<?php echo $mapLocation['longitude']; ?></p>
+                    <a href="contacts.php#map-location" class="hero-link-wrapper" style="text-decoration: none; color: inherit; display: block;">
+                        <div class="hero-visual">
+                            <div class="hero-image-container">
+                                <img src="<?php echo $heroImage['image_path']; ?>" alt="<?php echo $heroImage['alt_text']; ?>" class="hero-image">
+                                <div class="map-overlay">
+                                    <div class="map-content">
+                                        <div class="map-icon">📍</div>
+                                        <div class="map-text map-text-location">
+                                            <h3>«НТЦ «КУМИР» на карте</h3>
+                                            <p>N<?php echo $mapLocation['latitude']; ?>, E<?php echo $mapLocation['longitude']; ?></p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </a>
                 </div>
             </div>
         </div>

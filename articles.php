@@ -5,7 +5,7 @@ require_once __DIR__. '/config/config.php';
 
 // подключаемся к базе 
 $conn = getDBConnection();
-
+$mainBg = getImage($conn, 'image_background_all');
 // Проверяем, запрошена ли конкретная статья
 $article = null;
 if (isset($_GET['article']) && !empty($_GET['article'])) {
@@ -70,7 +70,7 @@ $footerPath = __DIR__. '/includes/footer.php';
 </head>
 <body style="<?php if (!empty($article['image_path'])): ?>
     background: url('<?= htmlspecialchars($article['image_path']) ?>') center/cover no-repeat fixed;
-<?php else: ?>background: url('/static/background.jpg') center/cover no-repeat fixed;<?php endif; ?>">
+<?php else: ?>background: url('<?php echo $mainBg['image_path']; ?>') center/cover no-repeat fixed;<?php endif; ?>">
     <!-- Header -->
     <?php include $headerPath; ?>
     

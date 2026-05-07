@@ -246,7 +246,7 @@ body::after {
    СТРАНИЦА ОТДЕЛЬНОЙ СТАТЬИ
    ======================================== */
 .article-container {
-    max-width: 900px;
+    max-width: 1400px;
     margin: 0 auto;
     border-radius: var(--border-radius-lg);
     overflow: hidden;

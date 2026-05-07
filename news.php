@@ -5,7 +5,7 @@ require_once __DIR__. '/config/config.php';
 
 // подключаемся к базе 
 $conn = getDBConnection();
-
+$mainBg = getImage($conn, 'image_background_all');
 // Настройки пагинации
 $newsPerPage = 6;
 $currentPage = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
@@ -71,10 +71,10 @@ $footerPath = __DIR__. '/includes/footer.php';
     <!-- Стили для страницы новостей -->
     <link rel="stylesheet" href="assets/css/news.css?version=<?php echo $version_code; ?>">
 
-</head>
+</head> 
 <body style="<?php if (!empty($newsItem['image_path'])): ?>
     background: url('<?= htmlspecialchars($newsItem['image_path']) ?>') center/cover no-repeat fixed;
-<?php else: ?>background: url('/static/background.jpg') center/cover no-repeat fixed;<?php endif; ?>">
+<?php else: ?>background: url('<?php echo $mainBg['image_path']; ?>') center/cover no-repeat fixed;<?php endif; ?>">
     <!-- Header -->
     <!-- Header -->
     <?php include $headerPath; ?>

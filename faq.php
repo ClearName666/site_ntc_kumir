@@ -35,6 +35,7 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'
 $categories = getFAQCategories($conn);
 $selectedCategory = isset($_GET['category']) ? $_GET['category'] : null;
 $faqItems = getFAQ($conn, $selectedCategory);
+$mainBg = getImage($conn, 'image_background_all');
 
 // Устанавливаем мета-данные
 $pageTitle = 'Вопрос-ответ - ' . getSetting($conn, 'site_title');
@@ -65,7 +66,7 @@ $footerPath = __DIR__. '/includes/footer.php';
     <link rel="stylesheet" href="assets/css/faq.css?version=<?php echo $version_code; ?>">
     
 </head>
-<body style="background: url('/static/background.jpg') center/cover no-repeat fixed;">
+<body style="background: url('<?php echo $mainBg['image_path']; ?>') center/cover no-repeat fixed;">
     <!-- Header -->
     <?php include $headerPath; ?>
     

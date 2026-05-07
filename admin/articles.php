@@ -299,6 +299,9 @@ require_once __DIR__. '/includes/menu.php';
                 <button class="builder-btn builder-btn-primary" onclick="addSliderBlock()">
                     <i class="fas fa-images"></i> Слайдер
                 </button>
+                <button class="builder-btn builder-btn-primary" onclick="addListBlock()">
+                    <i class="fas fa-list-ul"></i> Перечисление
+                </button>
                 <button class="builder-btn builder-btn-danger" onclick="clearAllBlocks()">
                     <i class="fas fa-trash-alt"></i> Очистить всё
                 </button>
@@ -310,7 +313,9 @@ require_once __DIR__. '/includes/menu.php';
         </div>
     </div>
 </div>
-
+<script>
+    window.isNewArticle = <?php echo $action === 'add' ? 'true' : 'false'; ?>;
+</script>
 <script src="assets/js/redactor.js"></script>
 <script src="assets/js/articles.js"></script>
 <script src="assets/js/scripts.js"></script>

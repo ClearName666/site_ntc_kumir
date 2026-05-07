@@ -207,7 +207,7 @@ require_once __DIR__. '/includes/menu.php';
                                 <i class="fas fa-pen"></i> Редактор блоков
                             </button>
                         </label>
-                        <textarea id="content" name="content" rows="10" required><?php echo htmlspecialchars($article['content'] ?? ''); ?></textarea>
+                        <textarea id="content" name="content" rows="10" required><?php echo htmlspecialchars($news['content'] ?? ''); ?></textarea>
                     </div>
                     
                     <div class="form-row">
@@ -292,6 +292,9 @@ require_once __DIR__. '/includes/menu.php';
                 <button class="builder-btn builder-btn-primary" onclick="addSliderBlock()">
                     <i class="fas fa-images"></i> Слайдер
                 </button>
+                <button class="builder-btn builder-btn-primary" onclick="addListBlock()">
+                    <i class="fas fa-list-ul"></i> Перечисление
+                </button>
                 <button class="builder-btn builder-btn-danger" onclick="clearAllBlocks()">
                     <i class="fas fa-trash-alt"></i> Очистить всё
                 </button>
@@ -303,7 +306,9 @@ require_once __DIR__. '/includes/menu.php';
         </div>
     </div>
 </div>
-
+<script>
+    window.isNewArticle = <?php echo $action === 'add' ? 'true' : 'false'; ?>;
+</script>
 <script src="assets/js/redactor.js"></script>
 <script src="assets/js/news.js"></script>
 <script src="assets/js/scripts.js"></script>

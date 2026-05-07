@@ -6,7 +6,7 @@ require_once __DIR__. '/config/config.php';
 
 // подключаемся к базе 
 $conn = getDBConnection();
-
+$mainBg = getImage($conn, 'image_background_all');
 // --- БЛОК ОБРАБОТКИ ФОРМЫ ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'send_feedback') {
     header('Content-Type: application/json');
@@ -74,7 +74,7 @@ $mapLng = $mainOffice ? $mainOffice['longitude'] : 104.278817;
     <link rel="stylesheet" href="assets/css/contacts.css?version=<?php echo $version_code; ?>">
 
 </head>
-<body style="background: url('/static/background.jpg') center/cover no-repeat fixed;">
+<body style="background: url('<?php echo $mainBg['image_path']; ?>') center/cover no-repeat fixed;">
     <!-- Header -->
     <?php include $headerPath; ?>
     
@@ -95,7 +95,7 @@ $mapLng = $mainOffice ? $mainOffice['longitude'] : 104.278817;
             </section>
             
             <!-- Карта -->
-            <section class="map-section">
+            <section class="map-section" id="map-location">
                 <h2 class="section-title">Мы на карте</h2>
                 <div class="map-container">
                     <div id="yandex-map"></div>

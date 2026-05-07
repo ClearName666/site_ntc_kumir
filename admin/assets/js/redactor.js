@@ -2,9 +2,20 @@
 
 let articleBuilder = null;
 
+function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
+    });
+}
+
 class ArticleBuilder {
     constructor(existingContent = null) {
         this.blocks = [];
+        this.dragSourceIndex = null; // для перетаскивания через ручку
         this.load(existingContent);
         this.render();
     }
@@ -24,17 +35,77 @@ class ArticleBuilder {
     
     parseExistingContent(html) {
         this.blocks = [];
-        
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = html;
         
-        // Поиск слайдеров
-        const sliders = tempDiv.querySelectorAll('.article-slider');
-        if (sliders.length > 0) {
-            sliders.forEach(slider => {
+        // Ищем главную сетку блоков
+        let grid = tempDiv.querySelector('.article-builder-grid');
+        if (!grid) {
+            const text = tempDiv.innerHTML.trim();
+            if (text) {
+                this.blocks.push({
+                    id: Date.now(),
+                    type: 'text',
+                    content: text,
+                    fontSize: 16,
+                    glassFrame: false,
+                    wide: false
+                });
+            }
+            return;
+        }
+        
+        // Проходим по всем дочерним элементам сетки строго по порядку
+        const children = Array.from(grid.children);
+        for (const child of children) {
+            if (child.classList.contains('article-builder-block')) {
+                // Может быть list-block, image-block, или обычный
+                if (child.classList.contains('list-block')) {
+                    const titleEl = child.querySelector('.list-title');
+                    const title = titleEl ? titleEl.innerText : 'Список';
+                    const items = Array.from(child.querySelectorAll('.styled-list li')).map(li => li.innerText);
+                    this.blocks.push({
+                        id: Date.now() + Math.random(),
+                        type: 'list',
+                        title: title,
+                        items: items,
+                        glassFrame: child.classList.contains('glass-frame'),
+                        wide: child.classList.contains('block-wide')
+                    });
+                } else if (child.classList.contains('image-block')) {
+                    const img = child.querySelector('img');
+                    if (img && img.src) {
+                        this.blocks.push({
+                            id: Date.now() + Math.random(),
+                            type: 'image',
+                            imageUrl: img.src,
+                            glassFrame: false,
+                            wide: child.classList.contains('block-wide')
+                        });
+                    }
+                } else {
+                    // Обычный текстовый блок
+                    let fontSize = 16;
+                    const styleAttr = child.getAttribute('style');
+                    if (styleAttr) {
+                        const match = styleAttr.match(/font-size:\s*(\d+)px/);
+                        if (match) fontSize = parseInt(match[1]);
+                    }
+                    this.blocks.push({
+                        id: Date.now() + Math.random(),
+                        type: 'text',
+                        content: child.innerHTML,
+                        imageUrl: null,
+                        glassFrame: child.classList.contains('glass-frame'),
+                        wide: child.classList.contains('block-wide'),
+                        fontSize: fontSize
+                    });
+                }
+            } else if (child.classList.contains('article-slider')) {
+                // Слайдер
                 const images = [];
-                const imgElements = slider.querySelectorAll('img');
-                imgElements.forEach(img => {
+                const imgs = child.querySelectorAll('img');
+                imgs.forEach(img => {
                     if (img.src) images.push(img.src);
                 });
                 this.blocks.push({
@@ -42,60 +113,10 @@ class ArticleBuilder {
                     type: 'slider',
                     images: images,
                     glassFrame: false,
-                    wide: slider.classList.contains('block-wide')
+                    wide: child.classList.contains('block-wide')
                 });
-            });
+            }
         }
-        
-        const blockSelectors = [
-            '.article-builder-block',
-            '.generated-block',
-            '.builder-block-content'
-        ];
-        
-        let foundBlocks = [];
-        for (const selector of blockSelectors) {
-            foundBlocks = tempDiv.querySelectorAll(selector);
-            if (foundBlocks.length > 0) break;
-        }
-        
-        if (foundBlocks.length > 0) {
-            foundBlocks.forEach(block => {
-                const img = block.querySelector('img');
-                const hasGlass = block.classList.contains('glass-frame');
-                const isWide = block.classList.contains('block-wide');
-                
-                if (img && img.src) {
-                    this.blocks.push({
-                        id: Date.now() + Math.random(),
-                        type: 'image',
-                        content: null,
-                        imageUrl: img.src,
-                        glassFrame: hasGlass,
-                        wide: isWide
-                    });
-                } else {
-                    this.blocks.push({
-                        id: Date.now() + Math.random(),
-                        type: 'text',
-                        content: block.innerHTML,
-                        imageUrl: null,
-                        glassFrame: hasGlass,
-                        wide: isWide
-                    });
-                }
-            });
-        } else if (tempDiv.innerHTML.trim() && !tempDiv.innerHTML.includes('article-builder')) {
-            this.blocks.push({
-                id: Date.now(),
-                type: 'text',
-                content: tempDiv.innerHTML,
-                imageUrl: null,
-                glassFrame: false,
-                wide: false
-            });
-        }
-        
         this.save();
     }
     
@@ -104,15 +125,22 @@ class ArticleBuilder {
     }
     
     addBlock(type) {
-        const newBlock = {
-            id: Date.now(),
-            type: type,
-            content: type === 'text' ? '<p>Введите текст...</p>' : null,
-            imageUrl: null,
-            images: type === 'slider' ? [] : null,
-            glassFrame: false,
-            wide: false
-        };
+        let newBlock;
+        switch(type) {
+            case 'text':
+                newBlock = { id: Date.now(), type: 'text', content: '<p>Введите текст...</p>', imageUrl: null, glassFrame: false, wide: false, fontSize: 16 };
+                break;
+            case 'image':
+                newBlock = { id: Date.now(), type: 'image', content: null, imageUrl: null, glassFrame: false, wide: false };
+                break;
+            case 'slider':
+                newBlock = { id: Date.now(), type: 'slider', images: [], glassFrame: false, wide: false };
+                break;
+            case 'list':
+                newBlock = { id: Date.now(), type: 'list', title: 'Мой список', items: ['Элемент 1', 'Элемент 2'], glassFrame: false, wide: false };
+                break;
+            default: return;
+        }
         this.blocks.push(newBlock);
         this.save();
         this.render();
@@ -126,10 +154,8 @@ class ArticleBuilder {
     
     updateContent(id, content) {
         const block = this.blocks.find(b => b.id === id);
-        if (block) {
-            block.content = content;
-            this.save();
-        }
+        if (block) block.content = content;
+        this.save();
     }
     
     updateImage(id, imageUrl) {
@@ -152,15 +178,6 @@ class ArticleBuilder {
             } else {
                 this.showNotification('Максимум 10 изображений', 'error');
             }
-        }
-    }
-    
-    removeSliderImage(id, index) {
-        const block = this.blocks.find(b => b.id === id);
-        if (block && block.type === 'slider') {
-            block.images.splice(index, 1);
-            this.save();
-            this.render();
         }
     }
     
@@ -189,13 +206,23 @@ class ArticleBuilder {
             this.render();
         }
     }
+
+    setFontSize(blockId, size) {
+        const block = this.blocks.find(b => b.id === blockId);
+        if (block) {
+            block.fontSize = size;
+            this.save();
+        }
+        const editableDiv = document.querySelector(`[data-block-id="${blockId}"] .builder-editable`);
+        if (editableDiv) {
+            editableDiv.style.fontSize = size + 'px';
+        }
+    }
     
     formatText(blockId, command, value = null) {
         const editableDiv = document.querySelector(`[data-block-id="${blockId}"] .builder-editable`);
         if (!editableDiv) return;
-        
         editableDiv.focus();
-        
         if (command === 'removeFormat') {
             document.execCommand('removeFormat', false, null);
         } else if (command === 'formatBlock') {
@@ -203,23 +230,17 @@ class ArticleBuilder {
         } else {
             document.execCommand(command, false, null);
         }
-        
         const block = this.blocks.find(b => b.id === blockId);
         if (block) {
             block.content = editableDiv.innerHTML;
             this.save();
         }
-        
         editableDiv.focus();
     }
     
     compressImage(file) {
         return new Promise((resolve, reject) => {
-            if (!file) {
-                reject('Неверный файл');
-                return;
-            }
-            
+            if (!file) return reject('Неверный файл');
             if (file.type === 'image/svg+xml') {
                 const reader = new FileReader();
                 reader.onload = (e) => resolve(e.target.result);
@@ -227,137 +248,120 @@ class ArticleBuilder {
                 reader.readAsDataURL(file);
                 return;
             }
-            
-            if (!file.type.startsWith('image/')) {
-                reject('Неверный формат файла');
-                return;
-            }
-            
+            if (!file.type.startsWith('image/')) return reject('Неверный формат');
             const reader = new FileReader();
             reader.onload = (e) => {
                 const img = new Image();
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
-                    let width = img.width;
-                    let height = img.height;
-                    
-                    const maxWidth = 800;
-                    const maxHeight = 600;
-                    
-                    if (width > maxWidth) {
-                        height = (height * maxWidth) / width;
-                        width = maxWidth;
-                    }
-                    if (height > maxHeight) {
-                        width = (width * maxHeight) / height;
-                        height = maxHeight;
-                    }
-                    
-                    canvas.width = width;
-                    canvas.height = height;
+                    let width = img.width, height = img.height;
+                    const maxWidth = 800, maxHeight = 600;
+                    if (width > maxWidth) { height = (height * maxWidth) / width; width = maxWidth; }
+                    if (height > maxHeight) { width = (width * maxHeight) / height; height = maxHeight; }
+                    canvas.width = width; canvas.height = height;
                     const ctx = canvas.getContext('2d');
-                    
-                    if (file.type === 'image/png') {
-                        ctx.clearRect(0, 0, width, height);
-                    }
-                    
+                    if (file.type === 'image/png') ctx.clearRect(0, 0, width, height);
                     ctx.drawImage(img, 0, 0, width, height);
-                    
                     const format = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
                     const quality = file.type === 'image/png' ? 1 : 0.7;
-                    const base64 = canvas.toDataURL(format, quality);
-                    resolve(base64);
+                    resolve(canvas.toDataURL(format, quality));
                 };
-                img.onerror = () => reject('Ошибка загрузки изображения');
+                img.onerror = () => reject('Ошибка загрузки');
                 img.src = e.target.result;
             };
-            reader.onerror = () => reject('Ошибка чтения файла');
+            reader.onerror = () => reject('Ошибка чтения');
             reader.readAsDataURL(file);
         });
     }
     
     async handleImageUpload(blockId, file, isSlider = false) {
-        if (!file) {
-            this.showNotification('Пожалуйста, выберите изображение', 'error');
-            return;
-        }
-        
-        this.showNotification('Загрузка изображения...', 'info');
-        
+        if (!file) return this.showNotification('Выберите изображение', 'error');
+        this.showNotification('Загрузка...', 'info');
         try {
             const base64 = await this.compressImage(file);
-            if (isSlider) {
-                this.addSliderImage(blockId, base64);
-            } else {
-                this.updateImage(blockId, base64);
-            }
-            this.showNotification('Изображение успешно загружено!', 'success');
-        } catch(error) {
-            console.error('Ошибка загрузки:', error);
-            this.showNotification('Ошибка загрузки изображения', 'error');
+            if (isSlider) this.addSliderImage(blockId, base64);
+            else this.updateImage(blockId, base64);
+            this.showNotification('Успешно!', 'success');
+        } catch(e) {
+            this.showNotification('Ошибка загрузки', 'error');
         }
     }
     
-    showNotification(message, type = 'info') {
-        const notification = document.createElement('div');
-        notification.textContent = message;
-        notification.style.cssText = `
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            padding: 12px 20px;
-            background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6'};
-            color: white;
-            border-radius: 8px;
-            z-index: 10001;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            max-width: 300px;
-            font-size: 14px;
-        `;
-        document.body.appendChild(notification);
-        setTimeout(() => notification.remove(), 3000);
+    showNotification(msg, type) {
+        const n = document.createElement('div');
+        n.textContent = msg;
+        n.style.cssText = `position:fixed; bottom:20px; right:20px; padding:12px 20px; background:${type==='success'?'#10b981':type==='error'?'#ef4444':'#3b82f6'}; color:white; border-radius:8px; z-index:10001; max-width:300px; font-size:14px;`;
+        document.body.appendChild(n);
+        setTimeout(() => n.remove(), 3000);
     }
     
-    handleDragOver(e) {
+    handleDragOver(e) { e.preventDefault(); }
+    handleDrop(e, blockId, isSlider) {
         e.preventDefault();
-        e.stopPropagation();
-    }
-    
-    handleDrop(e, blockId, isSlider = false) {
-        e.preventDefault();
-        e.stopPropagation();
-        
         const files = e.dataTransfer.files;
-        if (files && files.length > 0) {
-            this.handleImageUpload(blockId, files[0], isSlider);
-        }
+        if (files.length) this.handleImageUpload(blockId, files[0], isSlider);
     }
     
-    selectImageFile(blockId, isSlider = false) {
+    selectImageFile(blockId, isSlider) {
         const input = document.createElement('input');
         input.type = 'file';
         input.accept = 'image/*';
         input.onchange = (e) => {
-            if (e.target.files && e.target.files[0]) {
-                this.handleImageUpload(blockId, e.target.files[0], isSlider);
-            }
+            if (e.target.files[0]) this.handleImageUpload(blockId, e.target.files[0], isSlider);
         };
         input.click();
+    }
+    
+    // Перетаскивание блоков через ручку
+    onDragStartHandle(e, index) {
+        this.dragSourceIndex = index;
+        e.dataTransfer.setData('text/plain', index);
+        e.dataTransfer.effectAllowed = 'move';
+        e.target.closest('.builder-block').style.opacity = '0.4';
+    }
+    
+    onDragOverBlock(e, targetIndex) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        const blockDiv = e.currentTarget;
+        blockDiv.style.boxShadow = '0 0 0 2px #3b82f6';
+    }
+    
+    onDragLeaveBlock(e) {
+        e.currentTarget.style.boxShadow = 'none';
+    }
+    
+    onDropOnBlock(e, targetIndex) {
+        e.preventDefault();
+        const blockDiv = e.currentTarget;
+        blockDiv.style.boxShadow = 'none';
+        if (this.dragSourceIndex !== null && this.dragSourceIndex !== targetIndex) {
+            const moved = this.blocks[this.dragSourceIndex];
+            this.blocks.splice(this.dragSourceIndex, 1);
+            this.blocks.splice(targetIndex, 0, moved);
+            this.save();
+            this.render();
+        }
+        this.dragSourceIndex = null;
+    }
+    
+    onDragEndHandle(e) {
+        const blockDiv = e.target.closest('.builder-block');
+        if (blockDiv) blockDiv.style.opacity = '';
+        this.dragSourceIndex = null;
+        // Сбросить тени у всех блоков
+        document.querySelectorAll('.builder-block').forEach(b => b.style.boxShadow = 'none');
     }
     
     render() {
         const grid = document.getElementById('blocksGrid');
         if (!grid) return;
-        
         grid.innerHTML = '';
-        
         if (this.blocks.length === 0) {
-            grid.innerHTML = `
-                <div style="grid-column: span 2; text-align: center; padding: 60px; color: #6b7280; background: #f9fafb; border-radius: 12px; border: 2px dashed #e5e7eb;">
-                    <i class="fas fa-plus-circle" style="font-size: 48px; margin-bottom: 16px; color: #3b82f6;"></i>
-                    <p>Нет блоков. Нажмите "Текстовый блок", "Блок изображения" или "Слайдер"</p>
-                </div>
-            `;
+            grid.innerHTML = `<div style="grid-column: span 2; text-align: center; padding: 60px; color: #6b7280; background: #f9fafb; border-radius: 12px; border: 2px dashed #e5e7eb;">
+                <i class="fas fa-plus-circle" style="font-size: 48px; margin-bottom: 16px; color: #3b82f6;"></i>
+                <p>Нет блоков. Добавьте текстовый блок, изображение, слайдер или перечисление</p>
+            </div>`;
             return;
         }
         
@@ -366,23 +370,14 @@ class ArticleBuilder {
             blockDiv.className = `builder-block ${block.wide ? 'block-wide' : ''}`;
             blockDiv.setAttribute('data-block-id', block.id);
             blockDiv.setAttribute('data-index', index);
-            blockDiv.draggable = true;
+            // Блок не draggable, перетаскивание только через ручку
             blockDiv.style.position = 'relative';
             blockDiv.style.borderRadius = '24px';
-            blockDiv.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
-            blockDiv.style.transform = 'scale(1)';
+            blockDiv.style.transition = 'all 0.3s ease';
+            if (block.wide) blockDiv.style.gridColumn = 'span 2';
             
-            if (block.wide) {
-                blockDiv.style.gridColumn = 'span 2';
-            }
-            
-            if (block.type === 'slider') {
-                blockDiv.style.padding = '0';
-                blockDiv.style.background = 'transparent';
-                blockDiv.style.border = 'none';
-                blockDiv.style.minHeight = 'auto';
-                blockDiv.style.display = 'block';
-            } else if (block.type === 'image') {
+            // Стили в зависимости от типа
+            if (block.type === 'slider' || block.type === 'image') {
                 blockDiv.style.padding = '0';
                 blockDiv.style.background = 'transparent';
                 blockDiv.style.border = 'none';
@@ -398,683 +393,489 @@ class ArticleBuilder {
             }
             
             if (block.type === 'text' && block.glassFrame) {
-                blockDiv.style.background = 'rgba(255, 255, 255, 0.2)';
+                blockDiv.style.background = 'rgba(255,255,255,0.2)';
                 blockDiv.style.backdropFilter = 'blur(12px)';
-                blockDiv.style.border = '1px solid rgba(255, 255, 255, 0.3)';
-                blockDiv.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.1)';
-            } else if (block.type === 'text') {
-                blockDiv.style.background = 'white';
-                blockDiv.style.border = '1px solid #e5e7eb';
-                blockDiv.style.boxShadow = 'none';
+                blockDiv.style.border = '1px solid rgba(255,255,255,0.3)';
+                blockDiv.style.boxShadow = '0 8px 32px rgba(0,0,0,0.1)';
             }
             
-            // Drag handle
+            // Ручка перетаскивания (draggable)
             const dragHandle = document.createElement('div');
-            dragHandle.className = 'builder-block__drag-handle';
             dragHandle.innerHTML = '<i class="fas fa-grip-vertical"></i>';
-            dragHandle.style.cssText = 'position: absolute; left: -12px; top: 50%; transform: translateY(-50%); width: 28px; height: 56px; background: #e5e7eb; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: grab; color: #6b7280; z-index: 20; transition: all 0.2s;';
+            dragHandle.draggable = true;
+            dragHandle.style.cssText = 'position:absolute; left:-12px; top:50%; transform:translateY(-50%); width:28px; height:56px; background:#e5e7eb; border-radius:12px; display:flex; align-items:center; justify-content:center; cursor:grab; color:#6b7280; z-index:20;';
+            dragHandle.addEventListener('dragstart', (e) => this.onDragStartHandle(e, index));
+            dragHandle.addEventListener('dragend', (e) => this.onDragEndHandle(e));
             
-            // Delete button
+            // Кнопка удаления
             const deleteBtn = document.createElement('button');
-            deleteBtn.className = 'builder-block__delete';
             deleteBtn.innerHTML = '×';
-            deleteBtn.style.cssText = 'position: absolute; top: -10px; right: -10px; width: 28px; height: 28px; background: #ef4444; color: white; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; z-index: 20; transition: all 0.2s;';
-            deleteBtn.onclick = (e) => {
-                e.stopPropagation();
-                this.deleteBlock(block.id);
-            };
+            deleteBtn.style.cssText = 'position:absolute; top:-10px; right:-10px; width:28px; height:28px; background:#ef4444; color:white; border:none; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:18px; z-index:20;';
+            deleteBtn.onclick = (e) => { e.stopPropagation(); this.deleteBlock(block.id); };
             
             blockDiv.appendChild(dragHandle);
             blockDiv.appendChild(deleteBtn);
             
+            // Обработчики drop на самом блоке (не на ручке)
+            blockDiv.addEventListener('dragover', (e) => this.onDragOverBlock(e, index));
+            blockDiv.addEventListener('dragleave', (e) => this.onDragLeaveBlock(e));
+            blockDiv.addEventListener('drop', (e) => this.onDropOnBlock(e, index));
+            
+            // --- Текстовый блок ---
             if (block.type === 'text') {
-                const controlsContainer = document.createElement('div');
-                controlsContainer.style.cssText = 'position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: row; gap: 8px; z-index: 20; background: rgba(0,0,0,0.6); padding: 6px 12px; border-radius: 30px; backdrop-filter: blur(4px);';                
-                const glassCheckbox = document.createElement('div');
-                glassCheckbox.style.cssText = 'background: #f3f4f6; padding: 6px 10px; border-radius: 20px; font-size: 12px; display: flex; align-items: center; gap: 6px; cursor: pointer;';
-                glassCheckbox.innerHTML = `
-                    <input type="checkbox" id="glass-${block.id}" ${block.glassFrame ? 'checked' : ''} style="margin: 0; cursor: pointer;">
-                    <label style="cursor: pointer; font-size: 11px;">✨ Стекло</label>
-                `;
-                glassCheckbox.querySelector('input').onchange = (e) => {
-                    e.stopPropagation();
-                    this.toggleGlassFrame(block.id);
-                };
+                const controls = document.createElement('div');
+                controls.style.cssText = 'position:absolute; bottom:10px; left:50%; transform:translateX(-50%); display:flex; gap:8px; z-index:20; background:rgba(0,0,0,0.6); padding:6px 12px; border-radius:30px; backdrop-filter:blur(4px);';
                 
-                const wideToggle = document.createElement('div');
-                wideToggle.style.cssText = 'background: #f3f4f6; padding: 6px 10px; border-radius: 20px; font-size: 12px; display: flex; align-items: center; gap: 6px; cursor: pointer;';
-                wideToggle.innerHTML = `
-                    <input type="checkbox" id="wide-${block.id}" ${block.wide ? 'checked' : ''} style="margin: 0; cursor: pointer;">
-                    <label style="cursor: pointer; font-size: 11px;">📐 На всю ширину</label>
-                `;
-                wideToggle.querySelector('input').onchange = (e) => {
-                    e.stopPropagation();
-                    this.toggleWide(block.id);
-                };
+                const glassCb = document.createElement('div');
+                glassCb.style.cssText = 'background:#f3f4f6; padding:6px 10px; border-radius:20px; display:flex; align-items:center; gap:6px; cursor:pointer;';
+                glassCb.innerHTML = `<input type="checkbox" id="glass-${block.id}" ${block.glassFrame ? 'checked' : ''}><label style="font-size:11px; cursor:pointer;">✨ Стекло</label>`;
+                glassCb.querySelector('input').onchange = (e) => { e.stopPropagation(); this.toggleGlassFrame(block.id); };
                 
-                controlsContainer.appendChild(glassCheckbox);
-                controlsContainer.appendChild(wideToggle);
-                blockDiv.appendChild(controlsContainer);
+                const wideCb = document.createElement('div');
+                wideCb.style.cssText = 'background:#f3f4f6; padding:6px 10px; border-radius:20px; display:flex; align-items:center; gap:6px; cursor:pointer;';
+                wideCb.innerHTML = `<input type="checkbox" id="wide-${block.id}" ${block.wide ? 'checked' : ''}><label style="font-size:11px; cursor:pointer;">📐 На всю ширину</label>`;
+                wideCb.querySelector('input').onchange = (e) => { e.stopPropagation(); this.toggleWide(block.id); };
+                
+                controls.appendChild(glassCb);
+                controls.appendChild(wideCb);
+                blockDiv.appendChild(controls);
                 
                 const toolbar = document.createElement('div');
-                toolbar.style.cssText = 'background: rgba(249, 250, 251, 0.95); backdropFilter: blur(8px); border: 1px solid #e5e7eb; border-radius: 12px; padding: 8px; margin-bottom: 16px; display: flex; flex-wrap: wrap; gap: 8px;';
+                toolbar.style.cssText = 'background:rgba(249,250,251,0.95); backdropFilter:blur(8px); border:1px solid #e5e7eb; border-radius:12px; padding:8px; margin-bottom:16px; display:flex; flex-wrap:wrap; gap:8px; align-items:center;';
                 toolbar.innerHTML = `
-                    <button type="button" data-cmd="bold" style="padding: 6px 14px; border: 1px solid #d1d5db; background: white; border-radius: 8px; cursor: pointer;"><b>B</b></button>
-                    <button type="button" data-cmd="italic" style="padding: 6px 14px; border: 1px solid #d1d5db; background: white; border-radius: 8px; cursor: pointer;"><i>I</i></button>
-                    <button type="button" data-cmd="underline" style="padding: 6px 14px; border: 1px solid #d1d5db; background: white; border-radius: 8px; cursor: pointer;"><u>U</u></button>
-                    <button type="button" data-cmd="h1" style="padding: 6px 14px; border: 1px solid #d1d5db; background: white; border-radius: 8px; cursor: pointer;">H1</button>
-                    <button type="button" data-cmd="h2" style="padding: 6px 14px; border: 1px solid #d1d5db; background: white; border-radius: 8px; cursor: pointer;">H2</button>
-                    <button type="button" data-cmd="h3" style="padding: 6px 14px; border: 1px solid #d1d5db; background: white; border-radius: 8px; cursor: pointer;">H3</button>
+                    <button data-cmd="bold" style="padding:6px 14px; border:1px solid #d1d5db; background:white; border-radius:8px;"><b>B</b></button>
+                    <button data-cmd="italic" style="padding:6px 14px; border:1px solid #d1d5db; background:white; border-radius:8px;"><i>I</i></button>
+                    <button data-cmd="underline" style="padding:6px 14px; border:1px solid #d1d5db; background:white; border-radius:8px;"><u>U</u></button>
+                    <button data-cmd="h1" style="padding:6px 14px; border:1px solid #d1d5db; background:white; border-radius:8px;">H1</button>
+                    <button data-cmd="h2" style="padding:6px 14px; border:1px solid #d1d5db; background:white; border-radius:8px;">H2</button>
+                    <button data-cmd="h3" style="padding:6px 14px; border:1px solid #d1d5db; background:white; border-radius:8px;">H3</button>
+                    <div style="display:flex; align-items:center; gap:6px; margin-left:8px;">
+                        <span style="font-size:12px;">🔤</span>
+                        <input type="range" min="5" max="40" value="16" step="1" style="width:100px;">
+                        <span class="font-size-val" style="font-size:11px; width:30px;">16px</span>
+                    </div>
                 `;
-                
-                toolbar.querySelectorAll('button').forEach(btn => {
+                const slider = toolbar.querySelector('input[type="range"]');
+                const valSpan = toolbar.querySelector('.font-size-val');
+                // внутри toolbar, после создания слайдера и valSpan
+                slider.value = block.fontSize || 16;
+                valSpan.textContent = (block.fontSize || 16) + 'px';
+                slider.addEventListener('input', (e) => {
+                    const val = e.target.value;
+                    valSpan.textContent = val + 'px';
+                    this.setFontSize(block.id, val);
+                });
+                toolbar.querySelectorAll('[data-cmd]').forEach(btn => {
                     btn.onclick = (e) => {
                         e.preventDefault();
-                        e.stopPropagation();
                         const cmd = btn.getAttribute('data-cmd');
-                        if (cmd === 'h1' || cmd === 'h2' || cmd === 'h3') {
-                            this.formatText(block.id, 'formatBlock', cmd);
-                        } else {
-                            this.formatText(block.id, cmd);
-                        }
+                        if (cmd === 'h1' || cmd === 'h2' || cmd === 'h3') this.formatText(block.id, 'formatBlock', cmd);
+                        else this.formatText(block.id, cmd);
                     };
                 });
                 
                 const editable = document.createElement('div');
                 editable.setAttribute('contenteditable', 'true');
                 editable.className = 'builder-editable';
-                editable.style.cssText = 'outline: none; flex: 1; min-height: 120px; font-size: 16px; line-height: 1.6; word-wrap: break-word; overflow-wrap: break-word; white-space: pre-wrap;';
+                editable.style.cssText = 'outline:none; flex:1; min-height:120px; line-height:1.6; word-wrap:break-word; white-space:pre-wrap;';
                 editable.innerHTML = block.content || '<p>Введите текст...</p>';
-                editable.oninput = (e) => {
-                    this.updateContent(block.id, editable.innerHTML);
-                };
+                // Восстанавливаем размер шрифта
+                if (block.fontSize) {
+                    editable.style.fontSize = block.fontSize + 'px';
+                } else {
+                    editable.style.fontSize = '16px';
+                    block.fontSize = 16;
+                }
+                editable.oninput = () => this.updateContent(block.id, editable.innerHTML);
                 
                 blockDiv.appendChild(toolbar);
                 blockDiv.appendChild(editable);
+            }
+            // --- Блок изображения ---
+            else if (block.type === 'image') {
+                const controls = document.createElement('div');
+                controls.style.cssText = 'position:absolute; bottom:10px; left:50%; transform:translateX(-50%); display:flex; gap:8px; z-index:20; background:rgba(0,0,0,0.6); padding:6px 12px; border-radius:30px;';
+                const wideCb = document.createElement('div');
+                wideCb.style.cssText = 'background:rgba(0,0,0,0.6); padding:6px 10px; border-radius:20px; display:flex; align-items:center; gap:6px; color:white; cursor:pointer;';
+                wideCb.innerHTML = `<input type="checkbox" id="wide-img-${block.id}" ${block.wide ? 'checked' : ''}><label style="font-size:11px; cursor:pointer; color:white;">📐 На всю ширину</label>`;
+                wideCb.querySelector('input').onchange = (e) => { e.stopPropagation(); this.toggleWide(block.id); };
+                controls.appendChild(wideCb);
+                blockDiv.appendChild(controls);
                 
-            } else if (block.type === 'image') {
-                const controlsContainer = document.createElement('div');
-                controlsContainer.style.cssText = 'position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: row; gap: 8px; z-index: 20; background: rgba(0,0,0,0.6); padding: 6px 12px; border-radius: 30px; backdrop-filter: blur(4px);';                
+                const container = document.createElement('div');
+                container.style.cssText = 'text-align:center; min-height:200px; display:flex; align-items:center; justify-content:center; background:transparent; border-radius:20px; flex-direction:column;';
+                container.ondragover = (e) => this.handleDragOver(e);
+                container.ondrop = (e) => this.handleDrop(e, block.id, false);
                 
-                const wideToggle = document.createElement('div');
-                wideToggle.style.cssText = 'background: rgba(0,0,0,0.6); padding: 6px 10px; border-radius: 20px; font-size: 12px; display: flex; align-items: center; gap: 6px; cursor: pointer; color: white;';
-                wideToggle.innerHTML = `
-                    <input type="checkbox" id="wide-img-${block.id}" ${block.wide ? 'checked' : ''} style="margin: 0; cursor: pointer;">
-                    <label style="cursor: pointer; font-size: 11px;">📐 На всю ширину</label>
-                `;
-                wideToggle.querySelector('input').onchange = (e) => {
-                    e.stopPropagation();
-                    this.toggleWide(block.id);
-                };
-                
-                controlsContainer.appendChild(wideToggle);
-                blockDiv.appendChild(controlsContainer);
-                
-                const imageContainer = document.createElement('div');
-                imageContainer.style.cssText = 'text-align: center; min-height: 200px; display: flex; align-items: center; justify-content: center; background: transparent; border-radius: 20px; position: relative; flex-direction: column;';
-                
-                imageContainer.ondragover = (e) => this.handleDragOver(e);
-                imageContainer.ondrop = (e) => this.handleDrop(e, block.id, false);
-                
-                if (block.imageUrl && block.imageUrl !== 'null' && block.imageUrl !== 'undefined') {
+                if (block.imageUrl && block.imageUrl !== 'null') {
                     const img = document.createElement('img');
                     img.src = block.imageUrl;
-                    img.style.cssText = 'width: 100%; height: auto; border-radius: 20px; display: block; background: transparent;';
-                    imageContainer.appendChild(img);
-                    
-                    const buttonContainer = document.createElement('div');
-                    buttonContainer.style.cssText = 'position: absolute; bottom: 10px; right: 10px; display: flex; gap: 8px; z-index: 15;';
-                    
+                    img.style.cssText = 'width:100%; height:auto; border-radius:20px; display:block;';
+                    container.appendChild(img);
+                    const btnDiv = document.createElement('div');
+                    btnDiv.style.cssText = 'position:absolute; bottom:10px; right:10px; display:flex; gap:8px;';
                     const changeBtn = document.createElement('button');
                     changeBtn.innerHTML = '🖼 Заменить';
-                    changeBtn.style.cssText = 'background: rgba(0,0,0,0.7); color: white; border: none; border-radius: 8px; padding: 6px 12px; cursor: pointer; font-size: 12px;';
-                    changeBtn.onclick = (e) => {
-                        e.stopPropagation();
-                        this.selectImageFile(block.id, false);
-                    };
-                    
-                    const deleteImgBtn = document.createElement('button');
-                    deleteImgBtn.innerHTML = '🗑 Удалить';
-                    deleteImgBtn.style.cssText = 'background: rgba(0,0,0,0.7); color: white; border: none; border-radius: 8px; padding: 6px 12px; cursor: pointer; font-size: 12px;';
-                    deleteImgBtn.onclick = (e) => {
-                        e.stopPropagation();
-                        this.updateImage(block.id, null);
-                    };
-                    
-                    buttonContainer.appendChild(changeBtn);
-                    buttonContainer.appendChild(deleteImgBtn);
-                    imageContainer.appendChild(buttonContainer);
+                    changeBtn.style.cssText = 'background:rgba(0,0,0,0.7); color:white; border:none; border-radius:8px; padding:6px 12px; cursor:pointer;';
+                    changeBtn.onclick = () => this.selectImageFile(block.id, false);
+                    const delBtn = document.createElement('button');
+                    delBtn.innerHTML = '🗑 Удалить';
+                    delBtn.style.cssText = 'background:rgba(0,0,0,0.7); color:white; border:none; border-radius:8px; padding:6px 12px; cursor:pointer;';
+                    delBtn.onclick = () => this.updateImage(block.id, null);
+                    btnDiv.appendChild(changeBtn);
+                    btnDiv.appendChild(delBtn);
+                    container.appendChild(btnDiv);
                 } else {
                     const uploadBtn = document.createElement('button');
                     uploadBtn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Выбрать изображение';
-                    uploadBtn.style.cssText = 'background: #3b82f6; color: white; border: none; border-radius: 12px; padding: 12px 24px; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 8px;';
-                    uploadBtn.onclick = (e) => {
-                        e.stopPropagation();
-                        this.selectImageFile(block.id, false);
-                    };
-                    
+                    uploadBtn.style.cssText = 'background:#3b82f6; color:white; border:none; border-radius:12px; padding:12px 24px; cursor:pointer; display:flex; align-items:center; gap:8px;';
+                    uploadBtn.onclick = () => this.selectImageFile(block.id, false);
                     const dragText = document.createElement('p');
                     dragText.innerHTML = 'Или перетащите изображение сюда';
-                    dragText.style.cssText = 'color: #6b7280; margin-top: 10px; font-size: 12px;';
-                    
-                    imageContainer.appendChild(uploadBtn);
-                    imageContainer.appendChild(dragText);
+                    dragText.style.cssText = 'color:#6b7280; margin-top:10px; font-size:12px;';
+                    container.appendChild(uploadBtn);
+                    container.appendChild(dragText);
                 }
-                
-                blockDiv.appendChild(imageContainer);
-                
-            } else if (block.type === 'slider') {
-                const controlsContainer = document.createElement('div');
-                controlsContainer.style.cssText = 'position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: row; gap: 8px; z-index: 20; background: rgba(0,0,0,0.6); padding: 6px 12px; border-radius: 30px; backdrop-filter: blur(4px);';                
-                
-                const wideToggle = document.createElement('div');
-                wideToggle.style.cssText = 'background: rgba(0,0,0,0.6); padding: 6px 10px; border-radius: 20px; font-size: 12px; display: flex; align-items: center; gap: 6px; cursor: pointer; color: white;';
-                wideToggle.innerHTML = `
-                    <input type="checkbox" id="wide-slider-${block.id}" ${block.wide ? 'checked' : ''} style="margin: 0; cursor: pointer;">
-                    <label style="cursor: pointer; font-size: 11px;">📐 На всю ширину</label>
-                `;
-                wideToggle.querySelector('input').onchange = (e) => {
-                    e.stopPropagation();
-                    this.toggleWide(block.id);
-                };
-                
-                controlsContainer.appendChild(wideToggle);
-                blockDiv.appendChild(controlsContainer);
+                blockDiv.appendChild(container);
+            }
+            // --- Слайдер ---
+            else if (block.type === 'slider') {
                 
                 const sliderContainer = document.createElement('div');
-                sliderContainer.className = 'builder-slider-block';
-                sliderContainer.style.cssText = 'position: relative; border-radius: 24px; overflow: hidden; background: #f9fafb;';
-                
+                sliderContainer.style.cssText = 'position:relative; border-radius:24px; overflow:hidden; background:#f9fafb;';
                 if (!block.images || block.images.length === 0) {
-                    // Режим загрузки изображений
                     const uploadArea = document.createElement('div');
-                    uploadArea.className = 'slider-upload-area';
+                    uploadArea.style.cssText = 'text-align:center; padding:40px;';
                     uploadArea.innerHTML = `
-                        <i class="fas fa-images" style="font-size: 48px; color: #3b82f6;"></i>
-                        <h3 style="margin: 0;">Создайте слайдер</h3>
-                        <p style="margin: 0; color: #6b7280;">Загрузите от 2 до 10 изображений</p>
-                        <button class="builder-btn builder-btn-primary" style="margin-top: 16px;">
-                            <i class="fas fa-plus"></i> Добавить изображения
-                        </button>
-                        <p style="font-size: 12px; color: #9ca3af;">Или перетащите файлы сюда</p>
+                        <i class="fas fa-images" style="font-size:48px; color:#3b82f6;"></i>
+                        <h3>Создайте слайдер</h3>
+                        <p>Загрузите от 2 до 10 изображений</p>
+                        <button class="builder-btn builder-btn-primary" style="margin-top:16px;">+ Добавить изображения</button>
+                        <p style="font-size:12px;">Или перетащите файлы сюда</p>
                     `;
-                    
                     const addBtn = uploadArea.querySelector('button');
-                    addBtn.onclick = (e) => {
-                        e.stopPropagation();
-                        this.selectImageFile(block.id, true);
-                    };
-                    
+                    addBtn.onclick = () => this.selectImageFile(block.id, true);
                     uploadArea.ondragover = (e) => this.handleDragOver(e);
                     uploadArea.ondrop = (e) => this.handleDrop(e, block.id, true);
-                    
                     sliderContainer.appendChild(uploadArea);
                 } else {
-                    // Отображение слайдера
-                    let currentIndex = 0;
-                    
-                    const sliderInner = document.createElement('div');
-                    sliderInner.className = 'slider-container';
-                    sliderInner.style.cssText = 'position: relative; width: 100%; overflow: hidden; border-radius: 24px;';
-                    
+                    let currentIdx = 0;
+                    const inner = document.createElement('div');
+                    inner.style.cssText = 'position:relative; width:100%; overflow:hidden; border-radius:24px;';
                     const track = document.createElement('div');
-                    track.className = 'slider-track';
-                    track.style.cssText = 'display: flex; transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);';
-                    
-                    block.images.forEach((imgSrc, idx) => {
+                    track.style.cssText = 'display:flex; transition:transform 0.5s cubic-bezier(0.4,0,0.2,1);';
+                    block.images.forEach(src => {
                         const slide = document.createElement('div');
-                        slide.className = 'slider-slide';
-                        slide.style.cssText = 'flex-shrink: 0; width: 100%;';
+                        slide.style.cssText = 'flex-shrink:0; width:100%;';
                         const img = document.createElement('img');
-                        img.src = imgSrc;
-                        img.style.cssText = 'width: 100%; height: auto; display: block; background: transparent;';
+                        img.src = src;
+                        img.style.cssText = 'width:100%; display:block;';
                         slide.appendChild(img);
                         track.appendChild(slide);
                     });
+                    inner.appendChild(track);
                     
-                    sliderInner.appendChild(track);
+                    const updateTransform = () => { track.style.transform = `translateX(-${currentIdx * 100}%)`; };
+                    const prevBtn = document.createElement('button');
+                    prevBtn.innerHTML = '‹';
+                    prevBtn.style.cssText = 'position:absolute; top:50%; left:16px; transform:translateY(-50%); width:40px; height:40px; background:rgba(255,255,255,0.9); border:none; border-radius:50%; cursor:pointer; font-size:20px; z-index:10;';
+                    const nextBtn = document.createElement('button');
+                    nextBtn.innerHTML = '›';
+                    nextBtn.style.cssText = 'position:absolute; top:50%; right:16px; transform:translateY(-50%); width:40px; height:40px; background:rgba(255,255,255,0.9); border:none; border-radius:50%; cursor:pointer; font-size:20px; z-index:10;';
                     
-                    // Кнопки навигации
-                    if (block.images.length > 1) {
-                        const prevBtn = document.createElement('button');
-                        prevBtn.className = 'slider-btn slider-prev';
-                        prevBtn.innerHTML = '‹';
-                        prevBtn.onclick = () => {
-                            currentIndex = (currentIndex - 1 + block.images.length) % block.images.length;
-                            track.style.transform = `translateX(-${currentIndex * 100}%)`;
-                            updateDots();
-                        };
-                        
-                        const nextBtn = document.createElement('button');
-                        nextBtn.className = 'slider-btn slider-next';
-                        nextBtn.innerHTML = '›';
-                        nextBtn.onclick = () => {
-                            currentIndex = (currentIndex + 1) % block.images.length;
-                            track.style.transform = `translateX(-${currentIndex * 100}%)`;
-                            updateDots();
-                        };
-                        
-                        sliderInner.appendChild(prevBtn);
-                        sliderInner.appendChild(nextBtn);
-                        
-                        // Точки навигации
-                        const dots = document.createElement('div');
-                        dots.className = 'slider-dots';
-                        
-                        const updateDots = () => {
-                            dots.innerHTML = '';
-                            block.images.forEach((_, idx) => {
-                                const dot = document.createElement('button');
-                                dot.className = `slider-dot ${idx === currentIndex ? 'active' : ''}`;
-                                dot.onclick = () => {
-                                    currentIndex = idx;
-                                    track.style.transform = `translateX(-${currentIndex * 100}%)`;
-                                    updateDots();
-                                };
-                                dots.appendChild(dot);
+                    prevBtn.onclick = () => { 
+                        currentIdx = (currentIdx - 1 + block.images.length) % block.images.length; 
+                        updateTransform(); 
+                        updateDots(); 
+                        // обновить миниатюры
+                        document.querySelectorAll(`[data-thumb-for="${block.id}"]`).forEach((thumb, i) => {
+                            thumb.style.borderColor = i === currentIdx ? '#3b82f6' : 'transparent';
+                        });
+                    };
+                    nextBtn.onclick = () => { 
+                        currentIdx = (currentIdx + 1) % block.images.length; 
+                        updateTransform(); 
+                        updateDots(); 
+                        // обновить миниатюры
+                        document.querySelectorAll(`[data-thumb-for="${block.id}"]`).forEach((thumb, i) => {
+                            thumb.style.borderColor = i === currentIdx ? '#3b82f6' : 'transparent';
+                        });
+                    };
+                    
+                    inner.appendChild(prevBtn);
+                    inner.appendChild(nextBtn);
+                    
+                    const dotsDiv = document.createElement('div');
+                    dotsDiv.style.cssText = 'position:absolute; bottom:16px; left:50%; transform:translateX(-50%); display:flex; gap:8px; z-index:10;';
+                    const updateDots = () => {
+                        dotsDiv.innerHTML = '';
+                        block.images.forEach((_, i) => {
+                            const dot = document.createElement('button');
+                            dot.style.cssText = `width:8px; height:8px; background:${i === currentIdx ? 'white' : 'rgba(255,255,255,0.5)'}; border:none; border-radius:50%; cursor:pointer;`;
+                            dot.onclick = () => { 
+                            currentIdx = i; 
+                            updateTransform(); 
+                            updateDots(); 
+                            document.querySelectorAll(`[data-thumb-for="${block.id}"]`).forEach((thumb, idx) => {
+                                thumb.style.borderColor = idx === currentIdx ? '#3b82f6' : 'transparent';
                             });
                         };
-                        
-                        updateDots();
-                        sliderInner.appendChild(dots);
-                    }
-                    
-                    // Индикатор количества изображений
-                    const countIndicator = document.createElement('div');
-                    countIndicator.className = 'image-count-indicator';
-                    countIndicator.innerHTML = `${block.images.length} 📷`;
-                    sliderInner.appendChild(countIndicator);
-                    
-                    // Кнопка добавления изображения
-                    const addImageBtn = document.createElement('button');
-                    addImageBtn.innerHTML = '+ Добавить фото';
-                    addImageBtn.style.cssText = 'position: absolute; bottom: 16px; left: 16px; background: rgba(0,0,0,0.6); color: white; border: none; border-radius: 20px; padding: 6px 12px; cursor: pointer; font-size: 12px; z-index: 10;';
-                    addImageBtn.onclick = (e) => {
-                        e.stopPropagation();
-                        this.selectImageFile(block.id, true);
+                            dotsDiv.appendChild(dot);
+                        });
                     };
-                    sliderInner.appendChild(addImageBtn);
+                    updateDots();
+                    inner.appendChild(dotsDiv);
                     
-                    // Миниатюры для управления
-                    const thumbnailsContainer = document.createElement('div');
-                    thumbnailsContainer.style.cssText = 'position: absolute; bottom: 16px; right: 16px; display: flex; gap: 8px; z-index: 10; background: rgba(0,0,0,0.5); padding: 8px; border-radius: 12px; backdrop-filter: blur(4px);';
-                    
-                    block.images.forEach((imgSrc, idx) => {
+                    const addPhotoBtn = document.createElement('button');
+                    addPhotoBtn.innerHTML = '+ Добавить фото';
+                    addPhotoBtn.style.cssText = 'position:absolute; bottom:16px; left:16px; background:rgba(0,0,0,0.6); color:white; border:none; border-radius:20px; padding:6px 12px; cursor:pointer; font-size:12px; z-index:10;';
+                    addPhotoBtn.onclick = () => this.selectImageFile(block.id, true);
+                    inner.appendChild(addPhotoBtn);
+
+                    // ======= ВСТАВИТЬ МИНИАТЮРЫ =======
+                        const thumbsContainer = document.createElement('div');
+                        thumbsContainer.style.cssText = 'position: absolute; bottom: 16px; right: 16px; display: flex; gap: 8px; z-index: 10; background: rgba(0,0,0,0.5); padding: 8px; border-radius: 16px; backdrop-filter: blur(4px); overflow-x: auto; max-width: calc(100% - 100px);';
+                        block.images.forEach((imgSrc, idx) => {
                         const thumb = document.createElement('div');
-                        thumb.style.cssText = 'width: 40px; height: 40px; border-radius: 8px; overflow: hidden; cursor: pointer; border: 2px solid transparent; transition: all 0.2s;';
-                        if (idx === currentIndex) thumb.style.borderColor = '#3b82f6';
+                        thumb.style.cssText = 'width: 50px; height: 50px; border-radius: 8px; overflow: hidden; cursor: pointer; border: 2px solid transparent; transition: all 0.2s; flex-shrink: 0;';
+                        if (idx === currentIdx) thumb.style.borderColor = '#3b82f6';
                         const thumbImg = document.createElement('img');
                         thumbImg.src = imgSrc;
                         thumbImg.style.cssText = 'width: 100%; height: 100%; object-fit: cover;';
                         thumb.appendChild(thumbImg);
                         thumb.onclick = () => {
-                            currentIndex = idx;
-                            track.style.transform = `translateX(-${currentIndex * 100}%)`;
-                            document.querySelectorAll('.slider-dot').forEach((dot, i) => {
-                                dot.classList.toggle('active', i === currentIndex);
-                            });
+                            currentIdx = idx;
+                            track.style.transform = `translateX(-${currentIdx * 100}%)`;
+                            updateDots();
+                            // Обновить border активной миниатюры
+                            document.querySelectorAll(`[data-thumb-for="${block.id}"]`).forEach(t => t.style.borderColor = 'transparent');
+                            thumb.style.borderColor = '#3b82f6';
                         };
-                        thumbnailsContainer.appendChild(thumb);
+                        thumb.setAttribute('data-thumb-for', block.id);
+                        thumbsContainer.appendChild(thumb);
                     });
-                    
-                    sliderInner.appendChild(thumbnailsContainer);
-                    
-                    sliderContainer.appendChild(sliderInner);
+                    inner.appendChild(thumbsContainer);
+                    sliderContainer.appendChild(inner);
                 }
-                
                 blockDiv.appendChild(sliderContainer);
             }
-            
-            // Drag & Drop для перемещения блоков
-            blockDiv.ondragstart = (e) => {
-                e.dataTransfer.setData('text/plain', index);
-                blockDiv.style.opacity = '0.4';
-                blockDiv.style.transform = 'scale(0.98)';
-            };
-            
-            blockDiv.ondragover = (e) => {
-                e.preventDefault();
-                e.dataTransfer.dropEffect = 'move';
-                blockDiv.style.transform = 'scale(1.01)';
-                blockDiv.style.boxShadow = '0 0 0 2px #3b82f6';
-            };
-            
-            blockDiv.ondragleave = (e) => {
-                blockDiv.style.transform = 'scale(1)';
-                blockDiv.style.boxShadow = 'none';
-            };
-            
-            blockDiv.ondrop = (e) => {
-                e.preventDefault();
-                blockDiv.style.transform = 'scale(1)';
-                blockDiv.style.boxShadow = 'none';
-                
-                const fromIndex = parseInt(e.dataTransfer.getData('text/plain'));
-                const toIndex = index;
-                
-                if (!isNaN(fromIndex) && fromIndex !== toIndex) {
-                    const moved = this.blocks[fromIndex];
-                    this.blocks.splice(fromIndex, 1);
-                    this.blocks.splice(toIndex, 0, moved);
-                    this.save();
-                    this.render();
+            // --- Блок перечисления (list) ---
+            else if (block.type === 'list') {
+                // Стеклянный стиль, если включен
+                if (block.glassFrame) {
+                    blockDiv.style.background = 'rgba(255, 255, 255, 0.2)';
+                    blockDiv.style.backdropFilter = 'blur(12px)';
+                    blockDiv.style.border = '1px solid rgba(255, 255, 255, 0.3)';
+                    blockDiv.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.1)';
+                } else {
+                    blockDiv.style.background = 'white';
+                    blockDiv.style.border = '1px solid #e5e7eb';
+                    blockDiv.style.boxShadow = 'none';
                 }
-            };
+                
+                const controls = document.createElement('div');
+                controls.style.cssText = 'position:absolute; bottom:10px; left:50%; transform:translateX(-50%); display:flex; gap:8px; z-index:20; background:rgba(0,0,0,0.6); padding:6px 12px; border-radius:30px; backdrop-filter:blur(4px);';
+                
+                const glassCb = document.createElement('div');
+                glassCb.style.cssText = 'background:#f3f4f6; padding:6px 10px; border-radius:20px; display:flex; align-items:center; gap:6px; cursor:pointer;';
+                glassCb.innerHTML = `<input type="checkbox" id="glass-list-${block.id}" ${block.glassFrame ? 'checked' : ''}><label style="font-size:11px;">✨ Стекло</label>`;
+                glassCb.querySelector('input').onchange = (e) => { e.stopPropagation(); this.toggleGlassFrame(block.id); };
+                
+                const wideCb = document.createElement('div');
+                wideCb.style.cssText = 'background:#f3f4f6; padding:6px 10px; border-radius:20px; display:flex; align-items:center; gap:6px; cursor:pointer;';
+                wideCb.innerHTML = `<input type="checkbox" id="wide-list-${block.id}" ${block.wide ? 'checked' : ''}><label style="font-size:11px;">📐 На всю ширину</label>`;
+                wideCb.querySelector('input').onchange = (e) => { e.stopPropagation(); this.toggleWide(block.id); };
+                
+                controls.appendChild(glassCb);
+                controls.appendChild(wideCb);
+                blockDiv.appendChild(controls);
+                
+                const titleInput = document.createElement('input');
+                titleInput.type = 'text';
+                titleInput.value = block.title || 'Мой список';
+                titleInput.style.cssText = 'width:100%; font-size:20px; font-weight:bold; border:none; border-bottom:2px solid #e5e7eb; margin-bottom:16px; padding:8px 0; outline:none; background:transparent;';
+                titleInput.addEventListener('input', () => { block.title = titleInput.value; this.save(); });
+                blockDiv.appendChild(titleInput);
+                
+                const itemsContainer = document.createElement('div');
+                itemsContainer.style.cssText = 'display:flex; flex-direction:column; gap:12px;';
+                const updateItems = () => {
+                    itemsContainer.innerHTML = '';
+                    block.items.forEach((item, idx) => {
+                        const row = document.createElement('div');
+                        row.style.cssText = 'display:flex; align-items:center; gap:8px;';
+                        const inp = document.createElement('input');
+                        inp.type = 'text';
+                        inp.value = item;
+                        inp.style.cssText = 'flex:1; padding:8px 12px; border:1px solid #e5e7eb; border-radius:12px; outline:none; background:transparent;';
+                        inp.oninput = () => { block.items[idx] = inp.value; this.save(); };
+                        const del = document.createElement('button');
+                        del.innerHTML = '🗑';
+                        del.style.cssText = 'background:#ef4444; color:white; border:none; border-radius:8px; width:32px; height:32px; cursor:pointer;';
+                        del.onclick = () => { block.items.splice(idx,1); this.save(); updateItems(); };
+                        row.appendChild(inp);
+                        row.appendChild(del);
+                        itemsContainer.appendChild(row);
+                    });
+                };
+                updateItems();
+                
+                const addBtn = document.createElement('button');
+                addBtn.innerHTML = '+ Добавить пункт';
+                addBtn.style.cssText = 'margin-top:12px; padding:8px 16px; background:#f3f4f6; border:none; border-radius:12px; cursor:pointer; display:flex; align-items:center; gap:6px;';
+                addBtn.onclick = () => {
+                    block.items.push('Новый пункт');
+                    this.save();
+                    updateItems();
+                };
+                blockDiv.appendChild(addBtn);               
+                blockDiv.appendChild(itemsContainer);
             
-            blockDiv.ondragend = () => {
-                blockDiv.style.opacity = '';
-                blockDiv.style.transform = 'scale(1)';
-                blockDiv.style.boxShadow = 'none';
-            };
+            }
             
             grid.appendChild(blockDiv);
         });
     }
     
     generateHTML() {
-        if (this.blocks.length === 0) {
-            return '<div class="article-builder-grid"><div class="article-builder-block"><p>Статья пуста</p></div></div>';
-        }
-        
+        if (!this.blocks.length) return '<div class="article-builder-grid"><div class="article-builder-block"><p>Статья пуста</p></div></div>';
         let html = '<div class="article-builder-grid">';
         for (const block of this.blocks) {
-            const glassClass = (block.type === 'text' && block.glassFrame) ? 'glass-frame' : '';
+            const glassClass = (block.type === 'text' && block.glassFrame) ? 'glass-frame' : (block.type === 'list' && block.glassFrame) ? 'glass-frame' : '';
             const wideClass = block.wide ? 'block-wide' : '';
-            
-            if (block.type === 'text') {
-                let content = block.content || '';
-                html += `<div class="article-builder-block ${glassClass} ${wideClass}">${content}</div>`;
-            } else if (block.type === 'image' && block.imageUrl && block.imageUrl !== 'null' && block.imageUrl !== 'undefined') {
-                html += `<div class="article-builder-block image-block ${wideClass}">
-                    <img src="${block.imageUrl}" alt="Image">
-                </div>`;
-            } else if (block.type === 'slider' && block.images && block.images.length > 0) {
-                html += `<div class="article-slider ${wideClass}" style="border-radius: 24px; overflow: hidden; position: relative;">
-                    <div class="slider-container-init" style="position: relative; width: 100%; overflow: hidden; border-radius: 24px;">
-                        <div class="slider-track-init" style="display: flex; transition: transform 0.5s ease;">
-                            ${block.images.map(img => `
-                                <div class="slider-slide-init" style="flex-shrink: 0; width: 100%;">
-                                    <img src="${img}" style="width: 100%; height: auto; display: block; border-radius: 24px;" alt="Slide">
+            switch(block.type) {
+                case 'text': {
+                    let styleAttr = '';
+                    if (block.fontSize && block.fontSize !== 16) {
+                        styleAttr = ` style="font-size: ${block.fontSize}px;"`;
+                    }
+                    html += `<div class="article-builder-block ${glassClass} ${wideClass}"${styleAttr}>${block.content || ''}</div>`;
+                    break;
+                }
+                case 'image':
+                    if (block.imageUrl && block.imageUrl !== 'null')
+                        html += `<div class="article-builder-block image-block ${wideClass}"><img src="${block.imageUrl}" alt="Image"></div>`;
+                    break;
+                case 'slider':
+                    if (block.images && block.images.length) {
+                        html += `<div class="article-slider ${wideClass}" style="border-radius:24px; overflow:hidden; position:relative;">
+                            <div class="slider-container-init" style="position:relative; width:100%; overflow:hidden; border-radius:24px;">
+                                <div class="slider-track-init" style="display:flex; transition:transform 0.5s ease;">
+                                    ${block.images.map(img => `<div class="slider-slide-init" style="flex-shrink:0; width:100%;"><img src="${img}" style="width:100%; display:block; border-radius:24px;" alt="slide"></div>`).join('')}
                                 </div>
-                            `).join('')}
-                        </div>
-                        ${block.images.length > 1 ? `
-                        <button class="slider-prev-init" style="position: absolute; top: 50%; left: 16px; transform: translateY(-50%); width: 40px; height: 40px; background: rgba(255,255,255,0.9); border: none; border-radius: 50%; cursor: pointer; font-size: 20px;">‹</button>
-                        <button class="slider-next-init" style="position: absolute; top: 50%; right: 16px; transform: translateY(-50%); width: 40px; height: 40px; background: rgba(255,255,255,0.9); border: none; border-radius: 50%; cursor: pointer; font-size: 20px;">›</button>
-                        <div class="slider-dots-init" style="position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px;"></div>
-                        ` : ''}
-                    </div>
-                </div>`;
+                                ${block.images.length > 1 ? `
+                                <button class="slider-prev-init" style="position:absolute; top:50%; left:16px; transform:translateY(-50%); width:40px; height:40px; background:rgba(255,255,255,0.9); border:none; border-radius:50%; cursor:pointer;">‹</button>
+                                <button class="slider-next-init" style="position:absolute; top:50%; right:16px; transform:translateY(-50%); width:40px; height:40px; background:rgba(255,255,255,0.9); border:none; border-radius:50%; cursor:pointer;">›</button>
+                                <div class="slider-dots-init" style="position:absolute; bottom:16px; left:50%; transform:translateX(-50%); display:flex; gap:8px;"></div>
+                                ` : ''}
+                            </div>
+                        </div>`;
+                    }
+                    break;
+                case 'list':
+                    let itemsHtml = '';
+                    block.items.forEach(item => { itemsHtml += `<li>${escapeHtml(item)}</li>`; });
+                    html += `<div class="article-builder-block list-block ${wideClass} ${glassClass}">
+                        <h3 class="list-title">${escapeHtml(block.title)}</h3>
+                        <ul class="styled-list">${itemsHtml}</ul>
+                    </div>`;
+                    break;
             }
         }
         html += '</div>';
-        
         return html;
     }
     
     generateCSS() {
-        if (this.blocks.length === 0) return '';
-        
+        if (!this.blocks.length) return '';
         return `<style>
-            .article-builder-grid {
-                display: grid;
-                grid-template-columns: repeat(2, 1fr);
-                gap: 24px;
-                margin: 20px 0;
-                transition: all 0.3s ease;
-            }
-            
-            .article-builder-block {
-                background: #ffffff;
-                border: 1px solid #e5e7eb;
-                border-radius: 20px;
-                padding: 24px;
-                line-height: 1.6;
-                overflow-wrap: break-word;
-                word-wrap: break-word;
-                white-space: normal;
-                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            }
-            
-            .article-builder-block.block-wide {
-                grid-column: span 2;
-            }
-            
-            .article-builder-block.image-block {
-                padding: 0;
-                background: transparent;
-                border: none;
-                overflow: hidden;
-                line-height: 0;
-            }
-            
-            .article-builder-block.image-block img {
-                width: 100%;
-                height: auto;
-                border-radius: 20px;
-                display: block;
-                margin: 0;
-                background: transparent;
-            }
-            
-            .article-builder-block.glass-frame {
-                background: rgba(255, 255, 255, 0.2);
-                backdrop-filter: blur(12px);
-                border: 1px solid rgba(255, 255, 255, 0.3);
-                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            }
-            
-            /* Стили для слайдера в сгенерированном HTML */
-            .slider-container-init {
-                position: relative;
-                width: 100%;
-                overflow: hidden;
-                border-radius: 24px;
-            }
-            
-            .slider-track-init {
-                display: flex;
-                transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            }
-            
-            .slider-slide-init {
-                flex-shrink: 0;
-                width: 100%;
-            }
-            
-            .slider-slide-init img {
-                width: 100%;
-                height: auto;
-                display: block;
-            }
-            
-            .slider-prev-init, .slider-next-init {
-                transition: all 0.2s;
-            }
-            
-            .slider-prev-init:hover, .slider-next-init:hover {
-                transform: translateY(-50%) scale(1.1);
-                background: white;
-            }
-            
-            .slider-dots-init {
-                position: absolute;
-                bottom: 16px;
-                left: 50%;
-                transform: translateX(-50%);
-                display: flex;
-                gap: 8px;
-            }
-            
-            .article-builder-block p {
-                margin: 0 0 1em 0;
-                white-space: normal;
-                word-wrap: break-word;
-                overflow-wrap: break-word;
-            }
-            
-            .article-builder-block p:last-child {
-                margin-bottom: 0;
-            }
-            
-            .article-builder-block h1, 
-            .article-builder-block h2, 
-            .article-builder-block h3 {
-                margin-top: 0;
-                margin-bottom: 0.5em;
-                word-wrap: break-word;
-                overflow-wrap: break-word;
-            }
-            
-            @media (max-width: 768px) {
-                .article-builder-grid {
-                    grid-template-columns: 1fr;
-                    gap: 16px;
-                }
-                .article-builder-block {
-                    padding: 16px;
-                }
-                .article-builder-block.block-wide {
-                    grid-column: span 1;
-                }
-            }
-            
-            @media (max-width: 480px) {
-                .article-builder-grid {
-                    gap: 12px;
-                }
-                .article-builder-block {
-                    padding: 12px;
-                }
-            }
+            .article-builder-grid { display: grid; grid-template-columns: repeat(2,1fr); gap:24px; margin:20px 0; }
+            .article-builder-block { background:#fff; border:1px solid #e5e7eb; border-radius:20px; padding:24px; line-height:1.6; overflow-wrap:break-word; transition:all 0.3s; }
+            .article-builder-block.block-wide { grid-column: span 2; }
+            .article-builder-block.image-block { padding:0; background:transparent; border:none; line-height:0; }
+            .article-builder-block.image-block img { width:100%; border-radius:20px; display:block; }
+            .article-builder-block.glass-frame { background:rgba(255,255,255,0.2); backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,0.3); box-shadow:0 8px 32px rgba(0,0,0,0.1); }
+            .list-block { background:#fff; }
+            .list-title { margin:0 0 16px; font-size:1.5rem; font-weight:600; }
+            .styled-list { margin:0; padding-left:0; list-style:none; }
+            .styled-list li { margin:8px 0; padding:8px 12px; background:#f9fafb; border-radius:12px; transition:0.2s; }
+            .styled-list li:hover { background:#f3f4f6; transform:translateX(4px); }
+            .slider-container-init { position:relative; overflow:hidden; border-radius:24px; }
+            .slider-track-init { display:flex; transition:transform 0.5s cubic-bezier(0.4,0,0.2,1); }
+            .slider-slide-init { flex-shrink:0; width:100%; }
+            .slider-prev-init, .slider-next-init { transition:0.2s; }
+            .slider-prev-init:hover, .slider-next-init:hover { transform:translateY(-50%) scale(1.1); background:#fff; }
+            @media (max-width:768px) { .article-builder-grid { grid-template-columns:1fr; } .article-builder-block.block-wide { grid-column:span 1; } }
         </style>`;
     }
 }
 
 // ===== ГЛОБАЛЬНЫЕ ФУНКЦИИ =====
-
 function openArticleBuilder() {
     const modal = document.getElementById('articleBuilderModal');
     if (modal) {
         modal.classList.add('active');
-        
         const contentField = document.getElementById('content');
         const existingContent = contentField ? contentField.value : null;
-        
-        if (!articleBuilder) {
-            articleBuilder = new ArticleBuilder(existingContent);
+        if (window.isNewArticle) {
+            localStorage.removeItem('articleBlocks');
+            articleBuilder = new ArticleBuilder(null);
         } else {
-            articleBuilder.load(existingContent);
-            articleBuilder.render();
+            articleBuilder = new ArticleBuilder(existingContent);
         }
+        articleBuilder.render();
     }
 }
 
-function closeArticleBuilder() {
-    const modal = document.getElementById('articleBuilderModal');
-    if (modal) {
-        modal.classList.remove('active');
-    }
-}
-
-function addTextBlock() {
-    if (!articleBuilder) {
-        articleBuilder = new ArticleBuilder();
-    }
-    articleBuilder.addBlock('text');
-}
-
-function addImageBlock() {
-    if (!articleBuilder) {
-        articleBuilder = new ArticleBuilder();
-    }
-    articleBuilder.addBlock('image');
-}
-
-function addSliderBlock() {
-    if (!articleBuilder) {
-        articleBuilder = new ArticleBuilder();
-    }
-    articleBuilder.addBlock('slider');
-}
-
-function clearAllBlocks() {
-    if (articleBuilder) {
-        articleBuilder.clearAll();
-    }
-}
+function closeArticleBuilder() { document.getElementById('articleBuilderModal')?.classList.remove('active'); }
+function addTextBlock() { if (!articleBuilder) articleBuilder = new ArticleBuilder(); articleBuilder.addBlock('text'); }
+function addImageBlock() { if (!articleBuilder) articleBuilder = new ArticleBuilder(); articleBuilder.addBlock('image'); }
+function addSliderBlock() { if (!articleBuilder) articleBuilder = new ArticleBuilder(); articleBuilder.addBlock('slider'); }
+function addListBlock() { if (!articleBuilder) articleBuilder = new ArticleBuilder(); articleBuilder.addBlock('list'); }
+function clearAllBlocks() { if (articleBuilder) articleBuilder.clearAll(); }
 
 function generateAndSave() {
     if (!articleBuilder) return;
-    
     const contentField = document.getElementById('content');
     if (contentField) {
         const html = articleBuilder.generateHTML();
         const css = articleBuilder.generateCSS();
-        const js = `
-<script>
+        const js = `<script>
 (function initSliders() {
     document.querySelectorAll('.slider-container-init').forEach(container => {
-        let currentIndex = 0;
+        let idx = 0;
         const track = container.querySelector('.slider-track-init');
         const slides = container.querySelectorAll('.slider-slide-init');
-        const prevBtn = container.querySelector('.slider-prev-init');
-        const nextBtn = container.querySelector('.slider-next-init');
-        const dotsContainer = container.querySelector('.slider-dots-init');
-        
-        if (!track || slides.length === 0) return;
-        
-        const totalSlides = slides.length;
-        
-        const updateDots = () => {
-            if (!dotsContainer) return;
-            dotsContainer.innerHTML = '';
-            for (let i = 0; i < totalSlides; i++) {
+        const prev = container.querySelector('.slider-prev-init');
+        const next = container.querySelector('.slider-next-init');
+        const dotsDiv = container.querySelector('.slider-dots-init');
+        if (!track || !slides.length) return;
+        const total = slides.length;
+        const goTo = (i) => { idx = (i+total)%total; track.style.transform = 'translateX(-'+(idx*100)+'%)'; if(dotsDiv) Array.from(dotsDiv.children).forEach((d,ii)=>d.style.background = ii===idx ? 'white' : 'rgba(255,255,255,0.5)'); };
+        if(prev) prev.onclick = () => goTo(idx-1);
+        if(next) next.onclick = () => goTo(idx+1);
+        if(dotsDiv) {
+            for(let i=0;i<total;i++) {
                 const dot = document.createElement('button');
-                dot.className = 'slider-dot';
-                dot.style.cssText = 'width: 8px; height: 8px; background: ' + (i === currentIndex ? 'white' : 'rgba(255,255,255,0.5)') + '; border: none; border-radius: 50%; cursor: pointer; padding: 0; transition: all 0.2s;';
-                dot.onclick = () => goToSlide(i);
-                dotsContainer.appendChild(dot);
+                dot.style.cssText = 'width:8px;height:8px;background:rgba(255,255,255,0.5);border:none;border-radius:50%;cursor:pointer;padding:0;';
+                dot.onclick = () => goTo(i);
+                dotsDiv.appendChild(dot);
             }
-        };
-        
-        const goToSlide = (index) => {
-            currentIndex = index;
-            track.style.transform = \`translateX(-\${currentIndex * 100}%)\`;
-            if (dotsContainer) {
-                const dots = dotsContainer.querySelectorAll('.slider-dot');
-                dots.forEach((dot, i) => {
-                    dot.style.background = i === currentIndex ? 'white' : 'rgba(255,255,255,0.5)';
-                });
-            }
-        };
-        
-        if (prevBtn) {
-            prevBtn.onclick = () => goToSlide((currentIndex - 1 + totalSlides) % totalSlides);
+            goTo(0);
         }
-        if (nextBtn) {
-            nextBtn.onclick = () => goToSlide((currentIndex + 1) % totalSlides);
-        }
-        
-        updateDots();
     });
-})();
-</script>`;
-        const fullContent = css + html + js;
-        contentField.value = fullContent;
-        
-        articleBuilder.showNotification('✓ HTML, CSS и JS сгенерированы и сохранены!', 'success');
+})();<\/script>`;
+        contentField.value = css + html + js;
+        articleBuilder.showNotification('✓ HTML, CSS и JS сгенерированы!', 'success');
         closeArticleBuilder();
     }
 }
 
-
-
-// Регистрируем функции глобально
 window.openArticleBuilder = openArticleBuilder;
 window.closeArticleBuilder = closeArticleBuilder;
 window.addTextBlock = addTextBlock;
 window.addImageBlock = addImageBlock;
 window.addSliderBlock = addSliderBlock;
+window.addListBlock = addListBlock;
 window.clearAllBlocks = clearAllBlocks;
 window.generateAndSave = generateAndSave;

@@ -6,7 +6,7 @@ require_once __DIR__ . '/../config/config.php';
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-
+$mainBg = getImage($conn, 'image_background_all');
 // Простая проверка: если id админа есть в сессии, значит он вошел
 $isAdmin = isset($_SESSION['admin_id']);
 ?>
@@ -22,7 +22,7 @@ $isAdmin = isset($_SESSION['admin_id']);
     <link rel="stylesheet" href="/assets/css/header.css?version=<?php echo $version_code; ?>">
     <link rel="icon" href="<?php echo getSetting($conn, 'favicon_path'); ?>" type="image/x-icon">
 </head>
-<body>
+<body style="background: url('<?php echo $mainBg['image_path']; ?>') center/cover no-repeat fixed;">
     <header class="main-header">
         <div class="container">
             <div class="header-content">

@@ -7,7 +7,7 @@ require_once __DIR__. '/config/config.php';
 // подключаемся к базе 
 $conn = getDBConnection();
 $showForm = (getSetting($conn, 'form_view') == 1);
-
+$mainBg = getImage($conn, 'image_background_all');
 if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest' && isset($_POST['phone'])) {
     header('Content-Type: application/json');
     
@@ -86,7 +86,7 @@ $footerPath = 'includes/footer.php';
     <link rel="stylesheet" href="assets/css/products.css?version=<?php echo $version_code; ?>">
 
 </head>
-<body>
+<body style="background: url('<?php echo $mainBg['image_path']; ?>') center/cover no-repeat fixed;">
     <!-- Header -->
     <?php include $headerPath; ?>
     

@@ -305,7 +305,7 @@ body::after {
    СТРАНИЦА ОТДЕЛЬНОЙ НОВОСТИ
    ======================================== */
 .news-detail-container {
-    max-width: 900px;
+    max-width: 1400px;
     margin: 0 auto;
     background: var(--bg-white-semi);
     backdrop-filter: blur(10px);

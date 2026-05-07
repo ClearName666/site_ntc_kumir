@@ -7,7 +7,7 @@ $headerPath = __DIR__. '/includes/header.php';
 
 // подключаемся к базе 
 $conn = getDBConnection();
-
+$mainBg = getImage($conn, 'image_background_all');
 $email = getSetting($conn, 'company_email'); 
 $copmany_name = getSetting($conn, 'company_name');
 $domen = "https://pavelsite-n-t-c-kumir.ru/";
@@ -22,7 +22,7 @@ $privacy = "https://pavelsite-n-t-c-kumir.ru/privacy.php";
     <!-- Стили -->
     <link rel="stylesheet" href="assets/css/style.css?version=<?php echo $version_code; ?>">
 </head>
-<body>
+<body style="background: url('<?php echo $mainBg['image_path']; ?>') center/cover no-repeat fixed;">
     <?php include $headerPath; ?>
     <!-- Основной контент -->
     <main>
