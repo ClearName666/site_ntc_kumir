@@ -11,7 +11,8 @@ $mainTitle = getContentBlock($conn, 'main_title');
 $mainBgStart = getImage($conn, 'main_background');
 $heroImage = getImage($conn, 'hero_foreground');
 $mapLocation = getMapLocation($conn);
-
+$videoId = getSetting($conn, 'video_id');
+$videoThumb = getImage($conn, 'video_thumbnail'); 
 require_once __DIR__. '/includes/header.php';
 
 ?>
@@ -97,15 +98,34 @@ require_once __DIR__. '/includes/header.php';
             
             <div class="about-content">
                 <div class="video-section">
-                    <?php $videoThumb = getImage($conn, 'video_thumbnail'); ?>
-                    <div class="video-container">
-                        <img src="<?php echo $videoThumb['image_path']; ?>" alt="<?php echo $videoThumb['alt_text']; ?>" class="video-thumbnail">
-                        <div class="play-button">
-                            <span>▶</span>
-                        </div>
-                        <div class="video-title">
-                            <?php echo getContentBlock($conn, 'video_button_text')['content']; ?>
-                        </div>
+                    <div class="video-container" id="video-wrapper">
+                        <?php if (!empty($videoId)): ?>
+                            <!-- Показываем превью -->
+                            <div id="video-placeholder" style="cursor:pointer; position: relative;">
+                                <img src="<?php echo $videoThumb['image_path']; ?>" alt="Превью" style="width:100%; border-radius: 8px;">
+                                <div class="play-button" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                                    <span style="font-size: 50px; color: white;">▶</span>
+                                </div>
+                            </div>
+
+                            <!-- Скрипт вставки -->
+                            <script>
+                            document.getElementById('video-placeholder').onclick = function() {
+                                var iframe = document.createElement('iframe');
+                                iframe.setAttribute('width', '100%');
+                                iframe.setAttribute('height', '360');
+                                iframe.setAttribute('src', 'https://rutube.ru/play/embed/<?php echo $videoId; ?>/?autoplay=1');
+                                iframe.setAttribute('frameborder', '0');
+                                iframe.setAttribute('allow', 'autoplay; encrypted-media');
+                                iframe.setAttribute('allowfullscreen', '');
+                                iframe.style.borderRadius = '8px';
+                                
+                                var container = document.getElementById('video-wrapper');
+                                container.innerHTML = ''; // Удаляем картинку
+                                container.appendChild(iframe); // Вставляем видео
+                            };
+                            </script>
+                        <?php endif; ?>
                     </div>
                 </div>
                 

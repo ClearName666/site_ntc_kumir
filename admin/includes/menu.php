@@ -25,6 +25,10 @@ $current_page = basename($_SERVER['PHP_SELF']);
             <i class="fas fa-tachometer-alt"></i>
             <span>Дашборд</span>
         </a>
+        <a href="colors.php" class="menu-item">
+            <i class="fas fa-palette"></i>
+            <span>Настройка цветов</span>
+        </a>
 
         <div class="menu-title">Взаимодействие</div>
         <a href="feedback.php" class="menu-item <?php echo ($current_page == 'feedback.php') ? 'active' : ''; ?>">

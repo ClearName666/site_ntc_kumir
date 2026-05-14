@@ -1,0 +1,22 @@
+{
+    "primary-blue": "#3498db",
+    "dark-blue": "#2980b9",
+    "text-dark": "#2c3e50",
+    "text-light": "#7f8c8d",
+    "text-gray": "#666",
+    "text-meta": "#95a5a6",
+    "bg-light": "#f8f9fa",
+    "bg-white-transparent": "rgba(255, 255, 255, 0.3)",
+    "bg-overlay": "rgba(255, 255, 255, 0.4)",
+    "shadow-sm": "0 5px 20px rgba(0, 0, 0, 0.08)",
+    "shadow-md": "0 10px 40px rgba(0, 0, 0, 0.1)",
+    "shadow-lg": "0 20px 60px rgba(0, 0, 0, 0.15)",
+    "shadow-blue": "0 5px 15px rgba(52, 152, 219, 0.3)",
+    "shadow-blue-hover": "0 8px 20px rgba(52, 152, 219, 0.4)",
+    "border-light": "1px solid #eee",
+    "border-white-transparent": "1px solid rgba(255, 255, 255, 0.2)",
+    "border-radius": "16px",
+    "border-radius-lg": "20px",
+    "border-radius-btn": "50px",
+    "transition-smooth": "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
+}

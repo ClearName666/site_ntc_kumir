@@ -115,6 +115,12 @@ require_once __DIR__. '/includes/menu.php';
                             <input type="text" id="setting_phone" name="setting_phone" 
                                    value="<?php echo htmlspecialchars($settings['phone'] ?? ''); ?>">
                         </div>
+
+                        <div class="form-group col-md-6">
+                            <label for="setting_video_id">ID Rutub видео о компании</label>
+                            <input type="text" id="setting_video_id" name="setting_video_id" 
+                                   value="<?php echo htmlspecialchars($settings['video_id'] ?? ''); ?>">
+                        </div>
                     </div>
                     
                     <div class="form-row">
