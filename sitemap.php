@@ -1,8 +1,25 @@
 <?php
+/**
+ * УНИВЕРСАЛЬНЫЙ SITEMAP ГЕНЕРАТОР (Версия 1.0 - на твоих функциях)
+ */
 
+// 1. ПОДКЛЮЧЕНИЕ БАЗЫ И КЭША
 require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/Cache.php'; 
 
-$conn = getDBConnection();
+// Инициализируем переменные, которые твои функции ждут как global
+$conn = getDBConnection(); // Создаем соединение через твою функцию
+// $cache = new Cache();      // Создаем объект кэша
+
+// 2. ПОДКЛЮЧЕНИЕ ТВОИХ ФУНКЦИЙ
+require_once __DIR__ . '/includes/news-functions.php';
+require_once __DIR__ . '/includes/product-functions.php';
+require_once __DIR__ . '/includes/article-functions.php';
+require_once __DIR__ . '/includes/faq-functions.php';
+
+// Блокируем ошибки, чтобы не портить XML
+ini_set('display_errors', 0);
+error_reporting(E_ALL);
 
 header("Content-Type: application/xml; charset=utf-8");
 
@@ -11,113 +28,68 @@ echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . PHP_EOL;
 
 $baseUrl = "https://pavelsite-n-t-c-kumir.ru";
 
-function renderUrl($loc, $priority = '0.5', $changefreq = 'monthly', $lastmod = null)
-{
-    echo "<url>\n";
-
-    echo "<loc>" . htmlspecialchars($loc, ENT_XML1) . "</loc>\n";
-
-    if (!empty($lastmod) && $lastmod !== '0000-00-00 00:00:00') {
-        $timestamp = strtotime($lastmod);
-
-        if ($timestamp !== false) {
-            echo "<lastmod>" . date('Y-m-d', $timestamp) . "</lastmod>\n";
-        }
+/**
+ * Вспомогательная функция вывода URL
+ */
+function renderSitemapUrl($loc, $priority = '0.5', $changefreq = 'monthly', $lastmod = null) {
+    echo "  <url>" . PHP_EOL;
+    echo "    <loc>" . htmlspecialchars($loc) . "</loc>" . PHP_EOL;
+    if ($lastmod && $lastmod !== '0000-00-00 00:00:00') {
+        $date = date('Y-m-d', strtotime($lastmod));
+        echo "    <lastmod>{$date}</lastmod>" . PHP_EOL;
     }
-
-    echo "<changefreq>{$changefreq}</changefreq>\n";
-    echo "<priority>{$priority}</priority>\n";
-
-    echo "</url>\n";
+    echo "    <changefreq>{$changefreq}</changefreq>" . PHP_EOL;
+    echo "    <priority>{$priority}</priority>" . PHP_EOL;
+    echo "  </url>" . PHP_EOL;
 }
 
-try {
+// --- СТАТИЧЕСКИЕ СТРАНИЦЫ ---
+renderSitemapUrl($baseUrl . '/', '1.0', 'daily');
+renderSitemapUrl($baseUrl . '/news.php', '0.8', 'daily');
+renderSitemapUrl($baseUrl . '/products.php', '0.8', 'daily');
+renderSitemapUrl($baseUrl . '/contacts.php', '0.7', 'monthly');
+renderSitemapUrl($baseUrl . '/faq.php', '0.7', 'weekly');
 
-    // Статические страницы
-    renderUrl($baseUrl . '/', '1.0', 'daily');
-    renderUrl($baseUrl . '/news.php', '0.8', 'daily');
-    renderUrl($baseUrl . '/products.php', '0.8', 'daily');
-    renderUrl($baseUrl . '/contacts.php', '0.7', 'monthly');
-    renderUrl($baseUrl . '/faq.php', '0.7', 'weekly');
+// --- ДИНАМИКА (через твои функции) ---
 
-    // Новости
-    $res = $conn->query("
-        SELECT slug, published_at
-        FROM news
-        WHERE is_published = 1
-    ");
-
-    if ($res) {
-        while ($row = $res->fetch_assoc()) {
-
-            renderUrl(
-                $baseUrl . '/news.php?news=' . urlencode($row['slug']),
-                '0.7',
-                'monthly',
-                $row['published_at']
-            );
-        }
+// Новости
+$allNews = getNews($conn); 
+if ($allNews) {
+    foreach ($allNews as $item) {
+        renderSitemapUrl($baseUrl . '/news.php?news=' . urlencode($item['slug']), '0.7', 'monthly', $item['published_at']);
     }
+}
 
-    // Статьи
-    $res = $conn->query("
-        SELECT slug
-        FROM articles
-        WHERE is_published = 1
-    ");
-
-    if ($res) {
-        while ($row = $res->fetch_assoc()) {
-
-            renderUrl(
-                $baseUrl . '/articles.php?article=' . urlencode($row['slug']),
-                '0.7',
-                'monthly'
-            );
-        }
+// Статьи
+$allArticles = getArticles($conn);
+if ($allArticles) {
+    foreach ($allArticles as $article) {
+        renderSitemapUrl($baseUrl . '/pages/articles.php?article=' . urlencode($article['slug']), '0.7', 'monthly', $article['published_at']);
     }
+}
 
-    // Категории
-    $res = $conn->query("
-        SELECT slug, created_at
-        FROM product_categories
-        WHERE is_active = 1
-    ");
-
-    if ($res) {
-        while ($row = $res->fetch_assoc()) {
-
-            renderUrl(
-                $baseUrl . '/products.php?category=' . urlencode($row['slug']),
-                '0.8',
-                'weekly',
-                $row['created_at']
-            );
-        }
+// Категории товаров
+$categories = getProductCategories($conn);
+if ($categories) {
+    foreach ($categories as $cat) {
+        renderSitemapUrl($baseUrl . '/products.php?category=' . urlencode($cat['slug']), '0.8', 'weekly');
     }
+}
 
-    // Товары
-    $res = $conn->query("
-        SELECT slug, created_at
-        FROM products
-        WHERE is_active = 1
-    ");
-
-    if ($res) {
-        while ($row = $res->fetch_assoc()) {
-
-            renderUrl(
-                $baseUrl . '/products.php?product=' . urlencode($row['slug']),
-                '0.9',
-                'weekly',
-                $row['created_at']
-            );
-        }
+// Сами товары (через прямой запрос, так как функции getProducts часто требуют category_id)
+$resProducts = $conn->query("SELECT slug, created_at FROM products WHERE is_active = 1");
+if ($resProducts) {
+    while ($product = $resProducts->fetch_assoc()) {
+        renderSitemapUrl($baseUrl . '/products.php?product=' . urlencode($product['slug']), '0.9', 'weekly', $product['created_at']);
     }
+}
 
-} catch (Throwable $e) {
-
-    echo "<!-- ERROR: " . htmlspecialchars($e->getMessage()) . " -->";
+// FAQ Категории
+$faqCats = getFAQCategories($conn);
+if ($faqCats) {
+    foreach ($faqCats as $fCat) {
+        renderSitemapUrl($baseUrl . '/faq.php?category=' . urlencode($fCat), '0.5', 'monthly');
+    }
 }
 
 echo '</urlset>';
