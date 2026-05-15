@@ -50,14 +50,17 @@ if ($product) {
 if ($productData) {
     $pageTitle = htmlspecialchars($productData['name']) . ' - ' . getSetting($conn, 'site_title');
     $pageDescription = htmlspecialchars(strip_tags($productData['description']));
+    $pageKeyword = htmlspecialchars(strip_tags($productData['name']));
     $pageImage = !empty($productData['image_path']) ? $productData['image_path'] : getSetting($conn, 'logo_path');
 } elseif ($categoryData) {
     $pageTitle = htmlspecialchars($categoryData['name']) . ' - Продукция - ' . getSetting($conn, 'site_title');
     $pageDescription = htmlspecialchars($categoryData['description'] ?? 'Оборудование категории ' . $categoryData['name']);
+    $pageKeyword = htmlspecialchars($categoryData['description'] ?? 'Оборудование категории ' . $categoryData['name']);
     $pageImage = !empty($categoryData['image_path']) ? $categoryData['image_path'] : getSetting($conn, 'logo_path');
 } else {
     $pageTitle = 'Продукция - ' . getSetting($conn, 'site_title');
     $pageDescription = 'Оборудование и решения для автоматизации учета энергоресурсов';
+    $pageKeyword = 'Продукция - ' . getSetting($conn, 'site_title');
     $pageImage = getSetting($conn, 'logo_path');
 }
 
@@ -72,6 +75,7 @@ $footerPath = 'includes/footer.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $pageTitle ?></title>
     <meta name="description" content="<?= $pageDescription ?>">
+    <meta name="keywords" content="<?= $pageKeyword ?>">
     
     <!-- Open Graph -->
     <meta property="og:title" content="<?= $pageTitle ?>">

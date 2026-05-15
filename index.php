@@ -19,12 +19,12 @@ $mainBg = getImage($conn, 'image_background_all');
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta name="description" content="НТЦ КУМИР — разработка и производство систем автоматизированного учета ресурсов (АСКУЭ), промышленных модемов серии M32 и программного обеспечения для ЖКХ и промышленности в Иркутске.">
-    <meta name="keywords" content="кумир, ntc kumir, аскуэ, мониторинг ресурсов, модем m32, учет тепла, автоматизация жкх, телеметрия">
     <meta property="og:title" content="НТЦ КУМИР — Системы автоматизации и мониторинга">
     <meta property="og:type" content="website">
     <meta property="og:image" content="<?php echo $heroImage['image_path']; ?>">
 
+    <meta name="description" content="НТЦ КУМИР — разработка и производство систем автоматизированного учета ресурсов (АСКУЭ), промышленных модемов серии M32 и программного обеспечения для ЖКХ и промышленности в Иркутске.">
+    <meta name="keywords" content="кумир, ntc kumir, аскуэ, мониторинг ресурсов, модем m32, учет тепла, автоматизация жкх, телеметрия, радиомодем, рм81, сбор показаний">
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">

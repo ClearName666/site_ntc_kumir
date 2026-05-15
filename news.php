@@ -29,11 +29,12 @@ if ($newsItem) {
     
     // Используем безопасную функцию для обрезания описания
     $pageDescription = truncateDescription($newsItem['excerpt'] ?? $newsItem['content'], 160);
-    
+    $pageKeyword = truncateDescription($newsItem['excerpt'] ?? $newsItem['content'], 160);
     $pageImage = !empty($newsItem['image_path']) ? $newsItem['image_path'] : getSetting($conn, 'logo_path');
 } else {
     $pageTitle = 'Новости - ' . getSetting($conn, 'site_title');
     $pageDescription = 'Актуальные новости и события компании НТЦ КУМИР';
+    $pageKeyword = "Актуальные новости и события компании НТЦ КУМИР";
     $pageImage = getSetting($conn, 'logo_path');
 }
 
@@ -55,6 +56,7 @@ $footerPath = __DIR__. '/includes/footer.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $pageTitle ?></title>
     <meta name="description" content="<?= $pageDescription ?>">
+    <meta name="keywords" content="<?= $pageKeyword ?>">
     
     <!-- Open Graph -->
     <?php if ($newsItem): ?>
@@ -354,7 +356,7 @@ $footerPath = __DIR__. '/includes/footer.php';
                         <?php endforeach; ?>
                     </div>
                     
-                    <?php if ($totalPages > 1): ?>
+                    <?php if (isset($totalPages) && $totalPages > 1): ?>
                         <?php renderNewsPagination($currentPage, $totalPages, 'news.php'); ?>
                     <?php endif; ?>
                     

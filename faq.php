@@ -40,6 +40,7 @@ $mainBg = getImage($conn, 'image_background_all');
 // Устанавливаем мета-данные
 $pageTitle = 'Вопрос-ответ - ' . getSetting($conn, 'site_title');
 $pageDescription = 'Часто задаваемые вопросы и ответы по оборудованию и услугам НТЦ КУМИР.';
+$pageKeyword = "";
 
 // Определяем пути
 $headerPath = __DIR__. '/includes/header.php';
@@ -52,7 +53,7 @@ $footerPath = __DIR__. '/includes/footer.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $pageTitle ?></title>
     <meta name="description" content="<?= $pageDescription ?>">
-    
+    <meta name="keywords" content="<?= $pageKeyword ?>">
     <!-- Open Graph -->
     <meta property="og:title" content="<?= $pageTitle ?>">
     <meta property="og:description" content="<?= $pageDescription ?>">

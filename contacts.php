@@ -41,6 +41,7 @@ $showForm = (getSetting($conn, 'form_view') == 1);
 // Устанавливаем мета-данные
 $pageTitle = 'Контакты - ' . getSetting($conn, 'site_title');
 $pageDescription = 'Контактная информация компании НТЦ КУМИР. Адреса, телефоны, email для связи.';
+$pageKeyword = "контакты НТЦ КУМИР, адрес НТЦ КУМИР Иркутск, телефон техподдержки КУМИР, купить модем M32 Иркутск, обратная связь НТЦ КУМИР, офис НТЦ КУМИР, техническая поддержка АСКУЭ, автоматизация ЖКХ контакты, заказать приборы учета Иркутск, поддержка пользователей модем M32";
 
 // Определяем пути
 $headerPath = __DIR__. '/includes/header.php';
@@ -57,6 +58,7 @@ $mapLng = $mainOffice ? $mainOffice['longitude'] : 104.278817;
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $pageTitle ?></title>
     <meta name="description" content="<?= $pageDescription ?>">
+    <meta name="keywords" content="<?= $pageKeyword ?>">
     
     <!-- Open Graph -->
     <meta property="og:title" content="<?= $pageTitle ?>">
