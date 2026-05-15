@@ -26,10 +26,12 @@ if ($article) {
     $pageTitle = htmlspecialchars($article['title']) . ' - ' . getSetting($conn, 'site_title');
     $pageDescription = htmlspecialchars(strip_tags($article['excerpt'] ?? $article['content']));
     $pageDescription = safeSubstr($pageDescription, 0, 160);
+    $pageKeyword = $pageDescription;
     $pageImage = !empty($article['image_path']) ? $article['image_path'] : getSetting($conn, 'logo_path');
 } else {
     $pageTitle = 'Статьи - ' . getSetting($conn, 'site_title');
     $pageDescription = 'Полезные материалы и новости о современных технологиях учета энергоресурсов';
+    $pageKeyword = $pageDescription;
     $pageImage = getSetting($conn, 'logo_path');
 }
 
