@@ -1,0 +1,4 @@
+<FilesMatch "^(config\.php|api_debug\.log)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>

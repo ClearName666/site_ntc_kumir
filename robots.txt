@@ -1,0 +1,14 @@
+User-agent: *
+# Запрещаем индексировать системные папки
+Disallow: /config/
+Disallow: /backups/
+Disallow: /cache/
+Disallow: /includes/
+Disallow: /css_defaults/
+
+# Запрещаем индексировать админку и личный кабинет
+Disallow: /admin/
+Disallow: /userKumir/
+
+# Указываем путь к карте сайта (если она будет)
+Sitemap: https://pavelsite-n-t-c-kumir.ru/sitemap.xml
