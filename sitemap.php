@@ -9,7 +9,7 @@ require_once __DIR__ . '/Cache.php';
 
 // Инициализируем переменные, которые твои функции ждут как global
 $conn = getDBConnection(); // Создаем соединение через твою функцию
-// $cache = new Cache();      // Создаем объект кэша
+$cache = new Cache();      // Создаем объект кэша
 
 // 2. ПОДКЛЮЧЕНИЕ ТВОИХ ФУНКЦИЙ
 require_once __DIR__ . '/includes/news-functions.php';
