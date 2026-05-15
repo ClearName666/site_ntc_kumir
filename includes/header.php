@@ -21,6 +21,7 @@ $isAdmin = isset($_SESSION['admin_id']);
     <link rel="stylesheet" href="/assets/css/responsive.css?version=<?php echo $version_code; ?>">
     <link rel="stylesheet" href="/assets/css/header.css?version=<?php echo $version_code; ?>">
     <link rel="icon" href="<?php echo getSetting($conn, 'favicon_path'); ?>" type="image/x-icon">
+    <meta name="keywords" content="НТЦ КУМИР, ntc kumir, кумир иркутск, автоматизация ЖКХ, учет ресурсов, мониторинг энергоресурсов, АСКУЭ, телеметрия, диспетчеризация, модем M32, M32 Lite, модуль RM81, контроллер K24, промышленный модем, преобразователь интерфейсов, PI11, счетчик тепла, учет электроэнергии, дистанционное считывание данных, системы мониторинга, GPRS модем, оборудование для телеметрии, умный дом, автоматизация подстанций">
 </head>
 <body style="background: url('<?php echo $mainBg['image_path']; ?>') center/cover no-repeat fixed;">
     <header class="main-header">
