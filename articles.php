@@ -66,6 +66,11 @@ $footerPath = __DIR__. '/includes/footer.php';
     <!-- Стили -->
     <link rel="stylesheet" href="assets/css/articles.css?version=<?php echo $version_code; ?>">
     
+
+    <link rel="stylesheet" href="/assets/css/style.css?version=<?php echo $version_code; ?>">
+    <link rel="stylesheet" href="/assets/css/responsive.css?version=<?php echo $version_code; ?>">
+    <link rel="stylesheet" href="/assets/css/header.css?version=<?php echo $version_code; ?>">
+    
 </head>
 </head>
 <body style="<?php if (!empty($article['image_path'])): ?>

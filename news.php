@@ -71,6 +71,9 @@ $footerPath = __DIR__. '/includes/footer.php';
     <!-- Стили для страницы новостей -->
     <link rel="stylesheet" href="assets/css/news.css?version=<?php echo $version_code; ?>">
 
+    <link rel="stylesheet" href="/assets/css/style.css?version=<?php echo $version_code; ?>">
+    <link rel="stylesheet" href="/assets/css/responsive.css?version=<?php echo $version_code; ?>">
+    <link rel="stylesheet" href="/assets/css/header.css?version=<?php echo $version_code; ?>">
 </head> 
 <body style="<?php if (!empty($newsItem['image_path'])): ?>
     background: url('<?= htmlspecialchars($newsItem['image_path']) ?>') center/cover no-repeat fixed;

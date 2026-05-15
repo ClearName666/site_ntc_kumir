@@ -21,6 +21,9 @@ $privacy = "https://pavelsite-n-t-c-kumir.ru/privacy.php";
     <title>Политика конфиденциальности | НТЦ «КУМИр»</title>
     <!-- Стили -->
     <link rel="stylesheet" href="assets/css/style.css?version=<?php echo $version_code; ?>">
+
+    <link rel="stylesheet" href="/assets/css/responsive.css?version=<?php echo $version_code; ?>">
+    <link rel="stylesheet" href="/assets/css/header.css?version=<?php echo $version_code; ?>">
 </head>
 <body style="background: url('<?php echo $mainBg['image_path']; ?>') center/cover no-repeat fixed;">
     <?php include $headerPath; ?>

@@ -12,11 +12,31 @@ $mainBgStart = getImage($conn, 'main_background');
 $heroImage = getImage($conn, 'hero_foreground');
 $mapLocation = getMapLocation($conn);
 $videoId = getSetting($conn, 'video_id');
-$videoThumb = getImage($conn, 'video_thumbnail'); 
-require_once __DIR__. '/includes/header.php';
+// $videoThumb = getImage($conn, 'video_thumbnail'); 
+$mainBg = getImage($conn, 'image_background_all');
 
 ?>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta name="description" content="НТЦ КУМИР — разработка и производство систем автоматизированного учета ресурсов (АСКУЭ), промышленных модемов серии M32 и программного обеспечения для ЖКХ и промышленности в Иркутске.">
+    <meta name="keywords" content="кумир, ntc kumir, аскуэ, мониторинг ресурсов, модем m32, учет тепла, автоматизация жкх, телеметрия">
+    <meta property="og:title" content="НТЦ КУМИР — Системы автоматизации и мониторинга">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="<?php echo $heroImage['image_path']; ?>">
 
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?php echo getSetting($conn, 'site_title'); ?></title>
+    <link rel="stylesheet" href="/assets/css/style.css?version=<?php echo $version_code; ?>">
+    <link rel="stylesheet" href="/assets/css/responsive.css?version=<?php echo $version_code; ?>">
+    <link rel="stylesheet" href="/assets/css/header.css?version=<?php echo $version_code; ?>">
+    <link rel="icon" href="<?php echo getSetting($conn, 'favicon_path'); ?>" type="image/x-icon">
+</head>
+<body style="background: url('<?php echo $mainBg['image_path']; ?>') center/cover no-repeat fixed;">
+
+<?php require_once __DIR__. '/includes/header.php';?>
 <main>
     <!-- Hero Section - обновляем верхний отступ -->
     <section class="hero">
@@ -97,37 +117,21 @@ require_once __DIR__. '/includes/header.php';
             </div>
             
             <div class="about-content">
-                <div class="video-section">
-                    <div class="video-container" id="video-wrapper">
-                        <?php if (!empty($videoId)): ?>
-                            <!-- Показываем превью -->
-                            <div id="video-placeholder" style="cursor:pointer; position: relative;">
-                                <img src="<?php echo $videoThumb['image_path']; ?>" alt="Превью" style="width:100%; border-radius: 8px;">
-                                <div class="play-button" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
-                                    <span style="font-size: 50px; color: white;">▶</span>
-                                </div>
-                            </div>
-
-                            <!-- Скрипт вставки -->
-                            <script>
-                            document.getElementById('video-placeholder').onclick = function() {
-                                var iframe = document.createElement('iframe');
-                                iframe.setAttribute('width', '100%');
-                                iframe.setAttribute('height', '360');
-                                iframe.setAttribute('src', 'https://rutube.ru/play/embed/<?php echo $videoId; ?>/?autoplay=1');
-                                iframe.setAttribute('frameborder', '0');
-                                iframe.setAttribute('allow', 'autoplay; encrypted-media');
-                                iframe.setAttribute('allowfullscreen', '');
-                                iframe.style.borderRadius = '8px';
-                                
-                                var container = document.getElementById('video-wrapper');
-                                container.innerHTML = ''; // Удаляем картинку
-                                container.appendChild(iframe); // Вставляем видео
-                            };
-                            </script>
-                        <?php endif; ?>
-                    </div>
+            <div class="video-section">
+                <div class="video-container" id="video-wrapper">
+                    <?php if (!empty($videoId)): ?>
+                        <iframe 
+                            width="100%" 
+                            height="360" 
+                            src="https://rutube.ru/play/embed/<?php echo $videoId; ?>/" 
+                            frameborder="0" 
+                            allow="autoplay; encrypted-media" 
+                            allowfullscreen 
+                            style="border-radius: 8px;">
+                        </iframe>
+                    <?php endif; ?>
                 </div>
+            </div>
                 
                 <div class="company-info">
                     <?php 
@@ -158,4 +162,5 @@ require_once __DIR__. '/includes/header.php';
     
 </main>
 
-<?php require_once __DIR__. '/includes/footer.php'; ?>
+<?php require_once __DIR__. '/includes/footer.php'; ?></body>
+</html>
