@@ -38,10 +38,22 @@ $offices = getOffices($conn);
 $mainOffice = getMainOffice($conn);
 $showForm = (getSetting($conn, 'form_view') == 1);
 
-// Устанавливаем мета-данные
+/// Устанавливаем мета-данные
 $pageTitle = 'Контакты - ' . getSetting($conn, 'site_title');
 $pageDescription = 'Контактная информация компании НТЦ КУМИР. Адреса, телефоны, email для связи.';
 $pageKeyword = "контакты НТЦ КУМИР, адрес НТЦ КУМИР Иркутск, телефон техподдержки КУМИР, купить модем M32 Иркутск, обратная связь НТЦ КУМИР, офис НТЦ КУМИР, техническая поддержка АСКУЭ, автоматизация ЖКХ контакты, заказать приборы учета Иркутск, поддержка пользователей модем M32";
+
+// --- ДОПОЛНИТЕЛЬНАЯ ПОДГОТОВКА ДЛЯ SEO И СОЦСЕТЕЙ ---
+// Дефолтная картинка для соцсетей (настройте в БД или укажите путь)
+$defaultSocialImage = getSetting($conn, 'social_default_image');
+$ogImage = !empty($defaultSocialImage) ? $defaultSocialImage : getSetting($conn, 'logo_path');
+
+// Если описание пустое (маловероятно) — ставим запасной текст
+if (empty($pageDescription)) {
+    $pageDescription = 'Свяжитесь с нами любым удобным способом. Адреса, телефоны, email – НТЦ КУМИР';
+}
+
+$currentUrl = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 
 // Определяем пути
 $headerPath = __DIR__. '/includes/header.php';
@@ -55,31 +67,52 @@ $mapLng = $mainOffice ? $mainOffice['longitude'] : 104.278817;
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
     <title><?= $pageTitle ?></title>
-    <meta name="description" content="<?= $pageDescription ?>">
-    <meta name="keywords" content="<?= $pageKeyword ?>">
-    
-    <!-- Open Graph -->
+
+    <!-- SEO -->
+    <meta name="description" content="<?= htmlspecialchars($pageDescription) ?>">
+    <meta name="keywords" content="<?= htmlspecialchars($pageKeyword) ?>">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+    <meta name="author" content="НТЦ КУМИР">
+    <meta name="copyright" content="<?= date('Y') ?> <?= htmlspecialchars(getSetting($conn, 'site_title')) ?>">
+    <link rel="canonical" href="<?= $currentUrl ?>">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:locale" content="ru_RU">
+    <meta property="og:site_name" content="<?= htmlspecialchars(getSetting($conn, 'site_title')) ?>">
+    <meta property="og:url" content="<?= $currentUrl ?>">
     <meta property="og:title" content="<?= $pageTitle ?>">
-    <meta property="og:description" content="<?= $pageDescription ?>">
-    <meta property="og:image" content="<?= getSetting($conn, 'logo_path') ?>">
+    <meta property="og:description" content="<?= htmlspecialchars($pageDescription) ?>">
+    <meta property="og:image" content="<?= $ogImage ?>">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
     <meta property="og:type" content="website">
-    
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="<?= $pageTitle ?>">
+    <meta name="twitter:description" content="<?= htmlspecialchars($pageDescription) ?>">
+    <meta name="twitter:image" content="<?= $ogImage ?>">
+    <?php if (getSetting($conn, 'twitter_site')): ?>
+    <meta name="twitter:site" content="<?= htmlspecialchars(getSetting($conn, 'twitter_site')) ?>">
+    <?php endif; ?>
+
+    <!-- Мобильный вид -->
+    <meta name="theme-color" content="#ffffff">
+
     <!-- Yandex Maps API -->
     <script src="https://api-maps.yandex.ru/2.1/?apikey=942369a1-f9ea-437f-a44a-460ac101ca32&lang=ru_RU" type="text/javascript"></script>
-    
-    <!-- Favicon -->
-    <link rel="icon" href="<?= getSetting($conn, 'favicon_path') ?>" type="image/x-icon">
-    
-    <!-- Стили -->
-    <link rel="stylesheet" href="assets/css/contacts.css?version=<?php echo $version_code; ?>">
 
+    <!-- Favicon и RSS -->
+    <link rel="icon" href="<?= getSetting($conn, 'favicon_path') ?>" type="image/x-icon">
+    <link rel="alternate" type="application/rss+xml" title="<?= htmlspecialchars(getSetting($conn, 'site_title')) ?> – контакты" href="/rss.xml">
+
+    <!-- Стили (без изменений) -->
+    <link rel="stylesheet" href="assets/css/contacts.css?version=<?php echo $version_code; ?>">
     <link rel="stylesheet" href="/assets/css/style.css?version=<?php echo $version_code; ?>">
     <link rel="stylesheet" href="/assets/css/responsive.css?version=<?php echo $version_code; ?>">
     <link rel="stylesheet" href="/assets/css/header.css?version=<?php echo $version_code; ?>">
-    
-
 </head>
 <body style="background: url('<?php echo $mainBg['image_path']; ?>') center/cover no-repeat fixed;">
     <!-- Header -->

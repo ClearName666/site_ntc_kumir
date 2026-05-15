@@ -23,19 +23,43 @@ if (isset($_GET['news']) && !empty($_GET['news'])) {
     $currentViews = getActualNewsViews($conn, $newsItem['id']);
 }
 
+// --- ПОДГОТОВКА МЕТА-ДАННЫХ ДЛЯ SEO И СОЦСЕТЕЙ ---
+$siteTitle = getSetting($conn, 'site_title');
+$defaultSocialImage = getSetting($conn, 'social_default_image');
+$currentUrl = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+$baseNewsUrl = 'https://' . $_SERVER['HTTP_HOST'] . '/news.php';
+
 // Устанавливаем мета-данные страницы
 if ($newsItem) {
-    $pageTitle = htmlspecialchars($newsItem['title']) . ' - Новости - ' . getSetting($conn, 'site_title');
-    
-    // Используем безопасную функцию для обрезания описания
-    $pageDescription = truncateDescription($newsItem['excerpt'] ?? $newsItem['content'], 160);
-    $pageKeyword = truncateDescription($newsItem['excerpt'] ?? $newsItem['content'], 160);
-    $pageImage = !empty($newsItem['image_path']) ? $newsItem['image_path'] : getSetting($conn, 'logo_path');
+    // Детальная новость
+    $pageTitle = htmlspecialchars($newsItem['title']) . ' - Новости - ' . $siteTitle;
+    $rawDescription = $newsItem['excerpt'] ?? $newsItem['content'];
+    $pageDescription = truncateDescription($rawDescription, 160);
+    $pageKeyword = $pageDescription;
+    $pageImage = !empty($newsItem['image_path']) ? $newsItem['image_path'] : ($defaultSocialImage ?: getSetting($conn, 'logo_path'));
+    $ogType = 'article';
+    $canonicalUrl = $currentUrl;
+    $robotsDirective = 'index, follow, max-image-preview:large, max-snippet:-1';
 } else {
-    $pageTitle = 'Новости - ' . getSetting($conn, 'site_title');
+    // Список новостей (возможно с пагинацией)
+    $pageTitle = 'Новости - ' . $siteTitle;
     $pageDescription = 'Актуальные новости и события компании НТЦ КУМИР';
-    $pageKeyword = "Актуальные новости и события компании НТЦ КУМИР";
-    $pageImage = getSetting($conn, 'logo_path');
+    $pageKeyword = 'новости НТЦ КУМИР, события, аскуэ, модемы, автоматизация';
+    $pageImage = $defaultSocialImage ?: getSetting($conn, 'logo_path');
+    $ogType = 'website';
+    
+    // Канонический URL для списка без параметра page
+    $canonicalUrl = $baseNewsUrl;
+    if ($currentPage > 1) {
+        // Для страниц пагинации – разрешаем индексацию, но канонил ведёт на первую
+        $robotsDirective = 'index, follow, max-image-preview:large';
+    } else {
+        $robotsDirective = 'index, follow, max-image-preview:large, max-snippet:-1';
+    }
+}
+
+if (empty($pageDescription)) {
+    $pageDescription = 'Новости компании НТЦ КУМИР — современные решения для учёта энергоресурсов.';
 }
 
 // Получаем данные для списка новостей
@@ -53,30 +77,69 @@ $footerPath = __DIR__. '/includes/footer.php';
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
     <title><?= $pageTitle ?></title>
-    <meta name="description" content="<?= $pageDescription ?>">
-    <meta name="keywords" content="<?= $pageKeyword ?>">
-    
-    <!-- Open Graph -->
-    <?php if ($newsItem): ?>
-    <meta property="og:title" content="<?= htmlspecialchars($newsItem['title']) ?>">
-    <meta property="og:description" content="<?= $pageDescription ?>">
-    <meta property="og:image" content="<?= $pageImage ?>">
-    <meta property="og:type" content="article">
-    <meta property="article:published_time" content="<?= $newsItem['published_at'] ?>">
-    <?php endif; ?>
-    
-    <!-- Favicon -->
-    <link rel="icon" href="<?= getSetting($conn, 'favicon_path') ?>" type="image/x-icon">
-    
-    <!-- Стили для страницы новостей -->
-    <link rel="stylesheet" href="assets/css/news.css?version=<?php echo $version_code; ?>">
 
+    <!-- SEO -->
+    <meta name="description" content="<?= htmlspecialchars($pageDescription) ?>">
+    <meta name="keywords" content="<?= htmlspecialchars($pageKeyword) ?>">
+    <meta name="robots" content="<?= $robotsDirective ?>">
+    <meta name="author" content="НТЦ КУМИР">
+    <meta name="copyright" content="<?= date('Y') ?> <?= htmlspecialchars($siteTitle) ?>">
+    <link rel="canonical" href="<?= $canonicalUrl ?>">
+
+    <!-- Пагинация: prev/next -->
+    <?php if (!$newsItem && isset($totalPages) && $totalPages > 1): ?>
+        <?php if ($currentPage > 1): ?>
+            <link rel="prev" href="<?= $baseNewsUrl . ($currentPage-1 > 1 ? '?page=' . ($currentPage-1) : '') ?>">
+        <?php endif; ?>
+        <?php if ($currentPage < $totalPages): ?>
+            <link rel="next" href="<?= $baseNewsUrl . '?page=' . ($currentPage+1) ?>">
+        <?php endif; ?>
+    <?php endif; ?>
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:locale" content="ru_RU">
+    <meta property="og:site_name" content="<?= htmlspecialchars($siteTitle) ?>">
+    <meta property="og:url" content="<?= $currentUrl ?>">
+    <meta property="og:title" content="<?= $pageTitle ?>">
+    <meta property="og:description" content="<?= htmlspecialchars($pageDescription) ?>">
+    <meta property="og:image" content="<?= $pageImage ?>">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:type" content="<?= $ogType ?>">
+
+    <?php if ($newsItem): ?>
+        <!-- Дополнительные метки для статьи -->
+        <meta property="article:published_time" content="<?= $newsItem['published_at'] ?>">
+        <meta property="article:author" content="<?= htmlspecialchars($newsItem['author'] ?? 'НТЦ КУМИР') ?>">
+        <?php if (!empty($newsItem['modified_at'])): ?>
+            <meta property="article:modified_time" content="<?= $newsItem['modified_at'] ?>">
+        <?php endif; ?>
+    <?php endif; ?>
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="<?= $pageTitle ?>">
+    <meta name="twitter:description" content="<?= htmlspecialchars($pageDescription) ?>">
+    <meta name="twitter:image" content="<?= $pageImage ?>">
+    <?php if (getSetting($conn, 'twitter_site')): ?>
+        <meta name="twitter:site" content="<?= htmlspecialchars(getSetting($conn, 'twitter_site')) ?>">
+    <?php endif; ?>
+
+    <!-- Мобильный вид -->
+    <meta name="theme-color" content="#ffffff">
+
+    <!-- Favicon и RSS -->
+    <link rel="icon" href="<?= getSetting($conn, 'favicon_path') ?>" type="image/x-icon">
+    <link rel="alternate" type="application/rss+xml" title="<?= htmlspecialchars($siteTitle) ?> – новости" href="/rss.xml">
+
+    <!-- Стили (как у вас) -->
+    <link rel="stylesheet" href="assets/css/news.css?version=<?php echo $version_code; ?>">
     <link rel="stylesheet" href="/assets/css/style.css?version=<?php echo $version_code; ?>">
     <link rel="stylesheet" href="/assets/css/responsive.css?version=<?php echo $version_code; ?>">
     <link rel="stylesheet" href="/assets/css/header.css?version=<?php echo $version_code; ?>">
-</head> 
+</head>
 <body style="<?php if (!empty($newsItem['image_path'])): ?>
     background: url('<?= htmlspecialchars($newsItem['image_path']) ?>') center/cover no-repeat fixed;
 <?php else: ?>background: url('<?php echo $mainBg['image_path']; ?>') center/cover no-repeat fixed;<?php endif; ?>">

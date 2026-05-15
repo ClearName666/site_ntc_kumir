@@ -31,7 +31,7 @@ if ($article) {
 } else {
     $pageTitle = 'Статьи - ' . getSetting($conn, 'site_title');
     $pageDescription = 'Полезные материалы и новости о современных технологиях учета энергоресурсов';
-    $pageKeyword = $pageDescription;
+    $pageKeyword = 'Полезные материалы и новости о современных технологиях учета энергоресурсов';
     $pageImage = getSetting($conn, 'logo_path');
 }
 
@@ -48,23 +48,48 @@ $footerPath = __DIR__. '/includes/footer.php';
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
     <title><?= $pageTitle ?></title>
+
+    <!-- SEO -->
     <meta name="description" content="<?= $pageDescription ?>">
-    
-    <!-- Open Graph для соцсетей -->
+    <meta name="keywords" content="<?= $pageKeyword ?>">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+    <meta name="author" content="<?= htmlspecialchars($article['author'] ?? getSetting($conn, 'site_author') ?? 'НТЦ КУМИР') ?>">
+    <meta name="copyright" content="<?= date('Y') ?> <?= htmlspecialchars(getSetting($conn, 'site_title')) ?>">
+    <link rel="canonical" href="https://<?= $_SERVER['HTTP_HOST'] ?><?= $_SERVER['REQUEST_URI'] ?>">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:locale" content="ru_RU">
+    <meta property="og:site_name" content="<?= htmlspecialchars(getSetting($conn, 'site_title')) ?>">
+    <meta property="og:url" content="https://<?= $_SERVER['HTTP_HOST'] ?><?= $_SERVER['REQUEST_URI'] ?>">
     <?php if ($article): ?>
     <meta property="og:title" content="<?= htmlspecialchars($article['title']) ?>">
     <meta property="og:description" content="<?= $pageDescription ?>">
     <meta property="og:image" content="<?= $pageImage ?>">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
     <meta property="og:type" content="article">
     <meta property="article:published_time" content="<?= $article['published_at'] ?>">
     <meta property="article:author" content="<?= htmlspecialchars($article['author'] ?? 'НТЦ КУМИР') ?>">
     <?php endif; ?>
-    
-    <!-- Favicon -->
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="<?= htmlspecialchars($article['title'] ?? $pageTitle) ?>">
+    <meta name="twitter:description" content="<?= $pageDescription ?>">
+    <meta name="twitter:image" content="<?= $pageImage ?>">
+    <?php if (getSetting($conn, 'twitter_site')): ?>
+    <meta name="twitter:site" content="<?= htmlspecialchars(getSetting($conn, 'twitter_site')) ?>">
+    <?php endif; ?>
+
+    <!-- Мобильный вид -->
+    <meta name="theme-color" content="#ffffff">
+
+    <!-- Favicon и RSS -->
     <link rel="icon" href="<?= getSetting($conn, 'favicon_path') ?>" type="image/x-icon">
-    
+    <link rel="alternate" type="application/rss+xml" title="<?= htmlspecialchars(getSetting($conn, 'site_title')) ?> – лента статей" href="/rss.xml">
+
     <!-- Стили -->
     <link rel="stylesheet" href="assets/css/articles.css?version=<?php echo $version_code; ?>">
     
@@ -72,8 +97,6 @@ $footerPath = __DIR__. '/includes/footer.php';
     <link rel="stylesheet" href="/assets/css/style.css?version=<?php echo $version_code; ?>">
     <link rel="stylesheet" href="/assets/css/responsive.css?version=<?php echo $version_code; ?>">
     <link rel="stylesheet" href="/assets/css/header.css?version=<?php echo $version_code; ?>">
-    
-</head>
 </head>
 <body style="<?php if (!empty($article['image_path'])): ?>
     background: url('<?= htmlspecialchars($article['image_path']) ?>') center/cover no-repeat fixed;

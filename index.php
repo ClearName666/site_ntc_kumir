@@ -15,24 +15,63 @@ $videoId = getSetting($conn, 'video_id');
 // $videoThumb = getImage($conn, 'video_thumbnail'); 
 $mainBg = getImage($conn, 'image_background_all');
 
+
+// --- ДОПОЛНИТЕЛЬНАЯ ПОДГОТОВКА ДЛЯ SEO И СОЦСЕТЕЙ ---
+$siteTitle = getSetting($conn, 'site_title');
+$pageTitle = $siteTitle;
+$pageDescription = 'НТЦ КУМИР — разработка и производство систем автоматизированного учета ресурсов (АСКУЭ), промышленных модемов серии M32 и программного обеспечения для ЖКХ и промышленности в Иркутске.';
+$pageKeywords = 'кумир, ntc kumir, аскуэ, мониторинг ресурсов, модем m32, учет тепла, автоматизация жкх, телеметрия, радиомодем, рм81, сбор показаний';
+
+$defaultSocialImage = getSetting($conn, 'social_default_image');
+$ogImage = !empty($defaultSocialImage) ? $defaultSocialImage : ($heroImage['image_path'] ?? getSetting($conn, 'logo_path'));
+$currentUrl = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 ?>
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta property="og:title" content="НТЦ КУМИР — Системы автоматизации и мониторинга">
-    <meta property="og:type" content="website">
-    <meta property="og:image" content="<?php echo $heroImage['image_path']; ?>">
-
-    <meta name="description" content="НТЦ КУМИР — разработка и производство систем автоматизированного учета ресурсов (АСКУЭ), промышленных модемов серии M32 и программного обеспечения для ЖКХ и промышленности в Иркутске.">
-    <meta name="keywords" content="кумир, ntc kumir, аскуэ, мониторинг ресурсов, модем m32, учет тепла, автоматизация жкх, телеметрия, радиомодем, рм81, сбор показаний">
-
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo getSetting($conn, 'site_title'); ?></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
+    <title><?= htmlspecialchars($pageTitle) ?></title>
+
+    <!-- SEO -->
+    <meta name="description" content="<?= htmlspecialchars($pageDescription) ?>">
+    <meta name="keywords" content="<?= htmlspecialchars($pageKeywords) ?>">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+    <meta name="author" content="НТЦ КУМИР">
+    <meta name="copyright" content="<?= date('Y') ?> <?= htmlspecialchars($siteTitle) ?>">
+    <link rel="canonical" href="<?= $currentUrl ?>">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:locale" content="ru_RU">
+    <meta property="og:site_name" content="<?= htmlspecialchars($siteTitle) ?>">
+    <meta property="og:url" content="<?= $currentUrl ?>">
+    <meta property="og:title" content="<?= htmlspecialchars($pageTitle) ?>">
+    <meta property="og:description" content="<?= htmlspecialchars($pageDescription) ?>">
+    <meta property="og:image" content="<?= $ogImage ?>">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:type" content="website">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="<?= htmlspecialchars($pageTitle) ?>">
+    <meta name="twitter:description" content="<?= htmlspecialchars($pageDescription) ?>">
+    <meta name="twitter:image" content="<?= $ogImage ?>">
+    <?php if (getSetting($conn, 'twitter_site')): ?>
+    <meta name="twitter:site" content="<?= htmlspecialchars(getSetting($conn, 'twitter_site')) ?>">
+    <?php endif; ?>
+
+    <!-- Мобильный вид -->
+    <meta name="theme-color" content="#ffffff">
+
+    <!-- Favicon и RSS -->
+    <link rel="icon" href="<?= getSetting($conn, 'favicon_path') ?>" type="image/x-icon">
+    <link rel="alternate" type="application/rss+xml" title="<?= htmlspecialchars($siteTitle) ?> – новости и статьи" href="/rss.xml">
+
+    <!-- Стили -->
     <link rel="stylesheet" href="/assets/css/style.css?version=<?php echo $version_code; ?>">
     <link rel="stylesheet" href="/assets/css/responsive.css?version=<?php echo $version_code; ?>">
     <link rel="stylesheet" href="/assets/css/header.css?version=<?php echo $version_code; ?>">
-    <link rel="icon" href="<?php echo getSetting($conn, 'favicon_path'); ?>" type="image/x-icon">
 </head>
 <body style="background: url('<?php echo $mainBg['image_path']; ?>') center/cover no-repeat fixed;">
 

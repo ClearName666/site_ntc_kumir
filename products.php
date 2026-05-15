@@ -46,22 +46,45 @@ if ($product) {
     $allCategories = getProductCategories($conn);
 }
 
-// Устанавливаем мета-данные страницы
+// --- ПОДГОТОВКА МЕТА-ДАННЫХ ДЛЯ SEO И СОЦСЕТЕЙ ---
+$siteTitle = getSetting($conn, 'site_title');
+$defaultSocialImage = getSetting($conn, 'social_default_image');
+$currentUrl = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+
 if ($productData) {
-    $pageTitle = htmlspecialchars($productData['name']) . ' - ' . getSetting($conn, 'site_title');
-    $pageDescription = htmlspecialchars(strip_tags($productData['description']));
+    $pageTitle = htmlspecialchars($productData['name']) . ' - ' . $siteTitle;
+    $rawDescription = strip_tags($productData['description'] ?? $productData['full_description'] ?? '');
+    $pageDescription = truncateDescription($rawDescription, 160);
     $pageKeyword = htmlspecialchars(strip_tags($productData['name']));
-    $pageImage = !empty($productData['image_path']) ? $productData['image_path'] : getSetting($conn, 'logo_path');
+    $pageImage = !empty($productData['image_path']) ? $productData['image_path'] : ($defaultSocialImage ?: getSetting($conn, 'logo_path'));
+    $ogType = 'product';
+    $canonicalUrl = $currentUrl;
+    $robotsDirective = 'index, follow, max-image-preview:large, max-snippet:-1';
+    
+    // Для товара можно добавить цену и наличие в Open Graph
+    $ogPrice = !empty($productData['price']) ? number_format($productData['price'], 0, '.', '') : null;
+    $ogAvailability = $productData['is_available'] ? 'in stock' : 'out of stock';
+    
 } elseif ($categoryData) {
-    $pageTitle = htmlspecialchars($categoryData['name']) . ' - Продукция - ' . getSetting($conn, 'site_title');
-    $pageDescription = htmlspecialchars($categoryData['description'] ?? 'Оборудование категории ' . $categoryData['name']);
+    $pageTitle = htmlspecialchars($categoryData['name']) . ' - Продукция - ' . $siteTitle;
+    $pageDescription = truncateDescription($categoryData['description'] ?? 'Оборудование категории ' . $categoryData['name'], 160);
     $pageKeyword = htmlspecialchars($categoryData['description'] ?? 'Оборудование категории ' . $categoryData['name']);
-    $pageImage = !empty($categoryData['image_path']) ? $categoryData['image_path'] : getSetting($conn, 'logo_path');
+    $pageImage = !empty($categoryData['image_path']) ? $categoryData['image_path'] : ($defaultSocialImage ?: getSetting($conn, 'logo_path'));
+    $ogType = 'website';
+    $canonicalUrl = 'https://' . $_SERVER['HTTP_HOST'] . '/products.php?category=' . urlencode($categoryData['slug']);
+    $robotsDirective = 'index, follow, max-image-preview:large, max-snippet:-1';
 } else {
-    $pageTitle = 'Продукция - ' . getSetting($conn, 'site_title');
+    $pageTitle = 'Продукция - ' . $siteTitle;
     $pageDescription = 'Оборудование и решения для автоматизации учета энергоресурсов';
-    $pageKeyword = 'Продукция - ' . getSetting($conn, 'site_title');
-    $pageImage = getSetting($conn, 'logo_path');
+    $pageKeyword = 'продукция НТЦ КУМИР, оборудование, аскуэ, модемы, счетчики';
+    $pageImage = $defaultSocialImage ?: getSetting($conn, 'logo_path');
+    $ogType = 'website';
+    $canonicalUrl = 'https://' . $_SERVER['HTTP_HOST'] . '/products.php';
+    $robotsDirective = 'index, follow, max-image-preview:large, max-snippet:-1';
+}
+
+if (empty($pageDescription)) {
+    $pageDescription = 'Оборудование НТЦ КУМИР для автоматизации учёта энергоресурсов. Полные характеристики и цены.';
 }
 
 // Определяем пути
@@ -72,23 +95,58 @@ $footerPath = 'includes/footer.php';
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
     <title><?= $pageTitle ?></title>
-    <meta name="description" content="<?= $pageDescription ?>">
-    <meta name="keywords" content="<?= $pageKeyword ?>">
-    
-    <!-- Open Graph -->
-    <meta property="og:title" content="<?= $pageTitle ?>">
-    <meta property="og:description" content="<?= $pageDescription ?>">
-    <meta property="og:image" content="<?= $pageImage ?>">
-    <meta property="og:type" content="website">
-    
-    <!-- Favicon -->
-    <link rel="icon" href="<?= getSetting($conn, 'favicon_path') ?>" type="image/x-icon">
-    
-    <!-- Стили -->
-    <link rel="stylesheet" href="assets/css/products.css?version=<?php echo $version_code; ?>">
 
+    <!-- SEO -->
+    <meta name="description" content="<?= htmlspecialchars($pageDescription) ?>">
+    <meta name="keywords" content="<?= htmlspecialchars($pageKeyword) ?>">
+    <meta name="robots" content="<?= $robotsDirective ?>">
+    <meta name="author" content="НТЦ КУМИР">
+    <meta name="copyright" content="<?= date('Y') ?> <?= htmlspecialchars($siteTitle) ?>">
+    <link rel="canonical" href="<?= $canonicalUrl ?>">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:locale" content="ru_RU">
+    <meta property="og:site_name" content="<?= htmlspecialchars($siteTitle) ?>">
+    <meta property="og:url" content="<?= $currentUrl ?>">
+    <meta property="og:title" content="<?= $pageTitle ?>">
+    <meta property="og:description" content="<?= htmlspecialchars($pageDescription) ?>">
+    <meta property="og:image" content="<?= $pageImage ?>">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:type" content="<?= $ogType ?>">
+
+    <?php if ($productData && isset($ogPrice) && $ogPrice): ?>
+    <!-- Дополнительные метки для товара (Product) -->
+    <meta property="product:price:amount" content="<?= $ogPrice ?>">
+    <meta property="product:price:currency" content="RUB">
+    <?php if (isset($ogAvailability)): ?>
+        <meta property="product:availability" content="<?= $ogAvailability ?>">
+    <?php endif; ?>
+    <?php if (!empty($productData['sku'])): ?>
+        <meta property="product:retailer_item_id" content="<?= htmlspecialchars($productData['sku']) ?>">
+    <?php endif; ?>
+    <?php endif; ?>
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="<?= $pageTitle ?>">
+    <meta name="twitter:description" content="<?= htmlspecialchars($pageDescription) ?>">
+    <meta name="twitter:image" content="<?= $pageImage ?>">
+    <?php if (getSetting($conn, 'twitter_site')): ?>
+        <meta name="twitter:site" content="<?= htmlspecialchars(getSetting($conn, 'twitter_site')) ?>">
+    <?php endif; ?>
+
+    <!-- Мобильный вид -->
+    <meta name="theme-color" content="#ffffff">
+
+    <!-- Favicon и RSS -->
+    <link rel="icon" href="<?= getSetting($conn, 'favicon_path') ?>" type="image/x-icon">
+    <link rel="alternate" type="application/rss+xml" title="<?= htmlspecialchars($siteTitle) ?> – продукция" href="/rss.xml">
+
+    <!-- Стили (без изменений) -->
+    <link rel="stylesheet" href="assets/css/products.css?version=<?php echo $version_code; ?>">
     <link rel="stylesheet" href="/assets/css/style.css?version=<?php echo $version_code; ?>">
     <link rel="stylesheet" href="/assets/css/responsive.css?version=<?php echo $version_code; ?>">
     <link rel="stylesheet" href="/assets/css/header.css?version=<?php echo $version_code; ?>">
