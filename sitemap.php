@@ -2,11 +2,10 @@
 // 1. Подключаем базу
 require_once __DIR__ . '/config/database.php';
 
-// Полностью блокируем вывод любых ошибок в браузер (чтобы не ломать XML)
+// Блокируем вывод ошибок, чтобы не ломать XML структуру
 ini_set('display_errors', 0);
-error_reporting(0); 
+error_reporting(0);
 
-// Устанавливаем правильный заголовок
 header("Content-Type: application/xml; charset=utf-8");
 
 echo '<?xml version="1.0" encoding="UTF-8"?>' . PHP_EOL;
@@ -26,7 +25,7 @@ function renderUrl($loc, $priority = '0.5', $changefreq = 'monthly', $lastmod = 
     echo "  </url>" . PHP_EOL;
 }
 
-// --- 1. СТАТИЧЕСКИЕ СТРАНИЦЫ ---
+// --- СТАТИКА ---
 renderUrl($baseUrl . '/', '1.0', 'daily');
 renderUrl($baseUrl . '/news.php', '0.8', 'daily');
 renderUrl($baseUrl . '/products.php', '0.8', 'daily');
@@ -34,36 +33,35 @@ renderUrl($baseUrl . '/contacts.php', '0.7', 'monthly');
 renderUrl($baseUrl . '/faq.php', '0.7', 'weekly');
 renderUrl($baseUrl . '/privacy.php', '0.3', 'yearly');
 
-// --- 2. ДИНАМИЧЕСКИЕ СТРАНИЦЫ ---
-// Оборачиваем каждый блок в проверку, чтобы ошибка в одной таблице не ломала весь файл
+// --- ДИНАМИКА (с проверкой существования колонок) ---
 
-// Новости
-$res = $conn->query("SELECT slug, created_at FROM news WHERE is_published = 1");
-if ($res && $res->num_rows > 0) {
+// 1. Новости (пробуем забрать всё, что есть)
+$res = $conn->query("SELECT slug, created_at FROM news");
+if ($res) {
     while ($row = $res->fetch_assoc()) {
         renderUrl($baseUrl . '/news.php?news=' . urlencode($row['slug']), '0.7', 'monthly', $row['created_at']);
     }
 }
 
-// Статьи
-$res = $conn->query("SELECT slug, created_at FROM articles WHERE is_published = 1");
-if ($res && $res->num_rows > 0) {
+// 2. Статьи
+$res = $conn->query("SELECT slug, created_at FROM articles");
+if ($res) {
     while ($row = $res->fetch_assoc()) {
         renderUrl($baseUrl . '/pages/articles.php?article=' . urlencode($row['slug']), '0.7', 'monthly', $row['created_at']);
     }
 }
 
-// Категории товаров
-$res = $conn->query("SELECT slug FROM product_categories WHERE is_active = 1");
-if ($res && $res->num_rows > 0) {
+// 3. Категории
+$res = $conn->query("SELECT slug FROM product_categories");
+if ($res) {
     while ($row = $res->fetch_assoc()) {
         renderUrl($baseUrl . '/products.php?category=' . urlencode($row['slug']), '0.8', 'weekly');
     }
 }
 
-// Сами товары
-$res = $conn->query("SELECT slug FROM products WHERE is_active = 1");
-if ($res && $res->num_rows > 0) {
+// 4. Товары
+$res = $conn->query("SELECT slug FROM products");
+if ($res) {
     while ($row = $res->fetch_assoc()) {
         renderUrl($baseUrl . '/products.php?product=' . urlencode($row['slug']), '0.9', 'weekly');
     }
