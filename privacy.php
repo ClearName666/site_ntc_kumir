@@ -93,7 +93,7 @@ $privacy = "https://pavelsite-n-t-c-kumir.ru/privacy.php";
 
                     <h2>6. Цели обработки персональных данных</h2>
                     <table style="width:100%; border-collapse: collapse; margin: 20px 0;">
-                        <tr style="background: #f4f4f4;">
+                        <tr>
                             <th style="border: 1px solid #ddd; padding: 12px;">Цель обработки</th>
                             <th style="border: 1px solid #ddd; padding: 12px;">Установление с Пользователем обратной связи, включая направление уведомлений, запросов, касающихся использования сайта, оказания услуг, обработку запросов и заявок от Пользователя, а также направление коммерческих предложений</th>
                         </tr>
