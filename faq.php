@@ -82,15 +82,6 @@ $footerPath = __DIR__. '/includes/footer.php';
     <meta property="og:image:height" content="630">
     <meta property="og:type" content="website">
 
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="<?= $pageTitle ?>">
-    <meta name="twitter:description" content="<?= htmlspecialchars($pageDescription) ?>">
-    <meta name="twitter:image" content="<?= $ogImage ?>">
-    <?php if (getSetting($conn, 'twitter_site')): ?>
-    <meta name="twitter:site" content="<?= htmlspecialchars(getSetting($conn, 'twitter_site')) ?>">
-    <?php endif; ?>
-
     <!-- Мобильный вид -->
     <meta name="theme-color" content="#ffffff">
 

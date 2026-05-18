@@ -7,9 +7,10 @@
     -webkit-backdrop-filter: blur(15px);
     color: white;
 
-    position: absolute; /* Не занимает место в потоке */
+    position: absolute;
     top: 0;
-    left: 0;
+    left: 50%;
+    transform: translateX(-50%);
     width: 100%;
     z-index: 1000;
 

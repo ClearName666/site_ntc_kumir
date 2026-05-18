@@ -143,10 +143,14 @@ require_once __DIR__. '/includes/menu.php';
                             <label>Акцентный цвет</label>
                             <input type="color" name="color" value="<?php echo $item['color'] ?? '#007bff'; ?>" style="height: 45px;">
                         </div>
+                    </div>
+                    <div class="form-row">
                         <div class="form-group col-md-4">
                             <label>Порядок сортировки</label>
                             <input type="number" name="sort_order" value="<?php echo $item['sort_order'] ?? 0; ?>">
                         </div>
+                    </div>
+                    <div class="form-row">
                         <div class="form-group col-md-4" style="padding-top: 35px;">
                             <label class="checkbox-label">
                                 <input type="checkbox" name="is_active" value="1" <?php echo ($item['is_active'] ?? 1) ? 'checked' : ''; ?>>
@@ -154,7 +158,6 @@ require_once __DIR__. '/includes/menu.php';
                             </label>
                         </div>
                     </div>
-
                     <div class="form-group">
                         <label>Изображение/Иконка</label>
                         <div class="image-upload-container">

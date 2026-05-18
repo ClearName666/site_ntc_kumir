@@ -30,6 +30,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
+    // Принудительно устанавливаем 0 или 1 для чекбокса
+    $_POST['setting_price_view'] = isset($_POST['setting_price_view']) && $_POST['setting_price_view'] == 1 ? 1 : 0;
+    foreach ($_POST as $key => $value) {
+        if (strpos($key, 'setting_') === 0) {
+            $settingKey = substr($key, 8);
+            updateOrInsertSetting($conn, $settingKey, cleanInput($value));
+        }
+    }
+
     // 2. Обработка изображений
     $imageFields = [
         'logo' => 'logo',
@@ -115,12 +124,6 @@ require_once __DIR__. '/includes/menu.php';
                             <input type="text" id="setting_phone" name="setting_phone" 
                                    value="<?php echo htmlspecialchars($settings['phone'] ?? ''); ?>">
                         </div>
-
-                        <div class="form-group col-md-6">
-                            <label for="setting_video_id">ID Rutub видео о компании</label>
-                            <input type="text" id="setting_video_id" name="setting_video_id" 
-                                   value="<?php echo htmlspecialchars($settings['video_id'] ?? ''); ?>">
-                        </div>
                     </div>
                     
                     <div class="form-row">
@@ -136,16 +139,31 @@ require_once __DIR__. '/includes/menu.php';
                                     value="<?php echo htmlspecialchars($settings['company_address'] ?? ''); ?>">
                         </div>
                     </div>
-
-                    <div class="form-group">
-                        <label for="setting_form_view">
-                            <input type="hidden" name="setting_form_view" value="0">
-                            <input type="checkbox" id="setting_form_view" name="setting_form_view" value="1" 
-                                <?php echo (($settings['form_view'] ?? 0) == 1) ? 'checked' : ''; ?>>
-                            Форма отображения (включена)
-                        </label>
-                        <small class="text-muted d-block">1 – включено, 0 – выключено</small>
-                    </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="setting_video_id">ID Rutub видео о компании</label>
+                                <input type="text" id="setting_video_id" name="setting_video_id" 
+                                    value="<?php echo htmlspecialchars($settings['video_id'] ?? ''); ?>">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="setting_form_view">
+                                <input type="hidden" name="setting_form_view" value="0">
+                                <input type="checkbox" id="setting_form_view" name="setting_form_view" value="1" 
+                                    <?php echo (($settings['form_view'] ?? 0) == 1) ? 'checked' : ''; ?>>
+                                Форма отображения
+                            </label>
+                            <small class="text-muted d-block">1 – включено, 0 – выключено</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="setting_price_view">
+                                <input type="hidden" name="setting_price_view" value="0">
+                                <input type="checkbox" id="setting_price_view" name="setting_price_view" value="1" 
+                                    <?php echo (($settings['price_view'] ?? 0) == 1) ? 'checked' : ''; ?>>
+                                Цены товаров отображение
+                            </label>
+                            <small class="text-muted d-block">1 – включено, 0 – выключено</small>
+                        </div>
                 </div>
             </div>
             

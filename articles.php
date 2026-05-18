@@ -74,15 +74,6 @@ $footerPath = __DIR__. '/includes/footer.php';
     <meta property="article:author" content="<?= htmlspecialchars($article['author'] ?? 'НТЦ КУМИР') ?>">
     <?php endif; ?>
 
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="<?= htmlspecialchars($article['title'] ?? $pageTitle) ?>">
-    <meta name="twitter:description" content="<?= $pageDescription ?>">
-    <meta name="twitter:image" content="<?= $pageImage ?>">
-    <?php if (getSetting($conn, 'twitter_site')): ?>
-    <meta name="twitter:site" content="<?= htmlspecialchars(getSetting($conn, 'twitter_site')) ?>">
-    <?php endif; ?>
-
     <!-- Мобильный вид -->
     <meta name="theme-color" content="#ffffff">
 

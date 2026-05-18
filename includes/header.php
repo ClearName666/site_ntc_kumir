@@ -61,10 +61,10 @@ $isAdmin = isset($_SESSION['admin_id']);
                     </a>
                     
                     <!-- Кнопка входа в админ-панель -->
-                    <a href="/admin/login.php" class="btn-admin">
+                    <!-- <a href="/admin/login.php" class="btn-admin">
                         <span class="admin-icon">🔐</span>
                         <span class="admin-text">Вход</span>
-                    </a>
+                    </a> -->
                     
                     <!-- Кнопка мобильного меню -->
                     <button class="mobile-menu-btn">☰</button>
@@ -97,12 +97,12 @@ $isAdmin = isset($_SESSION['admin_id']);
             </a>
             
             <!-- Кнопка входа в админку для мобильной версии -->
-            <div class="mobile-admin-btn">
+            <!-- <div class="mobile-admin-btn">
                 <a href="/admin/login.php" class="btn-admin">
                     <span class="admin-icon">🔐</span>
                     <span class="admin-text">Вход в админку</span>
                 </a>
-            </div>
+            </div>-->
         </div>
     </div>
     
@@ -111,19 +111,19 @@ document.addEventListener('DOMContentLoaded', function() {
     const isAdmin = <?php echo $isAdmin ? 'true' : 'false'; ?>;
     
     // Обновление кнопки админа
-    if (isAdmin) {
-        const adminBtn = document.querySelector('.btn-admin');
-        if (adminBtn) {
-            adminBtn.innerHTML = '<span class="admin-icon">👑</span><span class="admin-text">Админка</span>';
-            adminBtn.href = '/admin/index.php';
-        }
+    // if (isAdmin) {
+    //     const adminBtn = document.querySelector('.btn-admin');
+    //     if (adminBtn) {
+    //         adminBtn.innerHTML = '<span class="admin-icon">👑</span><span class="admin-text">Админка</span>';
+    //         adminBtn.href = '/admin/index.php';
+    //     }
         
-        const mobileAdminBtn = document.querySelector('.mobile-admin-btn .btn-admin');
-        if (mobileAdminBtn) {
-            mobileAdminBtn.innerHTML = '<span class="admin-icon">👑</span><span class="admin-text">Админка</span>';
-            mobileAdminBtn.href = '/admin/index.php';
-        }
-    }
+    //     const mobileAdminBtn = document.querySelector('.mobile-admin-btn .btn-admin');
+    //     if (mobileAdminBtn) {
+    //         mobileAdminBtn.innerHTML = '<span class="admin-icon">👑</span><span class="admin-text">Админка</span>';
+    //         mobileAdminBtn.href = '/admin/index.php';
+    //     }
+    // }
     
     const header = document.querySelector('.main-header');
     const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
