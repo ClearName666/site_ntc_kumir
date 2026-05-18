@@ -64,7 +64,7 @@ if ($allNews) {
 $allArticles = getArticles($conn);
 if ($allArticles) {
     foreach ($allArticles as $article) {
-        renderSitemapUrl($baseUrl . '/pages/articles.php?article=' . urlencode($article['slug']), '0.7', 'monthly', $article['published_at']);
+        renderSitemapUrl($baseUrl . '/articles.php?article=' . urlencode($article['slug']), '0.7', 'monthly', $article['published_at']);
     }
 }
 
@@ -85,11 +85,11 @@ if ($resProducts) {
 }
 
 // FAQ Категории
-$faqCats = getFAQCategories($conn);
-if ($faqCats) {
-    foreach ($faqCats as $fCat) {
-        renderSitemapUrl($baseUrl . '/faq.php?category=' . urlencode($fCat), '0.5', 'monthly');
-    }
-}
+// $faqCats = getFAQCategories($conn);
+// if ($faqCats) {
+//     foreach ($faqCats as $fCat) {
+//         renderSitemapUrl($baseUrl . '/faq.php?category=' . urlencode($fCat), '0.5', 'monthly');
+//     }
+// }
 
 echo '</urlset>';
