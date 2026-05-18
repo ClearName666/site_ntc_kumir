@@ -3,7 +3,7 @@
 $conn = getDBConnection();
 ?>
 
-<footer class="main-footer">
+    <footer class="main-footer">
         <div class="container">
             <div class="footer-content">
                 <div class="footer-column">
