@@ -110,20 +110,39 @@ $isAdmin = isset($_SESSION['admin_id']);
 document.addEventListener('DOMContentLoaded', function() {
     const isAdmin = <?php echo $isAdmin ? 'true' : 'false'; ?>;
     
-    // Обновление кнопки админа
-    // if (isAdmin) {
-    //     const adminBtn = document.querySelector('.btn-admin');
-    //     if (adminBtn) {
-    //         adminBtn.innerHTML = '<span class="admin-icon">👑</span><span class="admin-text">Админка</span>';
-    //         adminBtn.href = '/admin/index.php';
-    //     }
+    if (isAdmin) {
+        // 1. Кнопка для ПК (вставляем в блок .header-right перед кнопкой гамбургера)
+        const desktopContainer = document.querySelector('.header-right');
+        if (desktopContainer) {
+            const desktopAdminHtml = `
+                <a href="/X8_qN-m2Wp9z_vK4bL-yR7t_jG3s_eE1d_xQ9w_pL5m/index.php" class="btn-admin">
+                    <span class="admin-icon">👑</span>
+                    <span class="admin-text">Админка</span>
+                </a>
+            `;
+            // Находим кнопку мобильного меню, чтобы вставить админку ПЕРЕД ней
+            const mobileMenuBtn = desktopContainer.querySelector('.mobile-menu-btn');
+            if (mobileMenuBtn) {
+                mobileMenuBtn.insertAdjacentHTML('beforebegin', desktopAdminHtml);
+            } else {
+                desktopContainer.insertAdjacentHTML('beforeend', desktopAdminHtml);
+            }
+        }
         
-    //     const mobileAdminBtn = document.querySelector('.mobile-admin-btn .btn-admin');
-    //     if (mobileAdminBtn) {
-    //         mobileAdminBtn.innerHTML = '<span class="admin-icon">👑</span><span class="admin-text">Админка</span>';
-    //         mobileAdminBtn.href = '/admin/index.php';
-    //     }
-    // }
+        // 2. Кнопка для телефона (вставляем в самый конец блока .mobile-contact)
+        const mobileContainer = document.querySelector('.mobile-contact');
+        if (mobileContainer) {
+            const mobileAdminHtml = `
+                <div class="mobile-admin-btn">
+                    <a href="/X8_qN-m2Wp9z_vK4bL-yR7t_jG3s_eE1d_xQ9w_pL5m/index.php" class="btn-admin">
+                        <span class="admin-icon">👑</span>
+                        <span class="admin-text">Админка</span>
+                    </a>
+                </div>
+            `;
+            mobileContainer.insertAdjacentHTML('beforeend', mobileAdminHtml);
+        }
+    }
     
     const header = document.querySelector('.main-header');
     const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
