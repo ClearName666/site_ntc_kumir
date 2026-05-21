@@ -152,8 +152,7 @@ require_once __DIR__. '/includes/menu.php';
                                                     <i class="fas fa-edit"></i>
                                                 </a>
                                                 <a href="menu.php?action=delete&id=<?php echo $item['id']; ?>" 
-                                                class="btn btn-sm btn-delete" 
-                                                onclick="return confirm('Удалить этот пункт меню?')">
+                                                class="btn btn-sm btn-delete">
                                                     <i class="fas fa-trash"></i>
                                                 </a>
                                             </div>

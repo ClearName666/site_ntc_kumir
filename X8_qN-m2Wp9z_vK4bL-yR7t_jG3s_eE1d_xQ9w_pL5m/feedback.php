@@ -126,9 +126,8 @@ require_once __DIR__. '/includes/menu.php';
                                                     </a>
                                                 <?php endif; ?>
                                                 <a href="feedback.php?action=delete&id=<?php echo $item['id']; ?>" 
-                                                   class="btn btn-sm btn-delete" 
-                                                   onclick="return confirm('Вы уверены, что хотите удалить это обращение?')"
-                                                   title="Удалить">
+                                                    class="btn btn-sm btn-delete" 
+                                                    title="Удалить">
                                                     <i class="fas fa-trash"></i>
                                                 </a>
                                             </div>

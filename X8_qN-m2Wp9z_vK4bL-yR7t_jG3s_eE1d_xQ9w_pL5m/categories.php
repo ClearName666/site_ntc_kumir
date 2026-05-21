@@ -161,8 +161,7 @@ require_once __DIR__. '/includes/menu.php';
                                             <i class="fas fa-edit"></i>
                                         </a>
                                         <a href="categories.php?action=delete&id=<?php echo $category['id']; ?>" 
-                                        class="btn btn-sm btn-delete" 
-                                        onclick="return confirm('Удалить эту категорию?')">
+                                            class="btn btn-sm btn-delete">
                                             <i class="fas fa-trash"></i>
                                         </a>
                                     </div>
