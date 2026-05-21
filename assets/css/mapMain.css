@@ -2,14 +2,14 @@
 .pos-logo-brand {
     /* Выравнивание по макету (отрегулируйте проценты под нужное место на карте) */
     top: 10%; 
-    left: 47.5%; 
+    left: 47%; 
     z-index: 4;
 }
 
 /* Контейнер-рамка для логотипа */
 .badge-logo-box {
-    background: #ffffff; /* Белый фон внутри */
-    border: 3px solid #ffffff; /* Белая плотная рамка */
+    background: rgba(0, 242, 254, 0.25); /* Аккуратное неоновое свечение при ховере */
+    border: 1px solid #ffffff; /* Белая плотная рамка */
     border-radius: 16px; /* Красивые закругленные углы */
     padding: 10px 15px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15); /* Объемная тень */
