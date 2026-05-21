@@ -22,6 +22,7 @@
     --bg-light: #f8f9fa;
     --bg-dark: #2c3e50;
     --bg-black: #000;
+    --bg-main: #3e4a5f;
     --bg-white-semi: rgba(255, 255, 255, 0.1);
     --bg-white-strong: rgba(255, 255, 255, 0.4);
     --bg-white-card: rgba(255, 255, 255, 0.6);
@@ -382,7 +383,7 @@ main {
     position: absolute;
     inset: 0;
     /*background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.7));*/
-    background-color: var(--bg-black);
+    background-color: var(--bg-main);
     z-index: 1;
 }
 
