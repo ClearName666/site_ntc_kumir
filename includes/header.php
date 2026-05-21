@@ -168,4 +168,21 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// Контроль трансформации хедера при скролле
+const header = document.querySelector('.main-header');
+
+function checkScroll() {
+    if (window.scrollY > 0) {
+        header.style.position = 'fixed';
+        header.classList.add('scrolled');
+    } else {
+        header.style.position = 'absolute';
+        header.classList.remove('scrolled');
+    }
+}
+
+// Проверяем при прокрутке и один раз при загрузке (если страница обновилась уже прокрученной)
+window.addEventListener('scroll', checkScroll);
+checkScroll();
 </script>

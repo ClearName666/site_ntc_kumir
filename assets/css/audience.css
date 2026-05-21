@@ -1,6 +1,7 @@
 /* Основной контейнер секции */
 .for-whom-section {
-    padding: 80px 0;
+    padding: 120px 0;
+    padding-bottom: 250px;
     position: relative;
     overflow: hidden;
     background-color: #ffffff;
@@ -129,9 +130,9 @@
 .pos-top-6 { top: -11%; left: 91%; }
 
 /* Нижний ряд карточек */
-.pos-bottom-1 { bottom: -8%; left: 20.5%; }
-.pos-bottom-2 { bottom: -8%; left: 42.5%; width: 16%; } /* Чуть шире для длинной надписи */
-.pos-bottom-3 { bottom: -8%; left: 68%; }
+.pos-bottom-1 { bottom: -25%; left: 20.5%; }
+.pos-bottom-2 { bottom: -25%; left: 42.5%; width: 16%; } /* Чуть шире для длинной надписи */
+.pos-bottom-3 { bottom: -25%; left: 68%; }
 
 
 /* --- АДАПТИВНОСТЬ ДЛЯ ПЛАНШЕТОВ И МОБИЛЬНЫХ --- */

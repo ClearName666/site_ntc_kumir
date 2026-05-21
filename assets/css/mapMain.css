@@ -1,0 +1,205 @@
+/* --- Стиль для нового блока с логотипом --- */
+.pos-logo-brand {
+    /* Выравнивание по макету (отрегулируйте проценты под нужное место на карте) */
+    top: 10%; 
+    left: 47.5%; 
+    z-index: 4;
+}
+
+/* Контейнер-рамка для логотипа */
+.badge-logo-box {
+    background: #ffffff; /* Белый фон внутри */
+    border: 3px solid #ffffff; /* Белая плотная рамка */
+    border-radius: 16px; /* Красивые закругленные углы */
+    padding: 10px 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15); /* Объемная тень */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.badge-logo-box .logo-link {
+    display: block;
+    line-height: 0;
+}
+
+.badge-logo-box img {
+    max-width: 120px; /* Ограничение ширины логотипа, чтобы он аккуратно смотрелся */
+    height: auto;
+    object-fit: contain;
+}
+
+/* Эффект при наведении только на логотип */
+.pos-logo-brand:hover {
+    transform: scale(1.08);
+}
+.pos-logo-brand:hover .badge-logo-box {
+    box-shadow: 0 15px 35px rgba(0, 242, 254, 0.25); /* Аккуратное неоновое свечение при ховере */
+}
+
+
+/* --- Стили для секции Географии --- */
+.geography-section {
+    padding-top: 40px;
+    position: relative;
+    overflow: hidden;
+    background-color: #ffffff;
+}
+
+/* Резиновый контейнер на основе пропорций оригинальной карты */
+.map-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 1300px;
+    aspect-ratio: 1300 / 560; /* Фиксирует пропорции, чтобы плашки не съезжали */
+    margin: 0 auto;
+}
+
+.map-bg-container {
+    width: 100%;
+    height: 100%;
+}
+
+.map-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* Стили интерактивных плашек */
+.map-badge {
+    position: absolute;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Светящаяся точка города на конце линии */
+.badge-dot {
+    width: 10px;
+    height: 10px;
+    background: #00f2fe;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #00f2fe, 0 0 20px #00f2fe;
+    margin-bottom: 5px;
+    display: none; /* Включаем при необходимости точечного указания */
+}
+
+/* Контейнер со списком городов */
+.badge-content {
+    background: rgba(26, 31, 54, 0.85); /* Темный технологичный фон с легкой прозрачностью */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 10px 14px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    color: #ffffff;
+    pointer-events: auto;
+}
+
+.badge-content h4 {
+    font-size: 14px;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0 0 4px 0;
+    white-space: nowrap;
+}
+
+.badge-content p {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0;
+    line-height: 1.4;
+    white-space: nowrap;
+}
+
+/* Только увеличение при наведении (без размытия окружающих элементов) */
+.map-badge:hover {
+    transform: scale(1.05);
+    z-index: 10;
+}
+.map-badge:hover .badge-content {
+    background: rgba(26, 31, 54, 0.98);
+    border-color: #00f2fe;
+}
+
+/* --- ТОЧНОЕ ПОЗИЦИОНИРОВАНИЕ НА КАРТЕ (%) --- */
+.pos-spb { top: 50%; left: 19%; }
+.pos-moscow { top: 60%; left: 22%; }
+.pos-saratov { top: 72%; left: 27%; }
+.pos-tyumen { top: 57%; left: 41%; }
+.pos-irkutsk { top: 47%; left: 56%; }
+.pos-ulan-ude { top: 74%; left: 48%; }
+.pos-yakutsk { top: 40%; left: 69%; }
+.pos-chita { top: 78%; left: 58%; }
+.pos-vladivostok { top: 83%; left: 67%; }
+.pos-kamchatka { top: 65%; left: 82%; }
+
+
+/* --- АДАПТИВНОСТЬ: МОБИЛЬНЫЕ И ПЛАНШЕТЫ --- */
+@media (max-width: 1024px) {
+    .map-bg-container {
+        display: none; /* Прячем картинку карты, чтобы избежать каши */
+    }
+    
+    .map-wrapper {
+        height: auto;
+        aspect-ratio: auto;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr); /* Списки идут красивыми колонками по два в ряд */
+        gap: 20px;
+        padding: 10px;
+    }
+    
+    .map-badge {
+        position: static; /* Сбрасываем абсолютные координаты */
+        width: 100%;
+        transform: none !important;
+    }
+    
+    .badge-content {
+        background: #1a1f36; /* Полностью плотный красивый фон на мобильных */
+        width: 100%;
+        box-sizing: border-box;
+    }
+    
+    .badge-content h4, .badge-content p {
+        white-space: normal; /* Разрешаем перенос длинного текста на смартфонах */
+    }
+}
+
+@media (max-width: 576px) {
+    /* На маленьких телефонах выстраиваем списки один за другим в одну колонку */
+    .map-wrapper {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+}
+
+
+
+/* --- Адаптив под мобильные устройства --- */
+@media (max-width: 1024px) {
+    .pos-logo-brand {
+        position: static;
+        width: 100%;
+        display: flex;
+        justify-content: center; /* Центрируем логотип в мобильной сетке */
+    }
+    
+    .badge-logo-box {
+        width: auto;
+        max-width: 200px;
+        margin: 0 auto;
+    }
+}
+
+/* --- Адаптив под мобильные устройства --- */
+@media (max-width: 1024px) {
+    .pos-logo-brand {
+        display: none !important; /* Полностью скрывает блок с логотипом на экранах меньше 1024px */
+    }
+}

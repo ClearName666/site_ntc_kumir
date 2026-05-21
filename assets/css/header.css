@@ -110,6 +110,41 @@ main, .hero, .products-page {
     padding-top: 0 !important;
 }
 
+/* Состояние по умолчанию: на самом верху (черный, жесткий) */
+.main-header {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    background: rgb(0, 0, 0); /* Чистый черный */
+    border-radius: 0px;
+    box-shadow: none;
+    
+    /* Контроль скорости и плавности анимации отделения хедера */
+    transition: 
+        background 0.35s ease-in-out, 
+        border-radius 0.35s ease-in-out, 
+        width 0.35s ease-in-out, 
+        top 0.35s ease-in-out, 
+        box-shadow 0.35s ease-in-out;
+}
+
+/* Состояние при отрыве от верха: плавающая капсула */
+.main-header.scrolled {
+    top: 20px; /* Отступ от верха экрана */
+    width: calc(100% - 40px); /* Сужение по бокам */
+    max-width: 1400px;
+    
+    background: rgba(0, 0, 0, 0.4); /* Полупрозрачность */
+    backdrop-filter: blur(15px); /* Эффект размытия */
+    -webkit-backdrop-filter: blur(15px);
+    
+    border-radius: 32px; /* Закругление */
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
 /* ========================================
    АДАПТИВНОСТЬ
    ======================================== */
