@@ -75,17 +75,15 @@ body::before {
 }
 
 /* Полупрозрачный оверлей */
-body::after {
-    content: "";
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    background: var(--bg-overlay);
-    backdrop-filter: blur(10px);
-}
 
 .container {
     max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.container-main {
+    max-width: 1500px;
     margin: 0 auto;
     padding: 0 20px;
 }
@@ -383,7 +381,8 @@ main {
 .hero-background {
     position: absolute;
     inset: 0;
-    background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.7));
+    /*background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.7));*/
+    background-color: var(--bg-black);
     z-index: 1;
 }
 
@@ -414,7 +413,7 @@ main {
 
 /* Главный заголовок */
 .main-title {
-    font-size: 48px;
+    font-size: 56px;
     font-weight: 700;
     color: white;
     margin-bottom: 30px;
@@ -460,6 +459,7 @@ main {
 /* Визуальная часть hero */
 .hero-visual {
     position: relative;
+    
 }
 
 .hero-image-container {
@@ -477,19 +477,19 @@ main {
 
 .hero-image {
     width: 100%;
-    height: 500px;
+    height: 100%;
     object-fit: cover;
 }
 
 /* Оверлей карты */
 .map-overlay {
     position: absolute;
-    bottom: 30px;
+    bottom: 10px;
     left: 30px;
     right: 30px;
-    background: rgba(255, 255, 255, 0.95);
+    background: var(--bg-glass);
     border-radius: var(--radius-card);
-    padding: 25px;
+    padding: 7px;
     box-shadow: var(--shadow-card);
     backdrop-filter: blur(10px);
 }
@@ -502,6 +502,7 @@ main {
 
 .map-icon {
     flex: 0 0 60px;
+    width: 60px; /* Дублируем ширину жестко */
     height: 60px;
     background: var(--primary-color);
     border-radius: var(--radius-card);
@@ -510,6 +511,7 @@ main {
     justify-content: center;
     color: white;
     font-size: 24px;
+    flex-shrink: 0; /* ЗАПРЕЩАЕМ сжатие полностью */
 }
 
 .map-text {
@@ -518,12 +520,12 @@ main {
 
 .map-text h3 {
     color: var(--text-dark);
-    margin-bottom: 8px;
+    margin-bottom: 4px;
     font-size: 18px;
 }
 
 .map-text p {
-    color: var(--text-gray);
+    color: var(--text-dark);
     font-size: 14px;
 }
 
@@ -631,19 +633,19 @@ main {
 }
 
 /* ========================================
-   СЕКЦИЯ "ПРЕИМУЩЕСТВА"
+   СЕКЦИЯ "ПРЕИМУЩЕСТВА" (КОМПАКТНЫЙ СТИЛЬ)
    ======================================== */
 .advantages-section {
-    padding: 100px 0;
+    padding: 60px 0; /* Было 100px — уменьшили вертикальные отступы секции */
     background: var(--bg-glass);
     backdrop-filter: blur(10px);
 }
 
 .section-title {
     text-align: center;
-    font-size: 42px;
+    font-size: 36px; /* Чуть уменьшили размер шрифта заголовка для аккуратности */
     font-weight: 700;
-    margin-bottom: 60px;
+    margin-bottom: 45px; /* Было 60px */
     color: #2c3e50;
     position: relative;
 }
@@ -651,75 +653,80 @@ main {
 .section-title::after {
     content: '';
     position: absolute;
-    bottom: -20px;
+    bottom: -15px; /* Поджали линию ближе к тексту */
     left: 50%;
     transform: translateX(-50%);
-    width: 80px;
-    height: 4px;
+    width: 60px; /* Сделали линию чуть изящнее */
+    height: 3px;
     background: var(--primary-color);
     border-radius: 2px;
 }
 
 .advantages-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: 40px;
-    margin-top: 50px;
+    /* Изменили minmax с 350px на 280px, чтобы карточки были более узкими, 
+       а gap (расстояние между карточками) уменьшили с 40px до 20px */
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px; 
+    margin-top: 35px; /* Было 50px */
 }
 
 .advantage-item {
     background: var(--bg-white-strong);
     backdrop-filter: blur(5px);
-    border-radius: var(--radius-card);
-    padding: 30px;
+    border-radius: 12px; /* Сделали закругление углов чуть более строгим */
+    padding: 20px; /* Было 30px — существенно уменьшили внутренние паддинги */
     transition: var(--transition-default);
-    border-left: 4px solid var(--primary-color);
+    border-left: 3px solid var(--primary-color); /* Сделали боковую полоску тоньше */
 }
 
 .advantage-item:hover {
     background: var(--bg-white-card);
-    box-shadow: var(--shadow-card);
-    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05); /* Более мягкая, "плоская" тень */
+    transform: translateY(-2px); /* Было -5px — теперь карточка приподнимается совсем слегка */
 }
 
 .advantage-header {
     display: flex;
     align-items: center;
-    gap: 20px;
-    margin-bottom: 20px;
+    gap: 14px; /* Было 20px — прижали иконку ближе к заголовку */
+    margin-bottom: 12px; /* Было 20px — уменьшили отступ до описания */
 }
 
 .advantage-icon {
-    flex: 0 0 60px;
-    width: 60px;
-    height: 60px;
+    /* Сделали иконку меньше (было 60px на 60px) */
+    flex: 0 0 45px;
+    width: 45px;
+    height: 45px;
     background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-    border-radius: var(--radius-card);
+    border-radius: 8px; /* Уменьшили радиус под размер иконки */
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
-    font-size: 24px;
+    font-size: 18px; /* Галочка стала аккуратнее */
     overflow: hidden;
 }
 
 .advantage-icon img {
-    width: 80%;
-    height: 80%;
+    width: 70%; /* Чуть уменьшили изображение внутри, чтобы не упиралось в края */
+    height: 70%;
     object-fit: contain;
 }
 
 .advantage-title {
-    font-size: 18px;
+    font-size: 16px; /* Было 18px — более плоский и аккуратный шрифт */
     font-weight: 600;
     color: var(--text-dark);
     margin: 0;
+    line-height: 1.3;
 }
 
 .advantage-description {
     color: var(--text-gray);
-    line-height: 1.7;
-    font-size: 16px;
+    line-height: 1.5; /* Сжали межстрочный интервал (было 1.7) */
+    font-size: 14px; /* Было 16px — теперь текст компактный и строгий */
+    margin: 0;
 }
 
 /* ========================================

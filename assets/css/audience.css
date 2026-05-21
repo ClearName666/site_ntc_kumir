@@ -1,0 +1,189 @@
+/* Основной контейнер секции */
+.for-whom-section {
+    padding: 80px 0;
+    position: relative;
+    overflow: hidden;
+    background-color: #ffffff;
+}
+
+/* Скрываем мобильный заголовок на десктопе по умолчанию */
+.mobile-only-title {
+    display: none;
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+
+
+/* Резиновая обертка, размеры высчитываются пропорционально (высота завязана на ширину через aspect-ratio) */
+.for-whom-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 1300px; /* Сделали картинку и всю секцию побольше */
+    aspect-ratio: 1300 / 680; /* Автоматически уменьшает высоту при сжатии экрана */
+    margin: 0 auto;
+}
+
+/* Контейнер картинки-подложки */
+.for-whom-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1;
+}
+
+.lines-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    margin-top: 100px;
+}
+
+/* Центральный круг */
+.center-desktop-circle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 500px;
+    height: 500px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.06);
+    z-index: 2;
+}
+
+.center-desktop-circle span {
+    margin-top: 50px;
+    font-size: 100px;
+    font-weight: 700;
+    color: #1a1f36;
+}
+
+/* Стили карточек (сделаны крупнее) */
+.target-item {
+    position: absolute;
+    width: 13.5%; /* Ширина в процентах, чтобы сжималась вместе с экраном */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    z-index: 3;
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Контейнеры для иконок (увеличенные) */
+.target-item .icon-box {
+    width: 90px;  /* Было 75px, стало 90px — блоки крупнее */
+    height: 90px;
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.07);
+    border: 1px solid rgba(0, 0, 0, 0.03);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 16px; /* Увеличили отступ, чтобы текст гарантированно не налезал на линии */
+    transition: box-shadow 0.25s ease;
+}
+
+.target-item .icon-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* Текст под иконками */
+.target-item p {
+    font-size: 14px;
+    line-height: 1.35;
+    color: #2c3142;
+    font-weight: 600;
+    margin: 0;
+    white-space: normal;
+}
+
+/* Анимация: ТОЛЬКО увеличение блока, без заблюривания фона */
+.target-item:hover {
+    transform: scale(1.1);
+    z-index: 10;
+}
+.target-item:hover .icon-box {
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
+}
+
+
+/* --- ТОЧНОЕ ВЫРАВНИВАНИЕ В ПРОЦЕНТАХ (По сетке оригинального макета) --- */
+/* Верхний ряд карточек */
+.pos-top-1 { top: -11%; left: -4%; }
+.pos-top-2 { top: -11%; left: 15%; }
+.pos-top-3 { top: -11%; left: 34%; }
+.pos-top-4 { top: -11%; left: 53%; }
+.pos-top-5 { top: -11%; left: 73%; }
+.pos-top-6 { top: -11%; left: 91%; }
+
+/* Нижний ряд карточек */
+.pos-bottom-1 { bottom: -8%; left: 20.5%; }
+.pos-bottom-2 { bottom: -8%; left: 42.5%; width: 16%; } /* Чуть шире для длинной надписи */
+.pos-bottom-3 { bottom: -8%; left: 68%; }
+
+
+/* --- АДАПТИВНОСТЬ ДЛЯ ПЛАНШЕТОВ И МОБИЛЬНЫХ --- */
+@media (max-width: 1024px) {
+    
+    /* Включаем стандартный заголовок секции сверху */
+    .mobile-only-title {
+        display: block;
+    }
+    
+    /* Сбрасываем относительную высоту, переводим блоки в аккуратную сетку */
+    .for-whom-wrapper {
+        height: auto;
+        aspect-ratio: auto;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr); /* По 2 блока в ряд */
+        gap: 30px 20px;
+        padding: 0 10px;
+    }
+    
+    /* Отключаем картинку-паутину и центральный круг на мобилках */
+    .for-whom-background {
+        display: none;
+    }
+    
+    /* Сбрасываем абсолютные координаты элементов для сетки */
+    .target-item {
+        position: static;
+        width: 100% !important;
+        flex-direction: row; /* Иконка слева, текст справа — так удобнее читать на телефонах */
+        text-align: left;
+        gap: 15px;
+        background: rgba(255, 255, 255, 0.5);
+        padding: 10px;
+        border-radius: 20px;
+    }
+    
+    .target-item .icon-box {
+        margin-bottom: 0; /* Убираем нижний отступ в мобильном режиме */
+        width: 70px;
+        height: 70px;
+    }
+    
+    .target-item p {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 576px) {
+    /* На совсем маленьких телефонах выстраиваем в 1 колонку */
+    .for-whom-wrapper {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+}

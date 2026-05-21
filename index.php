@@ -8,7 +8,7 @@ require_once __DIR__. '/config/config.php';
 // подключаемся к базе 
 $conn = getDBConnection();
 $mainTitle = getContentBlock($conn, 'main_title');
-$mainBgStart = getImage($conn, 'main_background');
+//$mainBgStart = getImage($conn, 'main_background');
 $heroImage = getImage($conn, 'hero_foreground');
 $mapLocation = getMapLocation($conn);
 $videoId = getSetting($conn, 'video_id');
@@ -63,6 +63,7 @@ $currentUrl = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
     <link rel="stylesheet" href="/assets/css/style.css?version=<?php echo $version_code; ?>">
     <link rel="stylesheet" href="/assets/css/responsive.css?version=<?php echo $version_code; ?>">
     <link rel="stylesheet" href="/assets/css/header.css?version=<?php echo $version_code; ?>">
+    <link rel="stylesheet" href="/assets/css/audience.css?version=<?php echo $version_code; ?>">
 </head>
 <body style="background: url('<?php echo $mainBg['image_path']; ?>') center/cover no-repeat fixed;">
 
@@ -71,10 +72,9 @@ $currentUrl = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
     <!-- Hero Section - обновляем верхний отступ -->
     <section class="hero">
         <div class="hero-background">
-            <img src="<?php echo $mainBgStart['image_path']; ?>" alt="<?php echo $mainBgStart['alt_text']; ?>">
         </div>
         
-        <div class="container">
+        <div class="container-main">
             <div class="hero-content">
                 <div class="hero-main">
                     <div class="hero-text">
@@ -92,31 +92,88 @@ $currentUrl = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
                         </div> -->
 
                         <!-- Кнопка для перехода к системе -->
-                        <div class="contacts-section">
+                        <!-- <div class="contacts-section">
                             <a href="https://v4.ntckumir.ru/" class="analytics-badge" target="_blank" rel="noopener noreferrer">
                                 <span>📊</span>
                                 <span>Дистанционный контроль и управление</span>
                             </a>
-                        </div>
+                        </div> -->
                     </div>
                     
-                    <a href="contacts.php#map-location" class="hero-link-wrapper" style="text-decoration: none; color: inherit; display: block;">
                         <div class="hero-visual">
                             <div class="hero-image-container">
                                 <img src="<?php echo $heroImage['image_path']; ?>" alt="<?php echo $heroImage['alt_text']; ?>" class="hero-image">
-                                <div class="map-overlay">
-                                    <div class="map-content">
-                                        <div class="map-icon">📍</div>
-                                        <div class="map-text map-text-location">
-                                            <h3>«НТЦ «КУМИР» на карте</h3>
-                                            <p>N<?php echo $mapLocation['latitude']; ?>, E<?php echo $mapLocation['longitude']; ?></p>
+                                <a href="contacts.php#map-location" class="hero-link-wrapper" style="text-decoration: none; color: inherit; display: block;">
+                                    <div class="map-overlay">
+                                        <div class="map-content">
+                                            <div class="map-icon">📍</div>
+                                            <div class="map-text map-text-location">
+                                                <h3>«НТЦ «КУМИР» на карте</h3>
+                                                <p>N<?php echo $mapLocation['latitude']; ?>, E<?php echo $mapLocation['longitude']; ?></p>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
+                                </a>
                             </div>
                         </div>
-                    </a>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="for-whom-section">
+        <div class="container-main">
+            
+            <h2 class="section-title mobile-only-title">Для кого</h2>
+            
+            <div class="for-whom-wrapper">
+                
+                <div class="for-whom-background">
+                    <img src="/assets/images/static/category_background.png" alt="Линии распределения" class="lines-img">
+                    
+                    <div class="center-desktop-circle">
+                        <span>Для кого</span>
+                    </div>
+                </div>
+
+                <div class="target-item pos-top-1">
+                    <div class="icon-box"><img src="/assets/images/static/thumb__166_0_0_0_auto.png" alt=""></div>
+                    <p>ЖКХ: управляющим компаниям и ТСЖ</p>
+                </div>
+                <div class="target-item pos-top-2">
+                    <div class="icon-box"><img src="/assets/images/static/thumb__166_0_0_0_auto(1).png" alt=""></div>
+                    <p>Энергосбытовым и сетевым компаниям</p>
+                </div>
+                <div class="target-item pos-top-3">
+                    <div class="icon-box"><img src="/assets/images/static/thumb__166_0_0_0_auto(2).png" alt=""></div>
+                    <p>Муниципальным и государственным учреждениям</p>
+                </div>
+                <div class="target-item pos-top-4">
+                    <div class="icon-box"><img src="/assets/images/static/thumb__166_0_0_0_auto(3).png" alt=""></div>
+                    <p>Эксплуатантам теплоисточников и магистральных сетей</p>
+                </div>
+                <div class="target-item pos-top-5">
+                    <div class="icon-box"><img src="/assets/images/static/thumb__166_0_0_0_auto(4).png" alt=""></div>
+                    <p>Садовым товариществам и коттеджным поселкам</p>
+                </div>
+                <div class="target-item pos-top-6">
+                    <div class="icon-box"><img src="/assets/images/static/thumb__166_0_0_0_auto(5).png" alt=""></div>
+                    <p>Застройщикам</p>
+                </div>
+
+                <div class="target-item pos-bottom-1">
+                    <div class="icon-box"><img src="/assets/images/static/thumb__166_0_0_0_auto(6).png" alt=""></div>
+                    <p>Умный дом</p>
+                </div>
+                <div class="target-item pos-bottom-2">
+                    <div class="icon-box"><img src="/assets/images/static/thumb__166_0_0_0_auto(7).png" alt=""></div>
+                    <p>Промышленности и <br>сельскому хозяйству</p>
+                </div>
+                <div class="target-item pos-bottom-3">
+                    <div class="icon-box"><img src="/assets/images/static/thumb__166_0_0_0_auto(8).png" alt=""></div>
+                    <p>Экология</p>
+                </div>
+
             </div>
         </div>
     </section>
@@ -189,7 +246,12 @@ $currentUrl = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
         </div>
     </section>
 
-    
+        <script>
+            window.addEventListener('load', function() {
+                window.scrollBy(0, 1);
+            });
+        </script>
+        <script src="/assets/js/audience.js"></script>
 </main>
 
 <?php require_once __DIR__. '/includes/footer.php'; ?></body>
