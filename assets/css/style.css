@@ -397,7 +397,7 @@ main {
     position: relative;
     z-index: 2;
     width: 100%;
-    padding: 80px 0;
+    padding-top: 80px;
 }
 
 .hero-main {
@@ -456,12 +456,13 @@ main {
 .feature-item:nth-child(3) { animation-delay: 0.7s; }
 .feature-item:nth-child(4) { animation-delay: 0.8s; }
 
-/* Визуальная часть hero */
+/* Визуальная часть hero — теперь главный опорный пункт для процентов */
 .hero-visual {
     position: relative;
-    
+    width: 100%;
 }
 
+/* Твой родной контейнер с 3D-эффектом — ОСТАЛСЯ НЕИЗМЕННЫМ */
 .hero-image-container {
     position: relative;
     border-radius: var(--radius-lg);
@@ -469,6 +470,7 @@ main {
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
     transform: perspective(1000px) rotateY(-5deg);
     transition: transform 0.5s;
+    width: 100%;
 }
 
 .hero-image-container:hover {
@@ -479,6 +481,97 @@ main {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    display: block;
+}
+
+/* --- СТИЛИ ДЛЯ ИНТЕРАКТИВНЫХ КАРТОЧЕК (РЕЗИНОВЫЕ) --- */
+.hero-card {
+    position: absolute;
+    width: 40%; /* Карточки занимают 30% от ширины всей области */
+    background: #ffffff;
+    border-radius: 32px; 
+    padding: 10px 5px 5px 5px; /* Стабильные паддинги, чтобы текст не зажимало */
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.18);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    box-sizing: border-box;
+    z-index: 10; /* Карточки всегда НАД крутящейся картинкой */
+    
+    border-bottom: 5px solid transparent; 
+    transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.3s ease;
+}
+
+/* При ховере на саму карточку она слегка приподнимается */
+.hero-card:hover {
+    transform: translateY(-5px) scale(1.03);
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.28);
+}
+
+/* Круглый узор внутри карточки */
+.card-pattern-box {
+    max-width: 70%;
+    max-height: 70%;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.pattern-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* Адаптивный текст надписи */
+.hero-card .card-title {
+    font-size: calc(12px + 0.3vw); 
+    font-weight: 700;
+    color: #2c3142;
+    line-height: 1.3;
+    margin: 0;
+}
+
+/* --- КООРДИНАТЫ НАЛОЖЕНИЯ КАРТОЧЕК (%) --- */
+
+/* 1. Учет энергоресурсов (Справа вверху, заходит на картинку) */
+.card-energy {
+    top: 35%;
+    right: 20%; /* Вылезает на правый край, теперь не обрежется! */
+    border-color: #8a2be2; 
+}
+
+/* 2. Аналитика (Слева по центру) */
+.card-analytics {
+    top: 15%;
+    left: 9%; /* Спокойно выходит за левый край фона */
+    border-color: #4facfe; 
+}
+
+/* 3. Дистанционный контроль (Справа внизу) */
+.card-control {
+    bottom: 60%;
+    right: 5%;
+    border-color: #ff4e50; 
+}
+
+/* --- ПОЛНАЯ РЕЗИНА ДЛЯ МОБИЛОК (НЕ СВОРАЧИВАЮТСЯ) --- */
+@media (max-width: 1024px) {
+    /* На планшетах и мобилках уменьшаем карточки, чтобы они не перекрыли весь шар */
+    .hero-card {
+        width: 28%;
+        padding: 10px 8px;
+        border-bottom-width: 3px;
+        border-radius: 8px;
+    }
+    
+    .card-pattern-box {
+        width: 40px; /* Уменьшаем узоры на телефонах */
+        height: 40px;
+        margin-bottom: 6px;
+    }
 }
 
 /* Оверлей карты */
@@ -519,13 +612,13 @@ main {
 }
 
 .map-text h3 {
-    color: var(--text-dark);
+    color: var(--text-light);
     margin-bottom: 4px;
     font-size: 18px;
 }
 
 .map-text p {
-    color: var(--text-dark);
+    color: var(--text-light);
     font-size: 14px;
 }
 

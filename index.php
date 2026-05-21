@@ -83,6 +83,17 @@ $currentUrl = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
                         
                         <div class="features-list">
                             <?php renderFeatures($conn); ?>
+                            <a href="contacts.php#map-location" class="hero-link-wrapper" style="text-decoration: none; color: inherit; display: block;">
+                                    <div class="feature-item">
+                                        <div class="map-content">
+                                            <div class="map-icon">📍</div>
+                                            <div class="map-text map-text-location">
+                                                <h3>«НТЦ «КУМИР» на карте</h3>
+                                                <p>N<?php echo $mapLocation['latitude']; ?>, E<?php echo $mapLocation['longitude']; ?></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
                         </div>
                         
                         <!-- <div class="contacts-section">
@@ -100,23 +111,32 @@ $currentUrl = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
                             </a>
                         </div> -->
                     </div>
-                    
-                        <div class="hero-visual">
-                            <div class="hero-image-container">
-                                <img src="<?php echo $heroImage['image_path']; ?>" alt="<?php echo $heroImage['alt_text']; ?>" class="hero-image">
-                                <a href="contacts.php#map-location" class="hero-link-wrapper" style="text-decoration: none; color: inherit; display: block;">
-                                    <div class="map-overlay">
-                                        <div class="map-content">
-                                            <div class="map-icon">📍</div>
-                                            <div class="map-text map-text-location">
-                                                <h3>«НТЦ «КУМИР» на карте</h3>
-                                                <p>N<?php echo $mapLocation['latitude']; ?>, E<?php echo $mapLocation['longitude']; ?></p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </a>
-                            </div>
+                    <div class="hero-visual">
+                        <div class="hero-image-container">
+                            <img src="<?php echo $heroImage['image_path']; ?>" alt="<?php echo $heroImage['alt_text']; ?>" class="hero-image">
                         </div>
+                        
+                        <div class="hero-card card-energy">
+                            <div class="card-pattern-box">
+                                <img src="/assets/images/static/firstDisplay--3.png" alt="" class="pattern-img"> 
+                            </div>
+                            <div class="card-title">Учет энергоресурсов</div>
+                        </div>
+
+                        <div class="hero-card card-analytics">
+                            <div class="card-pattern-box">
+                                <img src="/assets/images/static/firstDisplay--1.png" alt="" class="pattern-img">
+                            </div>
+                            <div class="card-title">Аналитика</div>
+                        </div>
+
+                        <div class="hero-card card-control">
+                            <div class="card-pattern-box">
+                                <img src="/assets/images/static/firstDisplay--2.png" alt="" class="pattern-img">
+                            </div>
+                            <div class="card-title">Дистанционный контроль и управление</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
