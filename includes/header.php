@@ -16,16 +16,24 @@ $isAdmin = isset($_SESSION['admin_id']);
                     <img src="/<?php echo getSetting($conn, 'logo_path'); ?>" alt="<?php echo getSetting($conn, 'company_name'); ?>">
                 </a>
                 
-                <!-- Основная навигация -->
                 <nav class="main-nav">
                     <?php
                     // Получаем все пункты меню из БД
                     $menuItems = getMenuItems($conn);
                     
-                    // Первый пункт меню (О компании) отображаем отдельно
-                    $firstItem = array_shift($menuItems);
+                    // Забираем первые 2 пункта меню отдельно
+                    // array_splice вырежет первые 2 элемента и вернет их в $firstTwoItems,
+                    // а в самом массиве $menuItems останутся только "оставшиеся позиции"
+                    $firstTwoItems = array_splice($menuItems, 0, 2);
                     
-                    // Остальные пункты помещаем в выпадающее меню
+                    // Сначала отображаем первые два пункта меню
+                    if (!empty($firstTwoItems)) {
+                        foreach ($firstTwoItems as $item) {
+                            echo '<a href="' . $item['url'] . '" class="nav-link">' . $item['title'] . '</a>';
+                        }
+                    }
+                    
+                    // Если что-то осталось, прячем в выпадающее меню
                     if (!empty($menuItems)) {
                         echo '<div class="dropdown">';
                         echo '<a href="#" class="nav-link dropdown-toggle">Оставшиеся позиции</a>';
@@ -37,11 +45,6 @@ $isAdmin = isset($_SESSION['admin_id']);
                         
                         echo '</div>';
                         echo '</div>';
-                    }
-                    
-                    // Отображаем первый пункт меню
-                    if ($firstItem) {
-                        echo '<a href="' . $firstItem['url'] . '" class="nav-link">' . $firstItem['title'] . '</a>';
                     }
                     ?>
                 </nav>
