@@ -1,45 +1,7 @@
-/* --- Стиль для нового блока с логотипом --- */
-.pos-logo-brand {
-    /* Выравнивание по макету (отрегулируйте проценты под нужное место на карте) */
-    top: 10%; 
-    left: 47%; 
-    z-index: 4;
-}
+/* ==========================================================================
+   СЕКЦИЯ ГЕОГРАФИИ ПРИМЕНЕНИЯ (RED NEON & GLASSMORPHISM ВЕРСИЯ)
+   ========================================================================= */
 
-/* Контейнер-рамка для логотипа */
-.badge-logo-box {
-    background: rgba(0, 0, 0, 0.7); /* Аккуратное неоновое свечение при ховере */
-    border: 1px solid #ffffff; /* Белая плотная рамка */
-    border-radius: 16px; /* Красивые закругленные углы */
-    padding: 15px 20px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15); /* Объемная тень */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
-}
-
-.badge-logo-box .logo-link {
-    display: block;
-    line-height: 0;
-}
-
-.badge-logo-box img {
-    max-width: 120px; /* Ограничение ширины логотипа, чтобы он аккуратно смотрелся */
-    height: auto;
-    object-fit: contain;
-}
-
-/* Эффект при наведении только на логотип */
-.pos-logo-brand:hover {
-    transform: scale(1.08);
-}
-.pos-logo-brand:hover .badge-logo-box {
-    box-shadow: 0 15px 35px rgba(0, 242, 254, 0.25); /* Аккуратное неоновое свечение при ховере */
-}
-
-
-/* --- Стили для секции Географии --- */
 .geography-section {
     padding-top: 40px;
     position: relative;
@@ -68,7 +30,7 @@
     display: block;
 }
 
-/* Стили интерактивных плашек */
+/* Базовые стили интерактивных плашек городов */
 .map-badge {
     position: absolute;
     z-index: 3;
@@ -78,20 +40,25 @@
     transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Светящаяся точка города на конце линии */
+.map-badge:hover {
+    transform: scale(1.05);
+    z-index: 10;
+}
+
+/* Светящаяся точка города на конце линии — ТЕПЕРЬ КРАСНАЯ */
 .badge-dot {
     width: 10px;
     height: 10px;
-    background: #00f2fe;
+    background: #ff2a2a;
     border-radius: 50%;
-    box-shadow: 0 0 10px #00f2fe, 0 0 20px #00f2fe;
+    box-shadow: 0 0 10px #ff2a2a, 0 0 20px #ff2a2a;
     margin-bottom: 5px;
-    display: none; /* Включаем при необходимости точечного указания */
+    display: none; 
 }
 
-/* Контейнер со списком городов */
+/* Контейнер со списком городов (темные плашки) */
 .badge-content {
-    background: rgba(26, 31, 54, 0.85); /* Темный технологичный фон с легкой прозрачностью */
+    background: rgba(26, 31, 54, 0.85); /* Темный технологичный фон */
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 12px;
     padding: 10px 14px;
@@ -116,21 +83,16 @@
     white-space: nowrap;
 }
 
-/* Только увеличение при наведении (без размытия окружающих элементов) */
-.map-badge:hover {
-    transform: scale(1.05);
-    z-index: 10;
-}
 .map-badge:hover .badge-content {
     background: rgba(26, 31, 54, 0.98);
-    border-color: #00f2fe;
+    border-color: #ff2a2a; /* Красная рамка при ховере */
 }
 
-/* --- ТОЧНОЕ ПОЗИЦИОНИРОВАНИЕ НА КАРТЕ (%) --- */
-.pos-spb { top: 50%; left: 19%; }
-.pos-moscow { top: 60%; left: 22%; }
-.pos-saratov { top: 72%; left: 27%; }
-.pos-tyumen { top: 57%; left: 41%; }
+/* --- КООРДИНАТЫ ГОРОДОВ НА КАРТЕ (%) --- */
+.pos-spb { top: 50%; left: 15%; }
+.pos-moscow { top: 60%; left: 19%; }
+.pos-saratov { top: 67%; left: 26%; }
+.pos-tyumen { top: 57%; left: 36%; }
 .pos-irkutsk { top: 47%; left: 56%; }
 .pos-ulan-ude { top: 74%; left: 48%; }
 .pos-yakutsk { top: 40%; left: 69%; }
@@ -139,40 +101,223 @@
 .pos-kamchatka { top: 65%; left: 82%; }
 
 
-/* --- АДАПТИВНОСТЬ: МОБИЛЬНЫЕ И ПЛАНШЕТЫ --- */
+/* ==========================================================================
+   СТИЛЬ ДЛЯ ПОЛУПРОЗРАЧНОГО БЛОКА О КОМПАНИИ С БЛЮРОМ
+   ========================================================================== */
+
+.pos-logo-brand {
+    top: 5%; 
+    left: 25%; 
+    z-index: 4;
+    position: absolute;
+    display: flex;
+    transition: transform 0.25s ease;
+}
+
+.pos-logo-brand:hover {
+    transform: scale(1.02); 
+}
+
+/* Главный контейнер (Чистый Glassmorphism) */
+.map-about-box-white {
+    position: relative;
+    background: rgba(255, 255, 255, 0.65); 
+    backdrop-filter: blur(12px); 
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 20px; 
+    padding: 16px 20px; 
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08); 
+    
+    display: flex;
+    justify-content: space-between;
+    align-items: center; 
+    gap: 18px; 
+    
+    width: 580px; 
+    max-width: 580px;
+    height: auto;
+    box-sizing: border-box;
+    pointer-events: auto;
+    transition: box-shadow 0.25s ease, background-color 0.25s ease;
+}
+
+/* Идеально закругленная КРАСНАЯ неоновая рамка */
+.map-about-box-white::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 20px; 
+    padding: 2px; /* Толщина переливающейся линии */
+    /* Переливы в красно-бордово-алой гамме */
+    background: conic-gradient(from var(--gradient-angle), #ff2a2a, #990000, #ff5252, #990000, #ff2a2a);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    animation: rotate-gradient 6s linear infinite;
+}
+
+.pos-logo-brand:hover .map-about-box-white {
+    background: rgba(255, 255, 255, 0.75);
+    box-shadow: 0 20px 40px rgba(255, 42, 42, 0.15); /* Мягкое алое свечение */
+}
+
+.pos-logo-brand:hover .map-about-box-white::before {
+    animation-duration: 3s; /* Ускорение перелива при ховере */
+}
+
+/* Левая колонка: Логотип в черном закругленном контейнере */
+.about-white-logo {
+    flex: 0 0 85px; 
+    background: rgba(26, 31, 54, 0.95); 
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px; 
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.about-logo-link {
+    display: block;
+    width: 100%;
+    line-height: 0;
+}
+
+.about-white-logo img {
+    width: 100%;
+    height: auto;
+    max-height: 50px; 
+    object-fit: contain;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+}
+
+/* Средняя колонка: Фичи (Черный текст) */
+.about-white-left {
+    flex: 0 1 35%; 
+    min-width: 145px; 
+    color: #000000 !important;
+}
+
+.about-white-title {
+    font-size: 13px;
+    font-weight: 800;
+    color: #1a1f36 !important; 
+    margin: 0 0 6px 0;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    line-height: 1.2;
+}
+
+.about-white-features {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.about-white-features li {
+    position: relative;
+    padding-left: 20px; 
+    font-size: 11px;
+    line-height: 1.4;
+    color: #2d3748 !important; 
+    margin-bottom: 6px; 
+    font-weight: 600;
+    display: flex;
+    align-items: center; 
+}
+
+/* Живой КРАСНЫЙ неоновый кругляшок вместо старого маркера */
+.about-white-features li::before {
+    content: "" !important; 
+    position: absolute;
+    left: 2px; 
+    top: 50%;
+    transform: translateY(-50%); 
+    
+    width: 7px; 
+    height: 7px;
+    background: #ff2a2a; /* Чистый неоновый красный */
+    border-radius: 50%;
+    
+    /* Мощное красное сияние */
+    box-shadow: 0 0 6px #ff2a2a, 0 0 12px #ff2a2a, 0 0 18px rgba(255, 42, 42, 0.5);
+    
+    /* Анимация пульсации */
+    animation: neon-pulse-about-red 2.5s ease-in-out infinite;
+    
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+/* Эффект при наведении на конкретную строчку списка */
+.about-white-features li:hover::before {
+    transform: translateY(-50%) scale(1.25);
+    box-shadow: 0 0 10px #ff2a2a, 0 0 18px #ff2a2a, 0 0 25px rgba(255, 42, 42, 0.8);
+}
+
+/* Правая колонка: Описание */
+.about-white-right {
+    flex: 1 1 auto; 
+    color: #2d3748 !important;
+    word-wrap: break-word; 
+    overflow-wrap: break-word;
+}
+
+.about-white-desc {
+    font-size: 11px;
+    line-height: 1.45;
+    color: #2d3748 !important;
+    margin: 0;
+    font-weight: 500;
+    white-space: normal; 
+}
+
+
+/* ==========================================================================
+   ОБЪЕДИНЕННЫЙ АДАПТИВ (ПЛАНШЕТЫ И МОБИЛЬНЫЕ СМАРТФОНЫ)
+   ========================================================================== */
+
 @media (max-width: 1024px) {
+    /* Полностью скрываем блок о компании на мобильных/планшетах */
+    .pos-logo-brand {
+        display: none !important; 
+    }
+    
     .map-bg-container {
-        display: none; /* Прячем картинку карты, чтобы избежать каши */
+        display: none; 
     }
     
     .map-wrapper {
         height: auto;
         aspect-ratio: auto;
         display: grid;
-        grid-template-columns: repeat(2, 1fr); /* Списки идут красивыми колонками по два в ряд */
+        grid-template-columns: repeat(2, 1fr); 
         gap: 20px;
         padding: 10px;
     }
     
     .map-badge {
-        position: static; /* Сбрасываем абсолютные координаты */
-        width: 100%;
+        position: static !important; 
+        width: 100% !important;
+        max-width: 100% !important;
         transform: none !important;
     }
     
     .badge-content {
-        background: #1a1f36; /* Полностью плотный красивый фон на мобильных */
+        background: #1a1f36; 
         width: 100%;
         box-sizing: border-box;
     }
     
-    .badge-content h4, .badge-content p {
-        white-space: normal; /* Разрешаем перенос длинного текста на смартфонах */
+    .badge-content h4, 
+    .badge-content p {
+        white-space: normal; 
     }
 }
 
 @media (max-width: 576px) {
-    /* На маленьких телефонах выстраиваем списки один за другим в одну колонку */
     .map-wrapper {
         grid-template-columns: 1fr;
         gap: 12px;
@@ -180,26 +325,35 @@
 }
 
 
+/* ==========================================================================
+   СЛУЖЕБНЫЕ НАСТРОЙКИ АНИМАЦИЙ И КЛЮЧЕВЫХ КАДРОВ
+   ========================================================================== */
 
-/* --- Адаптив под мобильные устройства --- */
-@media (max-width: 1024px) {
-    .pos-logo-brand {
-        position: static;
-        width: 100%;
-        display: flex;
-        justify-content: center; /* Центрируем логотип в мобильной сетке */
+/* Регистрация кастомной переменной угла для работы конического градиента */
+@property --gradient-angle {
+    syntax: "<angle>";
+    initial-value: 0deg;
+    inherits: false;
+}
+
+/* Анимация вращения градиента рамки */
+@keyframes rotate-gradient {
+    0% {
+        --gradient-angle: 0deg;
     }
-    
-    .badge-logo-box {
-        width: auto;
-        max-width: 200px;
-        margin: 0 auto;
+    100% {
+        --gradient-angle: 360deg;
     }
 }
 
-/* --- Адаптив под мобильные устройства --- */
-@media (max-width: 1024px) {
-    .pos-logo-brand {
-        display: none !important; /* Полностью скрывает блок с логотипом на экранах меньше 1024px */
+/* Пульсация красного неона для маленьких точек */
+@keyframes neon-pulse-about-red {
+    0%, 100% {
+        box-shadow: 0 0 6px #ff2a2a, 0 0 12px #ff2a2a, 0 0 18px rgba(255, 42, 42, 0.5);
+        opacity: 1;
+    }
+    50% {
+        box-shadow: 0 0 9px #ff2a2a, 0 0 16px #ff2a2a, 0 0 24px rgba(255, 42, 42, 0.8);
+        opacity: 0.85;
     }
 }

@@ -8,6 +8,29 @@
     }
 }
 
+/* --- Адаптивность --- */
+@media (max-width: 768px) {
+    .map-badge.pos-logo-brand.company-about-fullwidth {
+        position: relative; /* На мобилках выбиваем из абсолюта вниз под карту */
+        width: calc(100% - 40px);
+        left: 20px;
+        right: 20px;
+        margin-top: 20px;
+        box-shadow: none;
+        border: 1px solid #e0e0e0;
+    }
+
+    .map-about-box-white {
+        flex-direction: column; /* В одну колонку на смартфонах */
+        gap: 12px;
+        padding: 15px;
+    }
+
+    .about-white-left, .about-white-right {
+        flex: 1 1 100%;
+    }
+}
+
 @media (max-width: 992px) {
     .main-nav {
         display: none;

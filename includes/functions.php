@@ -88,10 +88,11 @@ function renderAdvantages($conn) {
     echo '</div>';
 }
 
+// PHP-функция: Добавляем пустой span для будущей точки перед текстом
 function renderFeatures($conn) {
     $features = getFeatures($conn);
     foreach ($features as $feature) {
-        echo '<div class="feature-item">' . $feature['title'] . '</div>';
+        echo '<div class="feature-item"><span class="feature-dot"></span>' . $feature['title'] . '</div>';
     }
 }
 

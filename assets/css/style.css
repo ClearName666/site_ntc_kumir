@@ -433,25 +433,84 @@ main {
     margin-bottom: 40px;
 }
 
+/* --- ОБНОВЛЕННЫЕ CSS СТИЛИ ДЛЯ FEATURE-ITEM С НЕОНОВЫМИ ТОЧКАМИ --- */
+
 .feature-item {
     background: var(--bg-white-semi);
-    padding: 20px;
+    padding: 18px 20px 18px 45px; /* Увеличили левый паддинг, чтобы освободить место под точку (было 20px) */
     border-radius: 10px;
     backdrop-filter: blur(10px);
     border: var(--border-white);
     color: white;
     font-size: 18px;
     font-weight: 500;
+    
     opacity: 0;
     transform: translateX(-30px);
     animation: slideInLeft 0.8s forwards;
     transition: var(--transition-default);
+    
+    /* ВАЖНО: Добавляем Flexbox для выравнивания точки и текста в одну линию */
+    display: flex;
+    align-items: center;
+    position: relative; /* Для позиционирования точки */
 }
 
+/* Стили для самой точки */
+.feature-dot {
+    position: absolute;
+    left: 15px; /* Отступ точки от левого края блока */
+    width: 10px; /* Размер точки */
+    height: 10px;
+    background: #00f2fe; /* Твой неоновый голубой цвет */
+    border-radius: 50%; /* Делаем круглой */
+    box-sizing: border-box;
+    
+    /* Базовое статичное сияние точки */
+    box-shadow: 0 0 8px #00f2fe, 0 0 15px #00f2fe, 0 0 25px rgba(0, 242, 254, 0.5);
+    
+    /* Запускаем анимацию бесконечного пульсирования сияния */
+    animation: neon-pulse 2.5s ease-in-out infinite;
+    
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Эффекты при наведении на весь блок feature-item */
 .feature-item:hover {
     background: rgba(255, 255, 255, 0.18);
+    transform: translateX(3px); /* Легкое смещение блока вправо при ховере */
 }
 
+/* При наведении на блок, точка становится чуть больше и сияет ярче */
+.feature-item:hover .feature-dot {
+    transform: scale(1.15);
+    box-shadow: 0 0 12px #00f2fe, 0 0 20px #00f2fe, 0 0 35px rgba(0, 242, 254, 0.8);
+}
+
+
+/* --- АНИМАЦИИ --- */
+
+/* Анимация плавного неонвого пульсирования (сияние то растет, то затухает) */
+@keyframes neon-pulse {
+    0%, 100% {
+        box-shadow: 0 0 8px #00f2fe, 0 0 15px #00f2fe, 0 0 25px rgba(0, 242, 254, 0.5);
+        opacity: 1;
+    }
+    50% {
+        box-shadow: 0 0 12px #00f2fe, 0 0 22px #00f2fe, 0 0 35px rgba(0, 242, 254, 0.8);
+        opacity: 0.85; /* Легкое мерцание самой точки */
+    }
+}
+
+/* Твоя стандартная анимация появления слева */
+@keyframes slideInLeft {
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Стандартные задержки появления */
 .feature-item:nth-child(1) { animation-delay: 0.5s; }
 .feature-item:nth-child(2) { animation-delay: 0.6s; }
 .feature-item:nth-child(3) { animation-delay: 0.7s; }
@@ -540,21 +599,21 @@ main {
 
 /* 1. Учет энергоресурсов (Справа вверху, заходит на картинку) */
 .card-energy {
-    top: 35%;
+    top: 55%;
     right: 20%; /* Вылезает на правый край, теперь не обрежется! */
     border-color: #8a2be2; 
 }
 
 /* 2. Аналитика (Слева по центру) */
 .card-analytics {
-    top: 15%;
+    top: 35%;
     left: 9%; /* Спокойно выходит за левый край фона */
     border-color: #4facfe; 
 }
 
 /* 3. Дистанционный контроль (Справа внизу) */
 .card-control {
-    bottom: 60%;
+    bottom: 40%;
     right: 5%;
     border-color: #ff4e50; 
 }
@@ -952,25 +1011,54 @@ main {
 }
 
 .company-features {
-    list-style: none;
-    margin-bottom: 30px;
+    list-style: none; /* Полностью убираем дефолтные маркеры или галочки */
+    padding: 0;
+    margin: 0;
 }
 
 .company-features li {
-    margin-bottom: 15px;
-    padding-left: 30px;
     position: relative;
-    font-size: 18px;
+    padding-left: 28px; /* Хороший отступ, чтобы большая светящаяся точка не наезжала на текст */
+    font-size: 16px; /* Подстрой под свой размер текста, если он отличается */
+    line-height: 1.5;
+    color: #ffffff; /* Или любой твой цвет текста */
+    margin-bottom: 12px; /* Расстояние между пунктами */
+    font-weight: 500;
+    
+    display: flex;
+    align-items: center; /* Центрируем точку относительно первой строки текста */
 }
 
+/* Создаем живую оранжевую неоновую точку */
 .company-features li::before {
-    content: '✓';
+    content: "" !important; /* Намертво стираем любые старые галочки/символы */
     position: absolute;
-    left: 0;
-    color: var(--secondary-color);
-    font-weight: bold;
-    font-size: 20px;
+    left: 4px; /* Отступ точки от левого края */
+    top: 50%;
+    transform: translateY(-50%); /* Идеальный центр по вертикали */
+    
+    width: 9px; /* Оптимальный размер для этого списка */
+    height: 9px;
+    background: #ff7700; /* Яркий неоновый оранжевый */
+    border-radius: 50%;
+    
+    /* Густое, глубокое оранжевое свечение */
+    box-shadow: 0 0 8px #ff7700, 0 0 16px #ff7700, 0 0 25px rgba(255, 119, 0, 0.6);
+    
+    /* Подключаем плавную пульсацию */
+    animation: neon-pulse-orange 2.5s ease-in-out infinite;
+    
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
+
+/* Эффект при наведении на строчку */
+.company-features li:hover::before {
+    transform: translateY(-50%) scale(1.3); /* Точка эффектно увеличивается */
+    box-shadow: 0 0 12px #ff7700, 0 0 22px #ff7700, 0 0 35px rgba(255, 119, 0, 0.9); /* Свечение взрывается яркостью */
+}
+
+
+
 
 .company-description {
     font-size: 18px;
@@ -1146,5 +1234,17 @@ main {
     to {
         opacity: 1;
         transform: translateX(0);
+    }
+}
+
+/* --- КЛЮЧЕВЫЕ КАДРЫ ДЛЯ ОРАНЖЕВОГО НЕОНА --- */
+@keyframes neon-pulse-orange {
+    0%, 100% {
+        box-shadow: 0 0 8px #ff7700, 0 0 16px #ff7700, 0 0 25px rgba(255, 119, 0, 0.6);
+        opacity: 1;
+    }
+    50% {
+        box-shadow: 0 0 12px #ff7700, 0 0 22px #ff7700, 0 0 32px rgba(255, 119, 0, 0.85);
+        opacity: 0.85; /* Легкое мерцание нити накала */
     }
 }

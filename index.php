@@ -268,105 +268,136 @@ $currentUrl = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
     <section class="geography-section">
         <div class="container-main">
             <h2 class="section-title">География применения</h2>
-            <div class="map-scroll-container">
-                <div class="map-wrapper">
-                    <div class="map-bg-container">
-                        <img src="/assets/images/static/map_background__lines.png" alt="Карта географии поставок" class="map-img">
-                    </div>
+            
+            <div class="map-wrapper">
+                <div class="map-bg-container">
+                    <img src="/assets/images/static/map_background__lines.png" alt="Карта географии поставок" class="map-img">
+                </div>
 
-                    <div class="map-badge pos-spb">
-                        <div class="badge-dot"></div>
-                        <div class="badge-content">
-                            <h4>Санкт-Петербург</h4>
-                        </div>
-                    </div>
-
-                    <div class="map-badge pos-moscow">
-                        <div class="badge-dot"></div>
-                        <div class="badge-content">
-                            <h4>Москва</h4>
-                            <p>Владимир</p>
-                            <p>Александров</p>
-                            <p>Ковров</p>
-                        </div>
-                    </div>
-
-                    <div class="map-badge pos-saratov">
-                        <div class="badge-dot"></div>
-                        <div class="badge-content">
-                            <h4>Саратов</h4>
-                        </div>
-                    </div>
-
-                    <div class="map-badge pos-tyumen">
-                        <div class="badge-dot"></div>
-                        <div class="badge-content">
-                            <h4>Тюмень</h4>
-                            <p>Тобольск</p>
-                            <p>Горноправдинск</p>
-                        </div>
-                    </div>
-
-                    <div class="map-badge pos-irkutsk">
-                        <div class="badge-dot"></div>
-                        <div class="badge-content">
-                            <h4>Иркутск</h4>
-                            <p>Ангарск • Шелехов</p>
-                            <p>Усолье-Сибирское</p>
-                            <p>Черемхово</p>
-                            <p>Нижнеудинск • Братск</p>
-                            <p>Железногорск-Илимский</p>
-                            <p>Усть-Илимск</p>
-                            <p>Слюдянка • Байкальск</p>
-                        </div>
-                    </div>
-
-                    <div class="map-badge pos-ulan-ude">
-                        <div class="badge-dot"></div>
-                        <div class="badge-content">
-                            <h4>Улан-Удэ</h4>
-                            <p>Северобайкальск</p>
-                            <p>Гусиноозерск</p>
-                        </div>
-                    </div>
-
-                    <div class="map-badge pos-yakutsk">
-                        <div class="badge-dot"></div>
-                        <div class="badge-content">
-                            <h4>Якутск</h4>
-                            <p>Депутатский</p>
-                            <p>Мирный</p>
-                        </div>
-                    </div>
-
-                    <div class="map-badge pos-chita">
-                        <div class="badge-dot"></div>
-                        <div class="badge-content">
-                            <h4>Чита</h4>
-                        </div>
-                    </div>
-
-                    <div class="map-badge pos-vladivostok">
-                        <div class="badge-dot"></div>
-                        <div class="badge-content">
-                            <h4>Владивосток</h4>
-                        </div>
-                    </div>
-
-                    <div class="map-badge pos-kamchatka">
-                        <div class="badge-dot"></div>
-                        <div class="badge-content">
-                            <h4>Петропавловск-Камчатский</h4>
-                        </div>
-                    </div>
-                    <div class="map-badge pos-logo-brand">
-                        <div class="badge-logo-box">
-                            <a href="/index.php" class="logo-link">
-                                <img src="/<?php echo getSetting($conn, 'logo_path'); ?>" alt="<?php echo getSetting($conn, 'company_name'); ?>">
-                            </a>
-                        </div>
+                <div class="map-badge pos-spb">
+                    <div class="badge-dot"></div>
+                    <div class="badge-content">
+                        <h4>Санкт-Петербург</h4>
                     </div>
                 </div>
+
+                <div class="map-badge pos-moscow">
+                    <div class="badge-dot"></div>
+                    <div class="badge-content">
+                        <h4>Москва</h4>
+                        <p>Владимир</p>
+                        <p>Александров</p>
+                        <p>Ковров</p>
+                    </div>
+                </div>
+
+                <div class="map-badge pos-saratov">
+                    <div class="badge-dot"></div>
+                    <div class="badge-content">
+                        <h4>Саратов</h4>
+                    </div>
+                </div>
+
+                <div class="map-badge pos-tyumen">
+                    <div class="badge-dot"></div>
+                    <div class="badge-content">
+                        <h4>Тюмень</h4>
+                        <p>Тобольск</p>
+                        <p>Горноправдинск</p>
+                    </div>
+                </div>
+
+                <div class="map-badge pos-irkutsk">
+                    <div class="badge-dot"></div>
+                    <div class="badge-content">
+                        <h4>Иркутск</h4>
+                        <p>Ангарск • Шелехов</p>
+                        <p>Усолье-Сибирское</p>
+                        <p>Черемхово</p>
+                        <p>Нижнеудинск • Братск</p>
+                        <p>Железногорск-Илимский</p>
+                        <p>Усть-Илимск</p>
+                        <p>Слюдянка • Байкальск</p>
+                    </div>
+                </div>
+
+                <div class="map-badge pos-ulan-ude">
+                    <div class="badge-dot"></div>
+                    <div class="badge-content">
+                        <h4>Улан-Удэ</h4>
+                        <p>Северобайкальск</p>
+                        <p>Гусиноозерск</p>
+                    </div>
+                </div>
+
+                <div class="map-badge pos-yakutsk">
+                    <div class="badge-dot"></div>
+                    <div class="badge-content">
+                        <h4>Якутск</h4>
+                        <p>Депутатский</p>
+                        <p>Мирный</p>
+                    </div>
+                </div>
+
+                <div class="map-badge pos-chita">
+                    <div class="badge-dot"></div>
+                    <div class="badge-content">
+                        <h4>Чита</h4>
+                    </div>
+                </div>
+
+                <div class="map-badge pos-vladivostok">
+                    <div class="badge-dot"></div>
+                    <div class="badge-content">
+                        <h4>Владивосток</h4>
+                    </div>
+                </div>
+
+                <div class="map-badge pos-kamchatka">
+                    <div class="badge-dot"></div>
+                    <div class="badge-content">
+                        <h4>Петропавловск-Камчатский</h4>
+                    </div>
+                </div>
+                    <div class="map-badge pos-logo-brand company-about-fullwidth">
+                        <div class="map-about-box-white">
+                            <?php 
+                            $aboutContent = getContentBlock($conn, 'about_content');
+                            $aboutFeatures = getContentBlock($conn, 'about_features');
+                            $aboutTitle = getContentBlock($conn, 'about_title');
+                            ?>
+                            
+                            <div class="about-white-logo">
+                                <a href="/index.php" class="about-logo-link">
+                                    <img src="/<?php echo getSetting($conn, 'logo_path'); ?>" alt="<?php echo getSetting($conn, 'company_name'); ?>">
+                                </a>
+                            </div>
+
+                            <div class="about-white-left">
+                                <h3 class="about-white-title"><?php echo $aboutTitle['content']; ?></h3>
+                                
+                                <ul class="about-white-features">
+                                    <?php
+                                    if (!empty($aboutFeatures['content'])) {
+                                        $featuresList = explode("\n", $aboutFeatures['content']);
+                                        foreach ($featuresList as $feature) {
+                                            $trimmed = trim($feature);
+                                            if ($trimmed) { 
+                                                echo '<li>' . $trimmed . '</li>';
+                                            }
+                                        }
+                                    }
+                                    ?>
+                                </ul>
+                            </div>
+                            
+                            <div class="about-white-right">
+                                <p class="about-white-desc">
+                                    <?php echo $aboutContent['content']; ?>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
             </div>
         </div>
     </section>
