@@ -164,6 +164,51 @@ require_once __DIR__. '/includes/menu.php';
                             </label>
                             <small class="text-muted d-block">1 – включено, 0 – выключено</small>
                         </div>
+                        <div class="form-group">
+                            <label for="setting_for_whom_view">
+                                <input type="hidden" name="setting_for_whom_view" value="0">
+                                <input type="checkbox" id="setting_for_whom_view" name="setting_for_whom_view" value="1" 
+                                    <?php echo (($settings['for_whom_view'] ?? 0) == 1) ? 'checked' : ''; ?>>
+                                Секция "Для кого" отображение
+                            </label>
+                            <small class="text-muted d-block">1 – включено, 0 – выключено</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="setting_our_products_view">
+                                <input type="hidden" name="setting_our_products_view" value="0">
+                                <input type="checkbox" id="setting_our_products_view" name="setting_our_products_view" value="1" 
+                                    <?php echo (($settings['our_products_view'] ?? 0) == 1) ? 'checked' : ''; ?>>
+                                Секция "Наша продукция" отображение
+                            </label>
+                            <small class="text-muted d-block">1 – включено, 0 – выключено</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="setting_advantages_of_our_system_view">
+                                <input type="hidden" name="setting_advantages_of_our_system_view" value="0">
+                                <input type="checkbox" id="setting_advantages_of_our_system_view" name="setting_advantages_of_our_system_view" value="1" 
+                                    <?php echo (($settings['advantages_of_our_system_view'] ?? 0) == 1) ? 'checked' : ''; ?>>
+                                Секция "Преимущества нашей системы" отображение
+                            </label>
+                            <small class="text-muted d-block">1 – включено, 0 – выключено</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="setting_about_the_company_view">
+                                <input type="hidden" name="setting_about_the_company_view" value="0">
+                                <input type="checkbox" id="setting_about_the_company_view" name="setting_about_the_company_view" value="1" 
+                                    <?php echo (($settings['about_the_company_view'] ?? 0) == 1) ? 'checked' : ''; ?>>
+                                Секция "О компании" отображение
+                            </label>
+                            <small class="text-muted d-block">1 – включено, 0 – выключено</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="setting_geography_of_application_view">
+                                <input type="hidden" name="setting_geography_of_application_view" value="0">
+                                <input type="checkbox" id="setting_geography_of_application_view" name="setting_geography_of_application_view" value="1" 
+                                    <?php echo (($settings['geography_of_application_view'] ?? 0) == 1) ? 'checked' : ''; ?>>
+                                Секция "География применения" отображение
+                            </label>
+                            <small class="text-muted d-block">1 – включено, 0 – выключено</small>
+                        </div>
                 </div>
             </div>
             

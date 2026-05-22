@@ -107,10 +107,16 @@
 
 .pos-logo-brand {
     top: 5%; 
-    left: 25%; 
+    left: 30%; 
     z-index: 4;
     position: absolute;
     display: flex;
+    
+    /* Добавляем ширину родителю, чтобы он не зажимал внутренности */
+    width: 30vw; 
+    min-width: 450px; 
+    max-width: 650px;
+    
     transition: transform 0.25s ease;
 }
 
@@ -118,7 +124,7 @@
     transform: scale(1.02); 
 }
 
-/* Главный контейнер (Чистый Glassmorphism) */
+/* В самом блоке меняем ширину на 100% от родителя */
 .map-about-box-white {
     position: relative;
     background: rgba(255, 255, 255, 0.65); 
@@ -133,8 +139,9 @@
     align-items: center; 
     gap: 18px; 
     
-    width: 580px; 
-    max-width: 580px;
+    /* ТЕПЕРЬ ОН ЗАЙМЕТ ВСЮ ШИРИНУ РОДИТЕЛЯ */
+    width: 100%; 
+    
     height: auto;
     box-sizing: border-box;
     pointer-events: auto;
@@ -166,7 +173,7 @@
     animation-duration: 3s; /* Ускорение перелива при ховере */
 }
 
-/* Левая колонка: Логотип в черном закругленном контейнере */
+/* Левая колонка: Логотип (остается фиксированным, ему тянуться не нужно) */
 .about-white-logo {
     flex: 0 0 85px; 
     background: rgba(26, 31, 54, 0.95); 
@@ -195,10 +202,13 @@
 }
 
 /* Средняя колонка: Фичи (Черный текст) */
-.about-white-left {
-    flex: 0 1 35%; 
-    min-width: 145px; 
-    color: #000000 !important;
+.about-white-right {
+    /* Заберет вторую половину свободного пространства, деля его со средней колонкой 50/50 */
+    flex: 1 1 0%; 
+    min-width: 180px; /* Защита от сжатия описания */
+    color: #2d3748 !important;
+    word-wrap: break-word; 
+    overflow-wrap: break-word;
 }
 
 .about-white-title {
@@ -217,6 +227,7 @@
     margin: 0;
 }
 
+/* Элементы списка: запрещаем тексту переноситься там, где это не нужно */
 .about-white-features li {
     position: relative;
     padding-left: 20px; 
@@ -227,6 +238,10 @@
     font-weight: 600;
     display: flex;
     align-items: center; 
+    
+    /* white-space: normal разрешает перенос, но благодаря flex: 1 1 0% 
+       строка теперь станет намного длиннее, прежде чем перенесется */
+    white-space: normal; 
 }
 
 /* Живой КРАСНЫЙ неоновый кругляшок вместо старого маркера */
@@ -266,7 +281,7 @@
 }
 
 .about-white-desc {
-    font-size: 11px;
+    font-size: 16px;
     line-height: 1.45;
     color: #2d3748 !important;
     margin: 0;

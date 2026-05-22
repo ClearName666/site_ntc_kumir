@@ -15,6 +15,14 @@ $videoId = getSetting($conn, 'video_id');
 // $videoThumb = getImage($conn, 'video_thumbnail'); 
 $mainBg = getImage($conn, 'image_background_all');
 
+// Получение настроек отображения 
+$for_whom_view = (getSetting($conn, 'for_whom_view') == 1);
+$our_products_view = (getSetting($conn, 'our_products_view') == 1);
+$advantages_of_our_system_view = (getSetting($conn, 'advantages_of_our_system_view') == 1);
+$about_the_company_view = (getSetting($conn, 'about_the_company_view') == 1);
+$geography_of_application_view = (getSetting($conn, 'geography_of_application_view') == 1);
+
+
 
 // --- ДОПОЛНИТЕЛЬНАЯ ПОДГОТОВКА ДЛЯ SEO И СОЦСЕТЕЙ ---
 $siteTitle = getSetting($conn, 'site_title');
@@ -142,265 +150,276 @@ $currentUrl = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
         </div>
     </section>
 
-    <section class="for-whom-section">
-        <div class="container-main">
-            
-            <h2 class="section-title mobile-only-title">Для кого</h2>
-            
-            <div class="for-whom-wrapper">
+    <?php if ($for_whom_view): ?>
+        <section class="for-whom-section">
+            <div class="container-main">
                 
-                <div class="for-whom-background">
-                    <img src="/assets/images/static/category_background.png" alt="Линии распределения" class="lines-img">
-                    
-                    <div class="center-desktop-circle">
-                        <span>Для кого</span>
-                    </div>
-                </div>
-
-                <div class="target-item pos-top-1">
-                    <div class="icon-box"><img src="/assets/images/static/thumb__166_0_0_0_auto.png" alt=""></div>
-                    <p>ЖКХ: управляющим компаниям и ТСЖ</p>
-                </div>
-                <div class="target-item pos-top-2">
-                    <div class="icon-box"><img src="/assets/images/static/thumb__166_0_0_0_auto(1).png" alt=""></div>
-                    <p>Энергосбытовым и сетевым компаниям</p>
-                </div>
-                <div class="target-item pos-top-3">
-                    <div class="icon-box"><img src="/assets/images/static/thumb__166_0_0_0_auto(2).png" alt=""></div>
-                    <p>Муниципальным и государственным учреждениям</p>
-                </div>
-                <div class="target-item pos-top-4">
-                    <div class="icon-box"><img src="/assets/images/static/thumb__166_0_0_0_auto(3).png" alt=""></div>
-                    <p>Эксплуатантам теплоисточников и магистральных сетей</p>
-                </div>
-                <div class="target-item pos-top-5">
-                    <div class="icon-box"><img src="/assets/images/static/thumb__166_0_0_0_auto(4).png" alt=""></div>
-                    <p>Садовым товариществам и коттеджным поселкам</p>
-                </div>
-                <div class="target-item pos-top-6">
-                    <div class="icon-box"><img src="/assets/images/static/thumb__166_0_0_0_auto(5).png" alt=""></div>
-                    <p>Застройщикам</p>
-                </div>
-
-                <div class="target-item pos-bottom-1">
-                    <div class="icon-box"><img src="/assets/images/static/thumb__166_0_0_0_auto(6).png" alt=""></div>
-                    <p>Умный дом</p>
-                </div>
-                <div class="target-item pos-bottom-2">
-                    <div class="icon-box"><img src="/assets/images/static/thumb__166_0_0_0_auto(7).png" alt=""></div>
-                    <p>Промышленности и <br>сельскому хозяйству</p>
-                </div>
-                <div class="target-item pos-bottom-3">
-                    <div class="icon-box"><img src="/assets/images/static/thumb__166_0_0_0_auto(8).png" alt=""></div>
-                    <p>Экология</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Products/Cards Section -->
-    <section class="cards-section">
-        <div class="container">
-            <h2 class="section-title">Наша продукция</h2>
-            <div class="cards-container">
-                <?php renderCards($conn); ?>
-            </div>
-        </div>
-    </section>
-
-    <!-- Advantages Section -->
-    <section class="advantages-section">
-        <div class="container">
-            <h2 class="section-title"><?php echo getContentBlock($conn, 'advantages_title')['content']; ?></h2>
-            <?php renderAdvantages($conn); ?>
-        </div>
-    </section>
-
-    <!-- About Section -->
-    <section class="about-section">
-        <div class="container about-container">
-            <div class="about-stats">
-                <?php renderStatistics($conn); ?>
-            </div>
-            
-            <div class="about-content">
-            <div class="video-section">
-                <div class="video-container" id="video-wrapper">
-                    <?php if (!empty($videoId)): ?>
-                        <iframe 
-                            width="100%" 
-                            height="360" 
-                            src="https://rutube.ru/play/embed/<?php echo $videoId; ?>/" 
-                            frameborder="0" 
-                            allow="autoplay; encrypted-media" 
-                            allowfullscreen 
-                            style="border-radius: 8px;">
-                        </iframe>
-                    <?php endif; ?>
-                </div>
-            </div>
+                <h2 class="section-title mobile-only-title">Для кого</h2>
                 
-                <div class="company-info">
-                    <?php 
-                    $aboutContent = getContentBlock($conn, 'about_content');
-                    $aboutFeatures = getContentBlock($conn, 'about_features');
-                    ?>
-                    <h2><?php echo getContentBlock($conn, 'about_title')['content']; ?></h2>
+                <div class="for-whom-wrapper">
                     
-                    <ul class="company-features">
-                        <?php
-                        $featuresList = explode("\n", $aboutFeatures['content']);
-                        foreach ($featuresList as $feature) {
-                            if (trim($feature)) {
-                                echo '<li>' . trim($feature) . '</li>';
-                            }
-                        }
-                        ?>
-                    </ul>
-                    
-                    <p class="company-description">
-                        <?php echo $aboutContent['content']; ?>
-                    </p>
-                </div>
-            </div>
-        </div>
-    </section>
-    <section class="geography-section">
-        <div class="container-main">
-            <h2 class="section-title">География применения</h2>
-            
-            <div class="map-wrapper">
-                <div class="map-bg-container">
-                    <img src="/assets/images/static/map_background__lines.png" alt="Карта географии поставок" class="map-img">
-                </div>
-
-                <div class="map-badge pos-spb">
-                    <div class="badge-dot"></div>
-                    <div class="badge-content">
-                        <h4>Санкт-Петербург</h4>
-                    </div>
-                </div>
-
-                <div class="map-badge pos-moscow">
-                    <div class="badge-dot"></div>
-                    <div class="badge-content">
-                        <h4>Москва</h4>
-                        <p>Владимир</p>
-                        <p>Александров</p>
-                        <p>Ковров</p>
-                    </div>
-                </div>
-
-                <div class="map-badge pos-saratov">
-                    <div class="badge-dot"></div>
-                    <div class="badge-content">
-                        <h4>Саратов</h4>
-                    </div>
-                </div>
-
-                <div class="map-badge pos-tyumen">
-                    <div class="badge-dot"></div>
-                    <div class="badge-content">
-                        <h4>Тюмень</h4>
-                        <p>Тобольск</p>
-                        <p>Горноправдинск</p>
-                    </div>
-                </div>
-
-                <div class="map-badge pos-irkutsk">
-                    <div class="badge-dot"></div>
-                    <div class="badge-content">
-                        <h4>Иркутск</h4>
-                        <p>Ангарск • Шелехов</p>
-                        <p>Усолье-Сибирское</p>
-                        <p>Черемхово</p>
-                        <p>Нижнеудинск • Братск</p>
-                        <p>Железногорск-Илимский</p>
-                        <p>Усть-Илимск</p>
-                        <p>Слюдянка • Байкальск</p>
-                    </div>
-                </div>
-
-                <div class="map-badge pos-ulan-ude">
-                    <div class="badge-dot"></div>
-                    <div class="badge-content">
-                        <h4>Улан-Удэ</h4>
-                        <p>Северобайкальск</p>
-                        <p>Гусиноозерск</p>
-                    </div>
-                </div>
-
-                <div class="map-badge pos-yakutsk">
-                    <div class="badge-dot"></div>
-                    <div class="badge-content">
-                        <h4>Якутск</h4>
-                        <p>Депутатский</p>
-                        <p>Мирный</p>
-                    </div>
-                </div>
-
-                <div class="map-badge pos-chita">
-                    <div class="badge-dot"></div>
-                    <div class="badge-content">
-                        <h4>Чита</h4>
-                    </div>
-                </div>
-
-                <div class="map-badge pos-vladivostok">
-                    <div class="badge-dot"></div>
-                    <div class="badge-content">
-                        <h4>Владивосток</h4>
-                    </div>
-                </div>
-
-                <div class="map-badge pos-kamchatka">
-                    <div class="badge-dot"></div>
-                    <div class="badge-content">
-                        <h4>Петропавловск-Камчатский</h4>
-                    </div>
-                </div>
-                    <div class="map-badge pos-logo-brand company-about-fullwidth">
-                        <div class="map-about-box-white">
-                            <?php 
-                            $aboutContent = getContentBlock($conn, 'about_content');
-                            $aboutFeatures = getContentBlock($conn, 'about_features');
-                            $aboutTitle = getContentBlock($conn, 'about_title');
-                            ?>
-                            
-                            <div class="about-white-logo">
-                                <a href="/index.php" class="about-logo-link">
-                                    <img src="/<?php echo getSetting($conn, 'logo_path'); ?>" alt="<?php echo getSetting($conn, 'company_name'); ?>">
-                                </a>
-                            </div>
-
-                            <div class="about-white-left">
-                                <h3 class="about-white-title"><?php echo $aboutTitle['content']; ?></h3>
-                                
-                                <ul class="about-white-features">
-                                    <?php
-                                    if (!empty($aboutFeatures['content'])) {
-                                        $featuresList = explode("\n", $aboutFeatures['content']);
-                                        foreach ($featuresList as $feature) {
-                                            $trimmed = trim($feature);
-                                            if ($trimmed) { 
-                                                echo '<li>' . $trimmed . '</li>';
-                                            }
-                                        }
-                                    }
-                                    ?>
-                                </ul>
-                            </div>
-                            
-                            <div class="about-white-right">
-                                <p class="about-white-desc">
-                                    <?php echo $aboutContent['content']; ?>
-                                </p>
-                            </div>
+                    <div class="for-whom-background">
+                        <img src="/assets/images/static/category_background.png" alt="Линии распределения" class="lines-img">
+                        
+                        <div class="center-desktop-circle">
+                            <span>Для кого</span>
                         </div>
                     </div>
+
+                    <div class="target-item pos-top-1">
+                        <div class="icon-box"><img src="/assets/images/static/thumb__166_0_0_0_auto.png" alt=""></div>
+                        <p>ЖКХ: управляющим компаниям и ТСЖ</p>
+                    </div>
+                    <div class="target-item pos-top-2">
+                        <div class="icon-box"><img src="/assets/images/static/thumb__166_0_0_0_auto(1).png" alt=""></div>
+                        <p>Энергосбытовым и сетевым компаниям</p>
+                    </div>
+                    <div class="target-item pos-top-3">
+                        <div class="icon-box"><img src="/assets/images/static/thumb__166_0_0_0_auto(2).png" alt=""></div>
+                        <p>Муниципальным и государственным учреждениям</p>
+                    </div>
+                    <div class="target-item pos-top-4">
+                        <div class="icon-box"><img src="/assets/images/static/thumb__166_0_0_0_auto(3).png" alt=""></div>
+                        <p>Эксплуатантам теплоисточников и магистральных сетей</p>
+                    </div>
+                    <div class="target-item pos-top-5">
+                        <div class="icon-box"><img src="/assets/images/static/thumb__166_0_0_0_auto(4).png" alt=""></div>
+                        <p>Садовым товариществам и коттеджным поселкам</p>
+                    </div>
+                    <div class="target-item pos-top-6">
+                        <div class="icon-box"><img src="/assets/images/static/thumb__166_0_0_0_auto(5).png" alt=""></div>
+                        <p>Застройщикам</p>
+                    </div>
+
+                    <div class="target-item pos-bottom-1">
+                        <div class="icon-box"><img src="/assets/images/static/thumb__166_0_0_0_auto(6).png" alt=""></div>
+                        <p>Умный дом</p>
+                    </div>
+                    <div class="target-item pos-bottom-2">
+                        <div class="icon-box"><img src="/assets/images/static/thumb__166_0_0_0_auto(7).png" alt=""></div>
+                        <p>Промышленности и <br>сельскому хозяйству</p>
+                    </div>
+                    <div class="target-item pos-bottom-3">
+                        <div class="icon-box"><img src="/assets/images/static/thumb__166_0_0_0_auto(8).png" alt=""></div>
+                        <p>Экология</p>
+                    </div>
+                </div>
             </div>
-        </div>
-    </section>
+        </section>
+    <?php endif; ?>
+
+    <!-- Products/Cards Section -->
+    <?php if ($our_products_view): ?>
+        <section class="cards-section">
+            <div class="container">
+                <h2 class="section-title">Наша продукция</h2>
+                <div class="cards-container">
+                    <?php renderCards($conn); ?>
+                </div>
+            </div>
+        </section>
+    <?php endif; ?>
+
+    <!-- Advantages Section -->
+     <?php if ($advantages_of_our_system_view): ?>
+        <section class="advantages-section">
+            <div class="container">
+                <h2 class="section-title"><?php echo getContentBlock($conn, 'advantages_title')['content']; ?></h2>
+                <?php renderAdvantages($conn); ?>
+            </div>
+        </section>
+    <?php endif; ?>
+
+    <!-- About Section -->
+     <?php if ($about_the_company_view): ?>
+        <section class="about-section">
+            <div class="container about-container">
+                <div class="about-stats">
+                    <?php renderStatistics($conn); ?>
+                </div>
+                
+                <div class="about-content">
+                <div class="video-section">
+                    <div class="video-container" id="video-wrapper">
+                        <?php if (!empty($videoId)): ?>
+                            <iframe 
+                                width="100%" 
+                                height="360" 
+                                src="https://rutube.ru/play/embed/<?php echo $videoId; ?>/" 
+                                frameborder="0" 
+                                allow="autoplay; encrypted-media" 
+                                allowfullscreen 
+                                style="border-radius: 8px;">
+                            </iframe>
+                        <?php endif; ?>
+                    </div>
+                </div>
+                    
+                    <div class="company-info">
+                        <?php 
+                        $aboutContent = getContentBlock($conn, 'about_content');
+                        $aboutFeatures = getContentBlock($conn, 'about_features');
+                        ?>
+                        <h2><?php echo getContentBlock($conn, 'about_title')['content']; ?></h2>
+                        
+                        <ul class="company-features">
+                            <?php
+                            $featuresList = explode("\n", $aboutFeatures['content']);
+                            foreach ($featuresList as $feature) {
+                                if (trim($feature)) {
+                                    echo '<li>' . trim($feature) . '</li>';
+                                }
+                            }
+                            ?>
+                        </ul>
+                        
+                        <p class="company-description">
+                            <?php echo $aboutContent['content']; ?>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    <?php endif; ?>
+
+    <?php if ($geography_of_application_view): ?>
+        <section class="geography-section">
+            <div class="container-main">
+                <h2 class="section-title">География применения</h2>
+                
+                <div class="map-wrapper">
+                    <div class="map-bg-container">
+                        <img src="/assets/images/static/map_background__lines.png" alt="Карта географии поставок" class="map-img">
+                    </div>
+
+                    <div class="map-badge pos-spb">
+                        <div class="badge-dot"></div>
+                        <div class="badge-content">
+                            <h4>Санкт-Петербург</h4>
+                        </div>
+                    </div>
+
+                    <div class="map-badge pos-moscow">
+                        <div class="badge-dot"></div>
+                        <div class="badge-content">
+                            <h4>Москва</h4>
+                            <p>Владимир</p>
+                            <p>Александров</p>
+                            <p>Ковров</p>
+                        </div>
+                    </div>
+
+                    <div class="map-badge pos-saratov">
+                        <div class="badge-dot"></div>
+                        <div class="badge-content">
+                            <h4>Саратов</h4>
+                        </div>
+                    </div>
+
+                    <div class="map-badge pos-tyumen">
+                        <div class="badge-dot"></div>
+                        <div class="badge-content">
+                            <h4>Тюмень</h4>
+                            <p>Тобольск</p>
+                            <p>Горноправдинск</p>
+                        </div>
+                    </div>
+
+                    <div class="map-badge pos-irkutsk">
+                        <div class="badge-dot"></div>
+                        <div class="badge-content">
+                            <h4>Иркутск</h4>
+                            <p>Ангарск • Шелехов</p>
+                            <p>Усолье-Сибирское</p>
+                            <p>Черемхово</p>
+                            <p>Нижнеудинск • Братск</p>
+                            <p>Железногорск-Илимский</p>
+                            <p>Усть-Илимск</p>
+                            <p>Слюдянка • Байкальск</p>
+                        </div>
+                    </div>
+
+                    <div class="map-badge pos-ulan-ude">
+                        <div class="badge-dot"></div>
+                        <div class="badge-content">
+                            <h4>Улан-Удэ</h4>
+                            <p>Северобайкальск</p>
+                            <p>Гусиноозерск</p>
+                        </div>
+                    </div>
+
+                    <div class="map-badge pos-yakutsk">
+                        <div class="badge-dot"></div>
+                        <div class="badge-content">
+                            <h4>Якутск</h4>
+                            <p>Депутатский</p>
+                            <p>Мирный</p>
+                        </div>
+                    </div>
+
+                    <div class="map-badge pos-chita">
+                        <div class="badge-dot"></div>
+                        <div class="badge-content">
+                            <h4>Чита</h4>
+                        </div>
+                    </div>
+
+                    <div class="map-badge pos-vladivostok">
+                        <div class="badge-dot"></div>
+                        <div class="badge-content">
+                            <h4>Владивосток</h4>
+                        </div>
+                    </div>
+
+                    <div class="map-badge pos-kamchatka">
+                        <div class="badge-dot"></div>
+                        <div class="badge-content">
+                            <h4>Петропавловск-Камчатский</h4>
+                        </div>
+                    </div>
+                        <div class="map-badge pos-logo-brand company-about-fullwidth">
+                            <div class="map-about-box-white">
+                                <?php 
+                                $aboutContent = getContentBlock($conn, 'about_content');
+                                $aboutFeatures = getContentBlock($conn, 'about_features');
+                                $aboutTitle = getContentBlock($conn, 'about_title');
+                                ?>
+                                
+                                <div class="about-white-logo">
+                                    <a href="/index.php" class="about-logo-link">
+                                        <img src="/<?php echo getSetting($conn, 'logo_path'); ?>" alt="<?php echo getSetting($conn, 'company_name'); ?>">
+                                    </a>
+                                </div>
+
+                                <div class="about-white-left">
+                                    
+                                    <ul class="about-white-features">
+                                        <?php
+                                        if (!empty($aboutFeatures['content'])) {
+                                            $featuresList = explode("\n", $aboutFeatures['content']);
+                                            foreach ($featuresList as $feature) {
+                                                $trimmed = trim($feature);
+                                                if ($trimmed) { 
+                                                    echo '<li>' . $trimmed . '</li>';
+                                                }
+                                            }
+                                        }
+                                        ?>
+                                    </ul>
+                                </div>
+                                
+                                <div class="about-white-right">
+                                    <p class="about-white-desc">
+                                        <?php echo $aboutContent['content']; ?>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                </div>
+            </div>
+        </section>
+    <?php endif; ?>
+
         <script>
             window.addEventListener('load', function() {
                 window.scrollBy(0, 1);
