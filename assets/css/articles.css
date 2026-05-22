@@ -83,17 +83,29 @@ body::after {
     color: var(--text-dark);
     margin-bottom: 1rem;
     font-weight: 700;
-    background: linear-gradient(45deg, var(--primary-blue), var(--text-dark));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    position: relative;
+    display: inline-block;
 }
+
+/* Декоративная линия под заголовком */
+.page-title::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 4px;
+    background: var(--news-primary);
+    border-radius: 2px;
+}
+
 
 .page-description {
     font-size: 1.125rem;
-    color: var(--text-light);
+    color: var(--text-dark);
     max-width: 600px;
-    margin: 0 auto;
+    margin: 2rem auto 0;
     line-height: 1.6;
 }
 

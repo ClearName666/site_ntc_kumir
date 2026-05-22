@@ -109,7 +109,7 @@ body::after {
 
 .page-description {
     font-size: 1.125rem;
-    color: var(--text-light);
+    color: var(--text-dark);
     max-width: 600px;
     margin: 2rem auto 0;
     line-height: 1.6;

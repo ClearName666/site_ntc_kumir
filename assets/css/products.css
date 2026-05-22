@@ -136,6 +136,7 @@ body::after {
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 2rem;
     margin-bottom: 3rem;
+    justify-content: center;  /* если используем auto-fill или когда элементов мало */
 }
 .category-card,
 .product-card {
@@ -148,26 +149,35 @@ body::after {
     opacity: 0;
     transform: translateY(30px) scale(0.95);
     animation: cardAppear 0.6s ease forwards;
+    max-width: 400px;          /* не даём карточке быть шире 400px */
+    width: 100%;               /* внутри ячейки будет занимать свою естественную ширину, но не больше max-width */
+    margin: 0 auto;            /* центрирование, если ячейка шире */
 }
 .category-card:hover,
 .product-card:hover {
-    transform: translateY(-10px) scale(1.02);
+    transform: translateY(-6px);
     box-shadow: var(--shadow-card);
     background: var(--bg-white-strong);
 }
-.category-link,
-.product-link {
-    display: block;
-    text-decoration: none;
-    color: inherit;
-    height: 100%;
-}
 .category-image,
 .product-image-wrapper {
-    height: 200px;
-    overflow: hidden;
     position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(248, 249, 250, 0.3); /* лёгкий фон, если картинка прозрачная */
     border-radius: var(--radius-product) var(--radius-product) 0 0;
+    overflow: hidden; /* на случай, если картинка всё же вылезет */
+}
+.category-image img,
+.product-image-wrapper img {
+    display: block;
+    max-width: 100%;
+    max-height: 300px;   /* ← разумный верхний предел */
+    width: auto;
+    height: auto;
+    object-fit: contain; /* вся картинка видна, пропорции сохранены */
+    transition: transform 0.4s ease;
 }
 .category-image img,
 .product-image-wrapper img {
@@ -178,7 +188,7 @@ body::after {
 }
 .category-card:hover .category-image img,
 .product-card:hover .product-image-wrapper img {
-    transform: scale(1.1);
+    transform: scale(1.04);
 }
 .category-content,
 .product-content {
@@ -225,14 +235,15 @@ body::after {
 .product-overlay-info {
     position: absolute;
     bottom: 12px;
-    left: 12px;
-    background: rgba(255, 255, 255, 0.95);
+    right: 12px;                /* ← вместо left */
+    left: auto;                 /* сбрасываем left */
+    background: rgba(255, 255, 255, 0.9);
     backdrop-filter: blur(8px);
-    border-radius: 20px;
+    border-radius: 12px;        /* можно чуть скруглить */
     padding: 6px 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    text-align: left;
-    min-width: 120px;
+    text-align: right;          /* ← текст теперь справа */
+    min-width: auto;            /* пусть ширина зависит от содержимого */
     border: 1px solid rgba(39, 174, 96, 0.3);
     z-index: 2;
 }
@@ -632,6 +643,11 @@ body::after {
     }
 }
 @media (max-width: 768px) {
+    .category-image img,
+    .product-image-wrapper img {
+        max-height: 250px;
+    }
+
     .products-page {
         padding: 100px 0 40px;
     }

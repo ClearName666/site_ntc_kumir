@@ -8,10 +8,10 @@
 
 /* Контейнер-рамка для логотипа */
 .badge-logo-box {
-    background: rgba(0, 242, 254, 0.25); /* Аккуратное неоновое свечение при ховере */
+    background: rgba(0, 0, 0, 0.7); /* Аккуратное неоновое свечение при ховере */
     border: 1px solid #ffffff; /* Белая плотная рамка */
     border-radius: 16px; /* Красивые закругленные углы */
-    padding: 10px 15px;
+    padding: 15px 20px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15); /* Объемная тень */
     display: flex;
     justify-content: center;

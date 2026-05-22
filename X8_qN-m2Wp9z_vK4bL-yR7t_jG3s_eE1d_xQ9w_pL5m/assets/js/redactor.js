@@ -487,6 +487,21 @@ class ArticleBuilder {
                     block.fontSize = 16;
                 }
                 editable.oninput = () => this.updateContent(block.id, editable.innerHTML);
+
+                // Обработка вставки (сбрасываем форматирование)
+                editable.addEventListener('paste', (e) => {
+                    e.preventDefault();
+                    const text = (e.clipboardData || window.clipboardData).getData('text/plain');
+                    document.execCommand('insertText', false, text);
+                });
+
+                editable.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    const text = e.dataTransfer.getData('text/plain');
+                    if (text) {
+                        document.execCommand('insertText', false, text);
+                    }
+                });
                 
                 blockDiv.appendChild(toolbar);
                 blockDiv.appendChild(editable);

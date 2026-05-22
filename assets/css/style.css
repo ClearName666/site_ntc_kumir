@@ -489,7 +489,8 @@ main {
 .hero-card {
     position: absolute;
     width: 40%; /* Карточки занимают 30% от ширины всей области */
-    background: #ffffff;
+    background-color: var(--bg-glass);
+    backdrop-filter: blur(10px);
     border-radius: 32px; 
     padding: 10px 5px 5px 5px; /* Стабильные паддинги, чтобы текст не зажимало */
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.18);
