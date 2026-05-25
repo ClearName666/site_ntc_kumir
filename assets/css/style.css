@@ -383,7 +383,7 @@ main {
     position: absolute;
     inset: 0;
     /*background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.7));*/
-    background-color: var(--bg-main);
+    /*background-color: var(--bg-main);*/
     z-index: 1;
 }
 
@@ -433,6 +433,8 @@ main {
     margin-bottom: 40px;
 }
 
+
+
 /* --- ОБНОВЛЕННЫЕ CSS СТИЛИ ДЛЯ FEATURE-ITEM С НЕОНОВЫМИ ТОЧКАМИ --- */
 
 .feature-item {
@@ -462,12 +464,12 @@ main {
     left: 30px; /* Отступ точки от левого края блока */
     width: 10px; /* Размер точки */
     height: 10px;
-    background: #b800ff; /* Неоново-фиолетовый цвет */
+    background: #0055ff; /* Насыщенный синий цвет */
     border-radius: 50%; /* Делаем круглой */
     box-sizing: border-box;
     
     /* Базовое статичное сияние точки */
-    box-shadow: 0 0 8px #b800ff, 0 0 15px #b800ff, 0 0 25px rgba(184, 0, 255, 0.5);
+    box-shadow: 0 0 8px #0055ff, 0 0 15px #0055ff, 0 0 25px rgba(0, 85, 255, 0.6);
     
     /* Запускаем анимацию бесконечного пульсирования сияния */
     animation: neon-pulse 2.5s ease-in-out infinite;
@@ -484,10 +486,8 @@ main {
 /* При наведении на блок, точка становится чуть больше и сияет ярче */
 .feature-item:hover .feature-dot {
     transform: scale(1.15);
-    box-shadow: 0 0 12px #b800ff, 0 0 20px #b800ff, 0 0 35px rgba(184, 0, 255, 0.8);
+    box-shadow: 0 0 14px #0055ff, 0 0 22px #0055ff, 0 0 40px rgba(0, 85, 255, 0.95);
 }
-
-
 
 /* Стандартные задержки появления */
 .feature-item:nth-child(1) { animation-delay: 0.5s; }

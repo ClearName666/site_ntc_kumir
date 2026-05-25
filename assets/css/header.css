@@ -158,3 +158,47 @@ main, .hero {
         width: calc(100% - 20px);
     }
 }
+
+
+
+/* Базовые стили для ссылки логотипа и самой картинки */
+.logo {
+    display: inline-block;
+    transition: transform 0.3s ease;
+}
+
+/* Эффект свечения на картинку */
+.logo img {
+    /* Настраиваем анимацию: название, длительность (2.5 секунды), бесконечно, плавно туда-обратно */
+    animation: whiteNeonGlow 2.5s infinite ease-in-out;
+    transition: filter 0.3s ease;
+}
+
+/* Немного увеличиваем логотип при наведении мышкой */
+.logo:hover {
+    transform: scale(1.03);
+}
+
+/* Эффект при наведении: свечение становится еще ярче и плотнее */
+.logo:hover img {
+    filter: drop-shadow(0 0 4px #ffffff) 
+            drop-shadow(0 0 12px #ffffff) 
+            drop-shadow(0 0 30px #ffffff);
+}
+
+/* ========================================
+   KEYFRAMES ДЛЯ БЕЛОГО НЕОНОВОГО СВЕЧЕНИЯ
+   ======================================== */
+@keyframes whiteNeonGlow {
+    0%, 100% {
+        /* Минимальное свечение (мягкий белый свет) */
+        filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.6)) 
+                drop-shadow(0 0 8px rgba(255, 255, 255, 0.4));
+    }
+    50% {
+        /* Максимальное свечение (эффект разгорания неона) */
+        filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.9)) 
+                drop-shadow(0 0 15px rgba(255, 255, 255, 0.7)) 
+                drop-shadow(0 0 25px rgba(255, 255, 255, 0.4));
+    }
+}

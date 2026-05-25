@@ -35,7 +35,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1;
+    z-index: 20;
 }
 
 .lines-img {
@@ -67,18 +67,30 @@
     color: #1a1f36;
 }
 
-/* Стили карточек (сделаны крупнее) */
+/* Находим .target-item в вашем CSS и приводим к такому виду: */
 .target-item {
     position: absolute;
-    width: 13.5%; /* Ширина в процентах, чтобы сжималась вместе с экраном */
+    width: 13.5%; /* Ширина в процентах */
+    height: 38%;  /* <-- ДОБАВЛЯЕМ: фиксированная высота в % от родительского контейнера */
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: flex-start; /* <-- ДОБАВЛЯЕМ: выравнивание контента от верхнего края */
     text-align: center;
     z-index: 3;
     transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-}
 
+    background: rgba(255, 255, 255, 0.1);
+    padding: 10px; 
+    border-radius: 16px;
+    backdrop-filter: blur(10px);
+    border: rgba(255, 255, 255, 0.2);
+    color: white;
+    font-size: 18px;
+    font-weight: 500;
+    
+    box-sizing: border-box; /* <-- РЕКОМЕНДУЕТСЯ: чтобы паддинги не раздували блоки наружу */
+}
 /* Контейнеры для иконок (увеличенные) */
 .target-item .icon-box {
     width: 90px;  /* Было 75px, стало 90px — блоки крупнее */
@@ -186,5 +198,33 @@
     .for-whom-wrapper {
         grid-template-columns: 1fr;
         gap: 15px;
+    }
+}
+
+@media (max-width: 1024px) {
+    /* ... ваши стили ... */
+
+    /* Находим .target-item внутри медиа-запроса и добавляем height: auto */
+    .target-item {
+        position: static;
+        width: 100% !important;
+        height: auto !important; /* <-- ДОБАВЛЯЕМ: сбрасываем высоту на мобилках */
+        flex-direction: row; 
+        text-align: left;
+        gap: 15px;
+        background: rgba(255, 255, 255, 0.5);
+        padding: 10px;
+        border-radius: 20px;
+    }
+    
+    /* Дополнительно заставим грид-сетку выравнивать элементы по высоте */
+    .for-whom-wrapper {
+        height: auto;
+        aspect-ratio: auto;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr); 
+        align-items: stretch; /* <-- ДОБАВЛЯЕМ: карточки в одном ряду будут одной высоты */
+        gap: 30px 20px;
+        padding: 0 10px;
     }
 }

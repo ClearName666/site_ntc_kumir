@@ -22,6 +22,14 @@ $advantages_of_our_system_view = (getSetting($conn, 'advantages_of_our_system_vi
 $about_the_company_view = (getSetting($conn, 'about_the_company_view') == 1);
 $geography_of_application_view = (getSetting($conn, 'geography_of_application_view') == 1);
 
+//  Настройки дизайна секций
+$hero_background = getSetting($conn, 'hero_background');
+$for_whom_background = getSetting($conn, 'for_whom_background');
+$our_products_background = getSetting($conn, 'our_products_background');
+$advantages_of_our_system_background = getSetting($conn, 'advantages_of_our_system_background');
+$about_the_company_background = getSetting($conn, 'about_the_company_background');
+$geography_of_application_background = getSetting($conn, 'geography_of_application_background');
+
 
 
 // --- ДОПОЛНИТЕЛЬНАЯ ПОДГОТОВКА ДЛЯ SEO И СОЦСЕТЕЙ ---
@@ -79,7 +87,7 @@ $currentUrl = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 <?php require_once __DIR__. '/includes/header.php';?>
 <main>
     <!-- Hero Section - обновляем верхний отступ -->
-    <section class="hero">
+    <section class="hero" style="<?= $hero_background ?>">
         <div class="hero-background">
         </div>
         
@@ -153,7 +161,7 @@ $currentUrl = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
     </section>
 
     <?php if ($for_whom_view): ?>
-        <section class="for-whom-section">
+        <section class="for-whom-section" style="<?= $for_whom_background ?>">
             <div class="container-main">
                 
                 <h2 class="section-title mobile-only-title">Для кого</h2>
@@ -167,7 +175,6 @@ $currentUrl = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
                             <span>Для кого</span>
                         </div>
                     </div>
-
                     <div class="target-item pos-top-1">
                         <div class="icon-box"><img src="/assets/images/static/thumb__166_0_0_0_auto.png" alt=""></div>
                         <p>ЖКХ: управляющим компаниям и ТСЖ</p>
@@ -212,7 +219,7 @@ $currentUrl = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 
     <!-- Products/Cards Section -->
     <?php if ($our_products_view): ?>
-        <section class="cards-section">
+        <section class="cards-section" style="<?= $our_products_background ?>">
             <div class="container">
                 <h2 class="section-title">Наша продукция</h2>
                 <div class="cards-container">
@@ -224,7 +231,7 @@ $currentUrl = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 
     <!-- Advantages Section -->
      <?php if ($advantages_of_our_system_view): ?>
-        <section class="advantages-section">
+        <section class="advantages-section" style="<?= $advantages_of_our_system_background ?>">
             <div class="container">
                 <h2 class="section-title"><?php echo getContentBlock($conn, 'advantages_title')['content']; ?></h2>
                 <?php renderAdvantages($conn); ?>
@@ -234,7 +241,7 @@ $currentUrl = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 
     <!-- About Section -->
      <?php if ($about_the_company_view): ?>
-        <section class="about-section">
+        <section class="about-section" style="<?= $about_the_company_background ?>">
             <div class="container about-container">
                 <div class="about-stats">
                     <?php renderStatistics($conn); ?>
@@ -285,7 +292,7 @@ $currentUrl = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
     <?php endif; ?>
 
     <?php if ($geography_of_application_view): ?>
-        <section class="geography-section">
+        <section class="geography-section" style="<?= $geography_of_application_background ?>">
             <div class="container-main">
                 <h2 class="section-title">География применения</h2>
                 

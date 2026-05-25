@@ -30,14 +30,14 @@
     }
 }
 
-/* Пульсация фиолетового неона для точек */
+/* Пульсация глубокого синего неона для точек */
 @keyframes neon-pulse {
     0%, 100% {
-        box-shadow: 0 0 8px #b800ff, 0 0 15px #b800ff, 0 0 25px rgba(184, 0, 255, 0.5);
+        box-shadow: 0 0 8px #0055ff, 0 0 15px #0055ff, 0 0 25px rgba(0, 85, 255, 0.6);
         opacity: 1;
     }
     50% {
-        box-shadow: 0 0 12px #b800ff, 0 0 22px #b800ff, 0 0 35px rgba(184, 0, 255, 0.8);
+        box-shadow: 0 0 14px #0055ff, 0 0 24px #0055ff, 0 0 38px rgba(0, 85, 255, 0.9);
         opacity: 0.85;
     }
 }
