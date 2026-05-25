@@ -59,11 +59,10 @@ body::after {
     backdrop-filter: blur(10px);
 }
 .products-page {
+    padding: 120px 0 60px; /* Было 120px, стало 180px */
+    min-height: 100vh;
     position: relative;
     z-index: 1;
-    
-    padding: 120px 0 60px;
-    min-height: 100vh;
 }
 .container {
     max-width: 1200px;

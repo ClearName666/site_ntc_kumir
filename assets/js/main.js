@@ -41,18 +41,33 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Для десктопного хедера делаем его фиксированным при скролле
     let lastScrollTop = 0;
-    const header = document.querySelector('.main-header');
+    // const header = document.querySelector('.main-header');
     
+    // window.addEventListener('scroll', function() {
+    //     let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        
+    //     if (scrollTop > 100) {
+    //         header.style.position = 'fixed';
+    //         header.style.top = '0';
+    //         header.style.boxShadow = '0 5px 20px rgba(0,0,0,0.3)';
+    //     } else {
+    //         header.style.position = 'relative';
+    //         header.style.boxShadow = 'none';
+    //     }
+        
+    //     lastScrollTop = scrollTop;
+    // });
+
+    // Находим хедер один раз
+    const header = document.querySelector('.main-header');
+
     window.addEventListener('scroll', function() {
         let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
         
         if (scrollTop > 100) {
-            header.style.position = 'fixed';
-            header.style.top = '0';
-            header.style.boxShadow = '0 5px 20px rgba(0,0,0,0.3)';
+            header.classList.add('scrolled');
         } else {
-            header.style.position = 'relative';
-            header.style.boxShadow = 'none';
+            header.classList.remove('scrolled');
         }
         
         lastScrollTop = scrollTop;

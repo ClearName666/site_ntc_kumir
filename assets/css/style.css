@@ -22,7 +22,7 @@
     --bg-light: #f8f9fa;
     --bg-dark: #2c3e50;
     --bg-black: #000;
-    --bg-main: #3e4a5f;
+    --bg-main: #060606;
     --bg-white-semi: rgba(255, 255, 255, 0.1);
     --bg-white-strong: rgba(255, 255, 255, 0.4);
     --bg-white-card: rgba(255, 255, 255, 0.6);
@@ -437,7 +437,7 @@ main {
 
 .feature-item {
     background: var(--bg-white-semi);
-    padding: 18px 20px 18px 45px; /* Увеличили левый паддинг, чтобы освободить место под точку (было 20px) */
+    padding: 18px 20px 18px 65px; /* Увеличили левый паддинг, чтобы освободить место под точку (было 20px) */
     border-radius: 10px;
     backdrop-filter: blur(10px);
     border: var(--border-white);
@@ -459,15 +459,15 @@ main {
 /* Стили для самой точки */
 .feature-dot {
     position: absolute;
-    left: 15px; /* Отступ точки от левого края блока */
+    left: 30px; /* Отступ точки от левого края блока */
     width: 10px; /* Размер точки */
     height: 10px;
-    background: #00f2fe; /* Твой неоновый голубой цвет */
+    background: #b800ff; /* Неоново-фиолетовый цвет */
     border-radius: 50%; /* Делаем круглой */
     box-sizing: border-box;
     
     /* Базовое статичное сияние точки */
-    box-shadow: 0 0 8px #00f2fe, 0 0 15px #00f2fe, 0 0 25px rgba(0, 242, 254, 0.5);
+    box-shadow: 0 0 8px #b800ff, 0 0 15px #b800ff, 0 0 25px rgba(184, 0, 255, 0.5);
     
     /* Запускаем анимацию бесконечного пульсирования сияния */
     animation: neon-pulse 2.5s ease-in-out infinite;
@@ -484,31 +484,10 @@ main {
 /* При наведении на блок, точка становится чуть больше и сияет ярче */
 .feature-item:hover .feature-dot {
     transform: scale(1.15);
-    box-shadow: 0 0 12px #00f2fe, 0 0 20px #00f2fe, 0 0 35px rgba(0, 242, 254, 0.8);
+    box-shadow: 0 0 12px #b800ff, 0 0 20px #b800ff, 0 0 35px rgba(184, 0, 255, 0.8);
 }
 
 
-/* --- АНИМАЦИИ --- */
-
-/* Анимация плавного неонвого пульсирования (сияние то растет, то затухает) */
-@keyframes neon-pulse {
-    0%, 100% {
-        box-shadow: 0 0 8px #00f2fe, 0 0 15px #00f2fe, 0 0 25px rgba(0, 242, 254, 0.5);
-        opacity: 1;
-    }
-    50% {
-        box-shadow: 0 0 12px #00f2fe, 0 0 22px #00f2fe, 0 0 35px rgba(0, 242, 254, 0.8);
-        opacity: 0.85; /* Легкое мерцание самой точки */
-    }
-}
-
-/* Твоя стандартная анимация появления слева */
-@keyframes slideInLeft {
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
 
 /* Стандартные задержки появления */
 .feature-item:nth-child(1) { animation-delay: 0.5s; }
@@ -599,41 +578,27 @@ main {
 
 /* 1. Учет энергоресурсов (Справа вверху, заходит на картинку) */
 .card-energy {
-    top: 55%;
-    right: 20%; /* Вылезает на правый край, теперь не обрежется! */
+
+    bottom: 60%;
+    right: 5%;
     border-color: #8a2be2; 
 }
 
 /* 2. Аналитика (Слева по центру) */
 .card-analytics {
-    top: 35%;
+    top: 18%;
     left: 9%; /* Спокойно выходит за левый край фона */
     border-color: #4facfe; 
 }
 
 /* 3. Дистанционный контроль (Справа внизу) */
 .card-control {
-    bottom: 40%;
-    right: 5%;
+    top: 40%;
+    right: 20%; /* Вылезает на правый край, теперь не обрежется! */
     border-color: #ff4e50; 
 }
 
-/* --- ПОЛНАЯ РЕЗИНА ДЛЯ МОБИЛОК (НЕ СВОРАЧИВАЮТСЯ) --- */
-@media (max-width: 1024px) {
-    /* На планшетах и мобилках уменьшаем карточки, чтобы они не перекрыли весь шар */
-    .hero-card {
-        width: 28%;
-        padding: 10px 8px;
-        border-bottom-width: 3px;
-        border-radius: 8px;
-    }
-    
-    .card-pattern-box {
-        width: 40px; /* Уменьшаем узоры на телефонах */
-        height: 40px;
-        margin-bottom: 6px;
-    }
-}
+
 
 /* Оверлей карты */
 .map-overlay {
@@ -654,32 +619,61 @@ main {
     gap: 20px;
 }
 
+/* Контейнер иконки карты */
 .map-icon {
-    flex: 0 0 60px;
-    width: 60px; /* Дублируем ширину жестко */
-    height: 60px;
-    background: var(--primary-color);
-    border-radius: var(--radius-card);
+    flex: 0 0 45px; /* Подгоняем под размер твоих новых фиолетовых точек */
+    width: 45px;
+    height: 45px;
+    background: rgba(57, 255, 20, 0.1); /* Прозрачный зеленый фон внутри круга */
+    border: 2px solid #39ff14; /* Неоново-зеленый бордер */
+    border-radius: 50%; /* Делаем круглым, как точки */
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
-    font-size: 24px;
-    flex-shrink: 0; /* ЗАПРЕЩАЕМ сжатие полностью */
+    transition: var(--transition-default);
+    
+    /* Базовое неоновое свечение самого круга */
+    box-shadow: 0 0 10px rgba(57, 255, 20, 0.4), 
+                inset 0 0 8px rgba(57, 255, 20, 0.3);
+    
+    /* Запуск бесконечной анимации зеленого неона */
+    animation: neon-green-pulse 2.5s ease-in-out infinite;
 }
 
+/* Стили для твоего будущего SVG внутри контейнера */
+.map-svg-icon {
+    width: 22px; /* Оптимальный размер иконки внутри круга */
+    height: 22px;
+    fill: #39ff14; /* Заливка иконки неоновым зеленым */
+    transition: var(--transition-default);
+    
+    /* Свечение для линий самого SVG */
+    filter: drop-shadow(0 0 4px #39ff14);
+}
+
+/* Эффект при ховере на весь блок feature-item */
+.hero-link-wrapper:hover .map-icon {
+    transform: scale(1.08);
+    background: rgba(57, 255, 20, 0.25);
+    box-shadow: 0 0 18px #39ff14, 
+                inset 0 0 10px rgba(57, 255, 20, 0.6);
+}
+
+.hero-link-wrapper:hover .map-svg-icon {
+    filter: drop-shadow(0 0 8px #39ff14);
+}
 .map-text {
     flex: 1;
 }
 
 .map-text h3 {
-    color: var(--text-light);
+    color: var(--bg-light);
     margin-bottom: 4px;
     font-size: 18px;
 }
 
 .map-text p {
-    color: var(--text-light);
+    color: var(--text-gray);
     font-size: 14px;
 }
 
@@ -1029,7 +1023,7 @@ main {
     align-items: center; /* Центрируем точку относительно первой строки текста */
 }
 
-/* Создаем живую оранжевую неоновую точку */
+/* Создаем живую белую неоновую точку */
 .company-features li::before {
     content: "" !important; /* Намертво стираем любые старые галочки/символы */
     position: absolute;
@@ -1039,14 +1033,14 @@ main {
     
     width: 9px; /* Оптимальный размер для этого списка */
     height: 9px;
-    background: #ff7700; /* Яркий неоновый оранжевый */
+    background: #ffffff; /* Чистый белый цвет */
     border-radius: 50%;
     
-    /* Густое, глубокое оранжевое свечение */
-    box-shadow: 0 0 8px #ff7700, 0 0 16px #ff7700, 0 0 25px rgba(255, 119, 0, 0.6);
+    /* Густое, глубокое белое свечение */
+    box-shadow: 0 0 8px #ffffff, 0 0 16px #ffffff, 0 0 25px rgba(255, 255, 255, 0.6);
     
-    /* Подключаем плавную пульсацию */
-    animation: neon-pulse-orange 2.5s ease-in-out infinite;
+    /* Подключаем плавную пульсацию белого неона */
+    animation: neon-pulse-white 2.5s ease-in-out infinite;
     
     transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
@@ -1054,9 +1048,8 @@ main {
 /* Эффект при наведении на строчку */
 .company-features li:hover::before {
     transform: translateY(-50%) scale(1.3); /* Точка эффектно увеличивается */
-    box-shadow: 0 0 12px #ff7700, 0 0 22px #ff7700, 0 0 35px rgba(255, 119, 0, 0.9); /* Свечение взрывается яркостью */
+    box-shadow: 0 0 12px #ffffff, 0 0 22px #ffffff, 0 0 35px rgba(255, 255, 255, 0.9); /* Свечение взрывается яркостью */
 }
-
 
 
 
@@ -1220,31 +1213,3 @@ main {
 }
 
 
-/* ========================================
-   АНИМАЦИИ
-   ======================================== */
-@keyframes slideDown {
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes slideInLeft {
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-/* --- КЛЮЧЕВЫЕ КАДРЫ ДЛЯ ОРАНЖЕВОГО НЕОНА --- */
-@keyframes neon-pulse-orange {
-    0%, 100% {
-        box-shadow: 0 0 8px #ff7700, 0 0 16px #ff7700, 0 0 25px rgba(255, 119, 0, 0.6);
-        opacity: 1;
-    }
-    50% {
-        box-shadow: 0 0 12px #ff7700, 0 0 22px #ff7700, 0 0 32px rgba(255, 119, 0, 0.85);
-        opacity: 0.85; /* Легкое мерцание нити накала */
-    }
-}

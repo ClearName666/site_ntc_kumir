@@ -92,16 +92,18 @@ $currentUrl = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
                         <div class="features-list">
                             <?php renderFeatures($conn); ?>
                             <a href="contacts.php#map-location" class="hero-link-wrapper" style="text-decoration: none; color: inherit; display: block;">
-                                    <div class="feature-item">
-                                        <div class="map-content">
-                                            <div class="map-icon">📍</div>
-                                            <div class="map-text map-text-location">
-                                                <h3>«НТЦ «КУМИР» на карте</h3>
-                                                <p>N<?php echo $mapLocation['latitude']; ?>, E<?php echo $mapLocation['longitude']; ?></p>
-                                            </div>
+                                <div class="feature-item">
+                                    <div class="map-content">
+                                        <div class="map-icon">
+                                            <img src="/assets/images/static/map.svg" alt="Карта" class="map-svg-icon">
+                                        </div>
+                                        <div class="map-text map-text-location">
+                                            <h3>«НТЦ «КУМИР» на карте</h3>
+                                            <p>N<?php echo $mapLocation['latitude']; ?>, E<?php echo $mapLocation['longitude']; ?></p>
                                         </div>
                                     </div>
-                                </a>
+                                </div>
+                            </a>
                         </div>
                         
                         <!-- <div class="contacts-section">
