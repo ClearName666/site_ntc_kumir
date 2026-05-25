@@ -652,7 +652,7 @@ main {
 }
 
 /* Эффект при ховере на весь блок feature-item */
-.hero-link-wrapper:hover .map-icon {
+/* .hero-link-wrapper:hover .map-icon {
     transform: scale(1.08);
     background: rgba(57, 255, 20, 0.25);
     box-shadow: 0 0 18px #39ff14, 
@@ -661,7 +661,7 @@ main {
 
 .hero-link-wrapper:hover .map-svg-icon {
     filter: drop-shadow(0 0 8px #39ff14);
-}
+} */
 .map-text {
     flex: 1;
 }
