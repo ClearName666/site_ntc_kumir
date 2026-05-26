@@ -147,52 +147,6 @@
 .pos-bottom-3 { bottom: -25%; left: 68%; }
 
 
-/* --- АДАПТИВНОСТЬ ДЛЯ ПЛАНШЕТОВ И МОБИЛЬНЫХ --- */
-@media (max-width: 1024px) {
-    
-    /* Включаем стандартный заголовок секции сверху */
-    .mobile-only-title {
-        display: block;
-    }
-    
-    /* Сбрасываем относительную высоту, переводим блоки в аккуратную сетку */
-    .for-whom-wrapper {
-        height: auto;
-        aspect-ratio: auto;
-        display: grid;
-        grid-template-columns: repeat(2, 1fr); /* По 2 блока в ряд */
-        gap: 30px 20px;
-        padding: 0 10px;
-    }
-    
-    /* Отключаем картинку-паутину и центральный круг на мобилках */
-    .for-whom-background {
-        display: none;
-    }
-    
-    /* Сбрасываем абсолютные координаты элементов для сетки */
-    .target-item {
-        position: static;
-        width: 100% !important;
-        flex-direction: row; /* Иконка слева, текст справа — так удобнее читать на телефонах */
-        text-align: left;
-        gap: 15px;
-        background: rgba(255, 255, 255, 0.5);
-        padding: 10px;
-        border-radius: 20px;
-    }
-    
-    .target-item .icon-box {
-        margin-bottom: 0; /* Убираем нижний отступ в мобильном режиме */
-        width: 70px;
-        height: 70px;
-    }
-    
-    .target-item p {
-        font-size: 14px;
-    }
-}
-
 @media (max-width: 576px) {
     /* На совсем маленьких телефонах выстраиваем в 1 колонку */
     .for-whom-wrapper {
@@ -201,30 +155,79 @@
     }
 }
 
+/* --- АДАПТИВНОСТЬ ДЛЯ ПЛАНШЕТОВ И МОБИЛЬНЫХ (Исправленная версия) --- */
 @media (max-width: 1024px) {
-    /* ... ваши стили ... */
+    
+    .for-whom-section {
+        padding: 60px 0;
+        padding-bottom: 60px; /* Убираем гигантский нижний отступ на мобилках */
+    }
 
-    /* Находим .target-item внутри медиа-запроса и добавляем height: auto */
-    .target-item {
-        position: static;
-        width: 100% !important;
-        height: auto !important; /* <-- ДОБАВЛЯЕМ: сбрасываем высоту на мобилках */
-        flex-direction: row; 
-        text-align: left;
-        gap: 15px;
-        background: rgba(255, 255, 255, 0.5);
-        padding: 10px;
-        border-radius: 20px;
+    /* Включаем стандартный заголовок секции сверху */
+    .mobile-only-title {
+        display: block;
     }
     
-    /* Дополнительно заставим грид-сетку выравнивать элементы по высоте */
+    /* Переводим блоки в аккуратную вертикальную стопку (1 колонка) */
     .for-whom-wrapper {
-        height: auto;
-        aspect-ratio: auto;
-        display: grid;
-        grid-template-columns: repeat(2, 1fr); 
-        align-items: stretch; /* <-- ДОБАВЛЯЕМ: карточки в одном ряду будут одной высоты */
-        gap: 30px 20px;
-        padding: 0 10px;
+        height: auto !important;
+        aspect-ratio: auto !important;
+        display: flex;
+        flex-direction: column; /* Строго друг под другом */
+        gap: 15px; /* Одинаковый красивый отступ между карточками */
+        padding: 0 15px;
+    }
+    
+    /* Полностью отключаем картинку-паутину и центральный круг на мобилках */
+    .for-whom-background, 
+    .lines-img, 
+    .center-desktop-circle {
+        display: none !important;
+    }
+    
+    /* Сбрасываем абсолютные координаты и фиксированную высоту */
+    .target-item {
+        position: static !important;
+        width: 100% !important;
+        height: auto !important; /* Высота подстраивается под длину текста */
+        min-height: auto !important;
+        
+        display: flex;
+        flex-direction: row; /* Иконка слева, текст справа — идеальный баланс */
+        align-items: center; /* Центрируем иконку и текст по вертикали */
+        text-align: left;
+        gap: 20px;
+        
+        /* Делаем фон читаемым, так как картинки-подложки больше нет */
+        background: rgba(255, 255, 255, 0.85); 
+        padding: 15px 20px;
+        border-radius: 20px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    /* Корректируем размеры иконок в мобильной версии */
+    .target-item .icon-box {
+        margin-bottom: 0 !important; /* Сбрасываем ПК-отступ */
+        width: 60px !important;
+        min-width: 60px !important; /* Защита от сжатия картинки, если текст огромный */
+        height: 60px !important;
+        border-radius: 14px;
+        flex-shrink: 0; /* Иконка никогда не сожмется */
+    }
+    
+    /* Стили текста для мобилок, чтобы длинные строки не ломали верстку */
+    .target-item p {
+        font-size: 15px;
+        line-height: 1.4;
+        color: #1a1f36;
+        font-weight: 600;
+        margin: 0;
+        word-break: break-word; /* Защита от вылезания слишком длинных слов */
+    }
+
+    /* Отключаем эффект увеличения при ховере на тач-экранах, чтобы не дергалось */
+    .target-item:hover {
+        transform: none !important;
     }
 }
