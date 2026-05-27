@@ -21,7 +21,9 @@ $our_products_view = (getSetting($conn, 'our_products_view') == 1);
 $advantages_of_our_system_view = (getSetting($conn, 'advantages_of_our_system_view') == 1);
 $about_the_company_view = (getSetting($conn, 'about_the_company_view') == 1);
 $geography_of_application_view = (getSetting($conn, 'geography_of_application_view') == 1);
+$news_artcles_view = (getSetting($conn, 'news_artcles_view') == 1);
 $site_new_view = (getSetting($conn, 'site_new_view') == 1);
+
 
 //  Настройки дизайна секций
 $hero_background = getSetting($conn, 'hero_background');
@@ -30,6 +32,7 @@ $our_products_background = getSetting($conn, 'our_products_background');
 $advantages_of_our_system_background = getSetting($conn, 'advantages_of_our_system_background');
 $about_the_company_background = getSetting($conn, 'about_the_company_background');
 $geography_of_application_background = getSetting($conn, 'geography_of_application_background');
+$news_artcles_background = getSetting($conn, 'news_artcles_background');
 
 
 
@@ -83,6 +86,7 @@ $currentUrl = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
     <link rel="stylesheet" href="/assets/css/audience.css?version=<?php echo $version_code; ?>">
     <link rel="stylesheet" href="/assets/css/mapMain.css?version=<?php echo $version_code; ?>">
     <link rel="stylesheet" href="/assets/css/newMain.css?version=<?php echo $version_code; ?>">
+    <link rel="stylesheet" href="/assets/css/newsArticlesMain.css?version=<?php echo $version_code; ?>">
 </head>
 <body style="background: url('<?php echo $mainBg['image_path']; ?>') center/cover no-repeat fixed;">
 
@@ -499,12 +503,114 @@ $currentUrl = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
         </section>
     <?php endif; ?>
 
+
+
+
+        <?php if ($news_artcles_view): ?>
+            <?php
+                // Получаем по 3 самых свежих записи (функции взяты из вашей архитектуры)
+                $homeNews = function_exists('getNews') ? getNews($conn, 3, 0) : [];
+                $homeArticles = function_exists('getArticles') ? getArticles($conn) : [];
+
+                // Если функция getArticles возвращает всё, то берем первые 3
+                if (!empty($homeArticles) && count($homeArticles) > 3) {
+                    $homeArticles = array_slice($homeArticles, 0, 3);
+                }
+
+                // Проверяем, есть ли хоть какой-то контент для отображения
+                $hasNews = !empty($homeNews);
+                $hasArticles = !empty($homeArticles);
+                $hasAnyMedia = $hasNews || $hasArticles;
+            ?>
+            <section class="media-section" style="<?= $news_artcles_background ?>">
+                <div class="container-main">
+                    
+                    <div class="media-section-header">
+                        <div class="media-title-block">
+                            <span class="media-subtitle">Статьи и новости</span>
+                            <!--<h2 class="media-main-title">Медиа-центр</h2>-->
+                        </div>
+                        <?php if ($hasAnyMedia): ?>
+                            <div class="slider-controls">
+                                <button class="slider-btn prev-btn" aria-label="Назад" id="mediaPrev">‹</button>
+                                <button class="slider-btn next-btn" aria-label="Вперед" id="mediaNext">›</button>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+
+                    <?php if ($hasAnyMedia): ?>
+                        <div class="media-slider-viewport" id="mediaViewport">
+                            <div class="media-slider-track" id="mediaTrack">
+
+                                <?php if ($hasNews): ?>
+                                    <?php foreach ($homeNews as $item): ?>
+                                        <article class="media-card card-news">
+                                            <a href="news.php?news=<?= urlencode($item['slug']) ?>" class="media-card-link">
+                                                <div class="card-badge">Новость</div>
+                                                <div class="media-card-image">
+                                                    <img src="<?= !empty($item['image_path']) ? htmlspecialchars($item['image_path']) : '/assets/images/static/placeholder.jpg' ?>" alt="<?= htmlspecialchars($item['title']) ?>" loading="lazy">
+                                                </div>
+                                                <div class="media-card-content">
+                                                    <time class="media-card-date">📅 <?= date('d.m.Y', strtotime($item['published_at'])) ?></time>
+                                                    <h3 class="media-card-title"><?= htmlspecialchars($item['title']) ?></h3>
+                                                    <p class="media-card-excerpt">
+                                                        <?= !empty($item['excerpt']) ? htmlspecialchars($item['excerpt']) : htmlspecialchars(strip_tags($item['content'])) ?>
+                                                    </p>
+                                                    <span class="media-card-more">Читать далее →</span>
+                                                </div>
+                                            </a>
+                                        </article>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+
+                                <?php if ($hasArticles): ?>
+                                    <?php foreach ($homeArticles as $item): ?>
+                                        <article class="media-card card-article">
+                                            <a href="articles.php?article=<?= urlencode($item['slug']) ?>" class="media-card-link">
+                                                <div class="card-badge">Статья</div>
+                                                <div class="media-card-image">
+                                                    <img src="<?= !empty($item['image_path']) ? htmlspecialchars($item['image_path']) : '/assets/images/static/placeholder.jpg' ?>" alt="<?= htmlspecialchars($item['title']) ?>" loading="lazy">
+                                                </div>
+                                                <div class="media-card-content">
+                                                    <time class="media-card-date">📅 <?= date('d.m.Y', strtotime($item['published_at'])) ?></time>
+                                                    <h3 class="media-card-title"><?= htmlspecialchars($item['title']) ?></h3>
+                                                    <p class="media-card-excerpt">
+                                                        <?php 
+                                                            $excerpt = !empty($item['excerpt']) ? $item['excerpt'] : strip_tags($item['content']);
+                                                            echo htmlspecialchars(mb_strimwidth($excerpt, 0, 120, "..."));
+                                                        ?>
+                                                    </p>
+                                                    <span class="media-card-more">Читать статью →</span>
+                                                </div>
+                                            </a>
+                                        </article>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+
+                            </div>
+                        </div>
+                    <?php else: ?>
+                        <div class="media-empty-state">
+                            <div class="empty-icon">📂</div>
+                            <h3>Раздел обновляется</h3>
+                            <p>Наши специалисты уже готовят свежие материалы и актуальные новости. Загляните позже!</p>
+                            <div class="empty-links">
+                                <a href="news.php" class="btn-empty">Все новости</a>
+                                <a href="articles.php" class="btn-empty">Все статьи</a>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+
+                </div>
+            </section>
+        <?php endif; ?>
         <script>
             window.addEventListener('load', function() {
                 window.scrollBy(0, 1);
             });
         </script>
         <script src="/assets/js/audience.js"></script>
+        <script src="/assets/js/newsArticlesMain.js"></script>
 </main>
 
 <?php require_once __DIR__. '/includes/footer.php'; ?></body>

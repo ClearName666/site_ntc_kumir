@@ -44,6 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $_POST['setting_advantages_of_our_system_view'] = isset($_POST['setting_advantages_of_our_system_view']) && $_POST['setting_advantages_of_our_system_view'] == 1 ? 1 : 0;
     $_POST['setting_about_the_company_view'] = isset($_POST['setting_about_the_company_view']) && $_POST['setting_about_the_company_view'] == 1 ? 1 : 0;
     $_POST['setting_geography_of_application_view'] = isset($_POST['setting_geography_of_application_view']) && $_POST['setting_geography_of_application_view'] == 1 ? 1 : 0;
+    $_POST['setting_news_artcles_view'] = isset($_POST['setting_news_artcles_view']) && $_POST['setting_news_artcles_view'] == 1 ? 1 : 0;
     
     // Перебираем POST и сохраняем обычные настройки
     foreach ($_POST as $key => $value) {
@@ -255,6 +256,13 @@ require_once __DIR__. '/includes/menu.php';
                             Секция "География применения" отображение
                         </label>
                     </div>
+                    <div class="form-group">
+                        <label for="setting_news_artcles_view">
+                            <input type="checkbox" id="setting_news_artcles_view" name="setting_news_artcles_view" value="1" 
+                                <?php echo (($settings['news_artcles_view'] ?? 0) == 1) ? 'checked' : ''; ?>>
+                            Секция "Статьи и новости"
+                        </label>
+                    </div>
                 </div>
             </div>
             
@@ -277,6 +285,7 @@ require_once __DIR__. '/includes/menu.php';
                             <option value="advantages_of_our_system_background">Секция "Преимущества системы"</option>
                             <option value="about_the_company_background">Секция "О компании"</option>
                             <option value="geography_of_application_background">Секция "География применения"</option>
+                            <option value="news_artcles_background">Секция "Статьи и новости"</option>
                         </select>
                     </div>
 
@@ -454,6 +463,13 @@ require_once __DIR__. '/includes/menu.php';
             c1: `<?= $settings['geography_of_application_bg_color1'] ?? '#ffffff' ?>`,
             c2: `<?= $settings['geography_of_application_bg_color2'] ?? '#ffffff' ?>`,
             img: `<?= $settings['geography_of_application_bg_image_path'] ?? '' ?>`
+        },
+        news_artcles_background: {
+            css: `<?= $settings['news_artcles_background'] ?? '' ?>`,
+            type: `<?= $settings['news_artcles_bg_type'] ?? 'solid' ?>`,
+            c1: `<?= $settings['news_artcles_bg_color1'] ?? '#ffffff' ?>`,
+            c2: `<?= $settings['news_artcles_bg_color2'] ?? '#ffffff' ?>`,
+            img: `<?= $settings['news_artcles_bg_image_path'] ?? '' ?>`
         }
     };
 </script>

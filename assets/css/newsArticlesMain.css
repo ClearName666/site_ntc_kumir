@@ -1,0 +1,272 @@
+/* ==========================================================================
+   СЕКЦИЯ МЕДИА-ЦЕНТРА (ГЛАВНАЯ СТРАНИЦА)
+   ========================================================================== */
+.media-section {
+    padding: 80px 0;
+    background-color: #f8f9fa;
+    position: relative;
+    overflow: hidden;
+}
+
+.media-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 40px;
+}
+
+.media-title-block {
+    display: flex;
+    flex-direction: column;
+}
+
+.media-subtitle {
+    font-size: 14px;
+    font-weight: 700;
+    color: #0f3966;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 8px;
+}
+
+.media-main-title {
+    font-size: 38px;
+    font-weight: 700;
+    color: #1a2c4d;
+    margin: 0;
+}
+
+/* Управление слайдером */
+.slider-controls {
+    display: flex;
+    gap: 12px;
+}
+
+.slider-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 1px solid #d2d9e5;
+    background-color: #ffffff;
+    color: #1a2c4d;
+    font-size: 24px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.25s ease;
+    user-select: none;
+    padding-bottom: 4px;
+}
+
+.slider-btn:hover {
+    background-color: #0f3966;
+    border-color: #0f3966;
+    color: #ffffff;
+}
+
+/* Окно просмотра */
+.media-slider-viewport {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    cursor: grab;
+}
+.media-slider-viewport:active {
+    cursor: grabbing;
+}
+
+.media-slider-track {
+    display: flex;
+    gap: 30px;
+    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    will-change: transform;
+}
+
+/* Карточки */
+.media-card {
+    flex: 0 0 calc((100% - 60px) / 3); /* Строго 3 карточки на экране ПК */
+    max-width: calc((100% - 60px) / 3);
+    background: #ffffff;
+    border-radius: 20px;
+    border: 1px solid rgba(0,0,0,0.04);
+    box-shadow: 0 4px 15px rgba(26, 44, 77, 0.03);
+    overflow: hidden;
+    position: relative;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.media-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 15px 30px rgba(26, 44, 77, 0.08);
+}
+
+.media-card-link {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+/* Баджики */
+.card-badge {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    z-index: 5;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.card-news .card-badge { background: #e3effb; color: #0f3966; }
+.card-article .card-badge { background: #e8f7ee; color: #1e7e34; }
+
+.media-card-image {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    background-color: #eaeaea;
+}
+
+.media-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.media-card:hover .media-card-image img {
+    transform: scale(1.05);
+}
+
+.media-card-content {
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.media-card-date {
+    font-size: 13px;
+    color: #8798ad;
+    margin-bottom: 12px;
+    display: block;
+}
+
+.media-card-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1a2c4d;
+    margin: 0 0 12px 0;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Обрезает заголовок до 2 строк */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    height: 50px; /* Фиксирует высоту структуры */
+}
+
+.media-card-excerpt {
+    font-size: 14px;
+    color: #62728d;
+    line-height: 1.5;
+    margin: 0 0 20px 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Обрезает аннотацию до 2 строк */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    height: 42px;
+}
+
+.media-card-more {
+    font-size: 14px;
+    font-weight: 600;
+    color: #0f3966;
+    margin-top: auto;
+    transition: color 0.2s ease;
+}
+.card-article .media-card-more { color: #1e7e34; }
+
+.media-card:hover .media-card-more {
+    text-decoration: underline;
+}
+
+/* ==========================================================================
+   СОСТОЯНИЕ СЕКЦИИ ПРИ ОТСУТСТВИИ ДАННЫХ
+   ========================================================================== */
+.media-empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    background: #ffffff;
+    border-radius: 20px;
+    border: 1px dashed #cfd8e3;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.empty-icon {
+    font-size: 48px;
+    margin-bottom: 20px;
+}
+
+.media-empty-state h3 {
+    font-size: 22px;
+    color: #1a2c4d;
+    margin: 0 0 10px 0;
+}
+
+.media-empty-state p {
+    font-size: 15px;
+    color: #62728d;
+    margin: 0 0 25px 0;
+}
+
+.empty-links {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.btn-empty {
+    padding: 10px 24px;
+    border: 1px solid #0f3966;
+    border-radius: 8px;
+    color: #0f3966;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.btn-empty:hover {
+    background-color: #0f3966;
+    color: #ffffff;
+}
+
+/* ==========================================================================
+   АДАТИВНОСТЬ
+   ========================================================================== */
+@media (max-width: 992px) {
+    .media-card {
+        flex: 0 0 calc((100% - 30px) / 2);
+        max-width: calc((100% - 30px) / 2);
+    }
+}
+
+@media (max-width: 650px) {
+    .media-section { padding: 50px 0; }
+    .media-main-title { font-size: 28px; }
+    .media-card {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+    .slider-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+    }
+}
