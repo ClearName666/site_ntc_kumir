@@ -791,7 +791,7 @@ main {
 
 .section-title {
     text-align: center;
-    font-size: 36px; /* Чуть уменьшили размер шрифта заголовка для аккуратности */
+    font-size: 30px; /* Чуть уменьшили размер шрифта заголовка для аккуратности */
     font-weight: 700;
     margin-bottom: 45px; /* Было 60px */
     color: #2c3e50;
