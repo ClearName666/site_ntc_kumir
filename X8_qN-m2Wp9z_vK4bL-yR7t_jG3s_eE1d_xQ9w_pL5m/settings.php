@@ -38,6 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // СНАЧАЛА 1. Обработка всех текстовых полей из $_POST
     $_POST['setting_form_view'] = isset($_POST['setting_form_view']) && $_POST['setting_form_view'] == 1 ? 1 : 0;
     $_POST['setting_price_view'] = isset($_POST['setting_price_view']) && $_POST['setting_price_view'] == 1 ? 1 : 0;
+    $_POST['setting_site_new_view'] = isset($_POST['setting_site_new_view']) && $_POST['setting_site_new_view'] == 1 ? 1 : 0; // <- ДОБАВЛЕНО
     $_POST['setting_for_whom_view'] = isset($_POST['setting_for_whom_view']) && $_POST['setting_for_whom_view'] == 1 ? 1 : 0;
     $_POST['setting_our_products_view'] = isset($_POST['setting_our_products_view']) && $_POST['setting_our_products_view'] == 1 ? 1 : 0;
     $_POST['setting_advantages_of_our_system_view'] = isset($_POST['setting_advantages_of_our_system_view']) && $_POST['setting_advantages_of_our_system_view'] == 1 ? 1 : 0;
@@ -210,6 +211,15 @@ require_once __DIR__. '/includes/menu.php';
                             Цены товаров отображение
                         </label>
                     </div>
+
+                    <div class="form-group">
+                        <label for="setting_site_new_view">
+                            <input type="checkbox" id="setting_site_new_view" name="setting_site_new_view" value="1" 
+                                <?php echo (($settings['site_new_view'] ?? 0) == 1) ? 'checked' : ''; ?>>
+                            Новый вариант сайта
+                        </label>
+                    </div>
+
                     <div class="form-group">
                         <label for="setting_for_whom_view">
                             <input type="checkbox" id="setting_for_whom_view" name="setting_for_whom_view" value="1" 

@@ -21,6 +21,7 @@ $our_products_view = (getSetting($conn, 'our_products_view') == 1);
 $advantages_of_our_system_view = (getSetting($conn, 'advantages_of_our_system_view') == 1);
 $about_the_company_view = (getSetting($conn, 'about_the_company_view') == 1);
 $geography_of_application_view = (getSetting($conn, 'geography_of_application_view') == 1);
+$site_new_view = (getSetting($conn, 'site_new_view') == 1);
 
 //  Настройки дизайна секций
 $hero_background = getSetting($conn, 'hero_background');
@@ -81,6 +82,7 @@ $currentUrl = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
     <link rel="stylesheet" href="/assets/css/header.css?version=<?php echo $version_code; ?>">
     <link rel="stylesheet" href="/assets/css/audience.css?version=<?php echo $version_code; ?>">
     <link rel="stylesheet" href="/assets/css/mapMain.css?version=<?php echo $version_code; ?>">
+    <link rel="stylesheet" href="/assets/css/newMain.css?version=<?php echo $version_code; ?>">
 </head>
 <body style="background: url('<?php echo $mainBg['image_path']; ?>') center/cover no-repeat fixed;">
 
@@ -91,73 +93,141 @@ $currentUrl = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
         <div class="hero-background">
         </div>
         
-        <div class="container-main">
-            <div class="hero-content">
-                <div class="hero-main">
-                    <div class="hero-text">
-                        <h1 class="main-title"><?php echo $mainTitle['content']; ?></h1>
+        <?php if ($site_new_view): ?>
+            <div class="container-main">
+                <div class="hero-new-content">
+                    
+                    <!-- Логотип компании -->
+                    <div class="hero-new-logo">
+                        <img src="/assets/images/static/new/001 - logo.svg" alt="НТЦ КУМИР" class="hero-logo-img">
+                    </div>
+
+                    <!-- Главный заголовок из базы данных -->
+                    <h1 class="hero-new-title"><?php echo $siteTitle; ?></h1>
+                    
+                    <!-- Подзаголовок -->
+                    <p class="hero-new-subtitle">Высокотехнологичные ИТ-решения для сложных задач и устойчивого роста</p>
+
+                    <!-- Блок с кнопками навигации -->
+                    <div class="hero-new-buttons">
+                        <a href="/products.php" class="btn-hero btn-primary">Продукция <span class="arrow">›</span></a>
+                        <a href="/articles.php" class="btn-hero btn-secondary">Статьи <span class="arrow">›</span></a>
+                        <a href="/contacts.php" class="btn-hero btn-secondary">Контакты <span class="arrow">›</span></a>
+                    </div>
+
+                    <!-- Нижняя полупрозрачная панель преимуществ -->
+                    <div class="hero-features-panel">
                         
-                        <div class="features-list">
-                            <?php renderFeatures($conn); ?>
-                            <a href="contacts.php#map-location" class="hero-link-wrapper" style="text-decoration: none; color: inherit; display: block;">
-                                <div class="feature-item">
-                                    <div class="map-content">
-                                        <div class="map-icon">
-                                            <img src="/assets/images/static/map.svg" alt="Карта" class="map-svg-icon">
-                                        </div>
-                                        <div class="map-text map-text-location">
-                                            <h3>«НТЦ «КУМИР» на карте</h3>
-                                            <p>N<?php echo $mapLocation['latitude']; ?>, E<?php echo $mapLocation['longitude']; ?></p>
+                        <div class="panel-item">
+                            <div class="panel-icon">
+                                <!-- Иконка Разработка -->
+                                <img src="/assets/images/static/new/chip-component-svgrepo-com.svg" alt="">
+                            </div>
+                            <h3>Разработка и интеграция</h3>
+                            <p>Создаём надёжные программные решения и системы</p>
+                        </div>
+
+                        <div class="panel-item">
+                            <div class="panel-icon">
+                                <!-- Иконка Безопасность -->
+                                <img src="/assets/images/static/new/security-svgrepo-com.svg" alt="">
+                            </div>
+                            <h3>Информационная безопасность</h3>
+                            <p>Защищаем данные и обеспечиваем соответствие стандартам</p>
+                        </div>
+
+                        <div class="panel-item">
+                            <div class="panel-icon">
+                                <!-- Иконка Аналитика -->
+                                <img src="/assets/images/static/new/analytics-reference-svgrepo-com.svg" alt="">
+                            </div>
+                            <h3>Аналитика и данные</h3>
+                            <p>Превращаем данные в полезные инсайты для бизнеса</p>
+                        </div>
+
+                        <div class="panel-item">
+                            <div class="panel-icon">
+                                <!-- Иконка Облако -->
+                                <img src="/assets/images/static/new/cloud-svgrepo-com.svg" alt="">
+                            </div>
+                            <h3>Инфраструктура и облака</h3>
+                            <p>Проектируем и развиваем отказоустойчивую ИТ-инфраструктуру</p>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        <?php else: ?>
+            <div class="container-main">
+                <div class="hero-content">
+                    <div class="hero-main">
+                        <div class="hero-text">
+                            <h1 class="main-title"><?php echo $mainTitle['content']; ?></h1>
+                            
+                            <div class="features-list">
+                                <?php renderFeatures($conn); ?>
+                                <a href="contacts.php#map-location" class="hero-link-wrapper" style="text-decoration: none; color: inherit; display: block;">
+                                    <div class="feature-item">
+                                        <div class="map-content">
+                                            <div class="map-icon">
+                                                <img src="/assets/images/static/map.svg" alt="Карта" class="map-svg-icon">
+                                            </div>
+                                            <div class="map-text map-text-location">
+                                                <h3>«НТЦ «КУМИР» на карте</h3>
+                                                <p>N<?php echo $mapLocation['latitude']; ?>, E<?php echo $mapLocation['longitude']; ?></p>
+                                            </div>
                                         </div>
                                     </div>
+                                </a>
+                            </div>
+                            
+                            <!-- <div class="contacts-section">
+                                <div class="analytics-badge">
+                                    <span>📊</span>
+                                    <span>Дистанционный контроль и управление</span>
                                 </div>
-                            </a>
-                        </div>
-                        
-                        <!-- <div class="contacts-section">
-                            <div class="analytics-badge">
-                                <span>📊</span>
-                                <span>Дистанционный контроль и управление</span>
-                            </div>
-                        </div> -->
+                            </div> -->
 
-                        <!-- Кнопка для перехода к системе -->
-                        <!-- <div class="contacts-section">
-                            <a href="https://v4.ntckumir.ru/" class="analytics-badge" target="_blank" rel="noopener noreferrer">
-                                <span>📊</span>
-                                <span>Дистанционный контроль и управление</span>
-                            </a>
-                        </div> -->
-                    </div>
-                    <div class="hero-visual">
-                        <div class="hero-image-container">
-                            <img src="<?php echo $heroImage['image_path']; ?>" alt="<?php echo $heroImage['alt_text']; ?>" class="hero-image">
+                            <!-- Кнопка для перехода к системе -->
+                            <!-- <div class="contacts-section">
+                                <a href="https://v4.ntckumir.ru/" class="analytics-badge" target="_blank" rel="noopener noreferrer">
+                                    <span>📊</span>
+                                    <span>Дистанционный контроль и управление</span>
+                                </a>
+                            </div> -->
                         </div>
-                        
-                        <div class="hero-card card-energy">
-                            <div class="card-pattern-box">
-                                <img src="/assets/images/static/firstDisplay--3.png" alt="" class="pattern-img"> 
+                        <div class="hero-visual">
+                            <div class="hero-image-container">
+                                <img src="<?php echo $heroImage['image_path']; ?>" alt="<?php echo $heroImage['alt_text']; ?>" class="hero-image">
                             </div>
-                            <div class="card-title">Учет энергоресурсов</div>
-                        </div>
+                            
+                            <div class="hero-card card-energy">
+                                <div class="card-pattern-box">
+                                    <img src="/assets/images/static/firstDisplay--3.png" alt="" class="pattern-img"> 
+                                </div>
+                                <div class="card-title">Учет энергоресурсов</div>
+                            </div>
 
-                        <div class="hero-card card-analytics">
-                            <div class="card-pattern-box">
-                                <img src="/assets/images/static/firstDisplay--1.png" alt="" class="pattern-img">
+                            <div class="hero-card card-analytics">
+                                <div class="card-pattern-box">
+                                    <img src="/assets/images/static/firstDisplay--1.png" alt="" class="pattern-img">
+                                </div>
+                                <div class="card-title">Аналитика</div>
                             </div>
-                            <div class="card-title">Аналитика</div>
-                        </div>
 
-                        <div class="hero-card card-control">
-                            <div class="card-pattern-box">
-                                <img src="/assets/images/static/firstDisplay--2.png" alt="" class="pattern-img">
+                            <div class="hero-card card-control">
+                                <div class="card-pattern-box">
+                                    <img src="/assets/images/static/firstDisplay--2.png" alt="" class="pattern-img">
+                                </div>
+                                <div class="card-title">Дистанционный контроль и управление</div>
                             </div>
-                            <div class="card-title">Дистанционный контроль и управление</div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        <?php endif; ?>
+
     </section>
 
     <?php if ($for_whom_view): ?>
@@ -169,7 +239,7 @@ $currentUrl = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
                 <div class="for-whom-wrapper">
                     
                     <div class="for-whom-background">
-                        <img src="/assets/images/static/category_background.png" alt="Линии распределения" class="lines-img">
+                        <img src="/assets/images/static/category_background.svg" alt="Линии распределения" class="lines-img">
                         
                         <div class="center-desktop-circle">
                             <span>Для кого</span>
