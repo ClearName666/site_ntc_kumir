@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Uploaded to: SVG Repo, www.svgrepo.com, Transformed by: SVG Repo Mixer Tools -->
+
+<svg
+   fill="#000000"
+   width="64px"
+   height="64px"
+   viewBox="0 0 56.00 56.00"
+   stroke="#000000"
+   stroke-width="0.00056"
+   transform="matrix(1, 0, 0, 1, 0, 0)"
+   version="1.1"
+   id="svg1"
+   sodipodi:docname="on.svg"
+   inkscape:version="1.4.2 (ebf0e940d0, 2025-05-08)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="12.59375"
+     inkscape:cx="31.960298"
+     inkscape:cy="25.647643"
+     inkscape:window-width="1920"
+     inkscape:window-height="1015"
+     inkscape:window-x="1280"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="SVGRepo_iconCarrier" />
+  <g
+     id="SVGRepo_bgCarrier"
+     stroke-width="0" />
+  <g
+     id="SVGRepo_tracerCarrier"
+     stroke-linecap="round"
+     stroke-linejoin="round"
+     stroke="#CCCCCC"
+     stroke-width="0.33599999999999997" />
+  <g
+     id="SVGRepo_iconCarrier"
+     style="stroke-width:0.000875;stroke-dasharray:none;stroke-miterlimit:3.7">
+    <path
+       d="M 7.7147278,40.958913 H 48.285272 c 4.898418,0 7.359427,-1.464125 7.359427,-4.364207 V 19.405293 c 0,-2.90008 -2.461009,-4.364208 -7.359427,-4.364208 H 7.7147278 c -4.8750174,0 -7.35942622,1.450012 -7.35942622,4.364208 v 17.189413 c 0,2.914198 2.48440882,4.364207 7.35942622,4.364207 z"
+       id="path1"
+       style="stroke-width:0.00067815;stroke-miterlimit:3.7;stroke-dasharray:none;stroke-linejoin:miter" />
+  </g>
+</svg>

@@ -615,5 +615,35 @@ $currentUrl = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
         <script src="/assets/js/newsArticlesMain.js"></script>
 </main>
 
-<?php require_once __DIR__. '/includes/footer.php'; ?></body>
+<?php require_once __DIR__. '/includes/footer.php'; ?>
+
+<script>
+// Принудительное применение цветов текста
+document.addEventListener('DOMContentLoaded', function() {
+    var textColors = {
+        '.hero': '<?= getSetting($conn, "hero_text_color") ?>',
+        '.for-whom-section': '<?= getSetting($conn, "for_whom_text_color") ?>',
+        '.cards-section': '<?= getSetting($conn, "our_products_text_color") ?>',
+        '.advantages-section': '<?= getSetting($conn, "advantages_of_our_system_text_color") ?>',
+        '.about-section': '<?= getSetting($conn, "about_the_company_text_color") ?>',
+        '.geography-section': '<?= getSetting($conn, "geography_of_application_text_color") ?>',
+        '.media-section': '<?= getSetting($conn, "news_artcles_text_color") ?>'
+    };
+    
+    for (var selector in textColors) {
+        var color = textColors[selector];
+        if (!color || color === '') continue;
+        
+        var section = document.querySelector(selector);
+        if (!section) continue;
+        
+        // Применяем цвет ко ВСЕМ элементам внутри секции
+        var allElements = section.querySelectorAll('*');
+        for (var i = 0; i < allElements.length; i++) {
+            allElements[i].style.setProperty('color', color, 'important');
+        }
+    }
+});
+</script>
+</body>
 </html>

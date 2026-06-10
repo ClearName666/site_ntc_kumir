@@ -1,0 +1,114 @@
+/* Стили для кастомных блоков управления и эффекта dropzone */
+.custom-select-styled {
+    border-radius: 6px;
+    border: 1px solid #ced4da;
+    font-weight: 500;
+}
+.style-dropzone {
+    border: 2px dashed #007bff !important;
+    background: #f8f9fa !important;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+.style-dropzone:hover {
+    background: #e9ecef !important;
+}
+.uc-file-input {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+.gap-2 { gap: 0.5rem !important; }
+.gap-3 { gap: 1rem !important; }
+
+/* Состояние блокировки панелей при глобальном сбросе */
+.uc-locked-state {
+    position: relative;
+    pointer-events: none; /* Отключаем любые клики */
+    opacity: 0.4;        /* Делаем блок блеклым */
+    filter: blur(0.5px);
+    transition: all 0.3s ease;
+}
+.uc-locked-state::after {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(255, 255, 255, 0.3);
+    z-index: 1000;
+    cursor: not-allowed;
+    border-radius: calc(.25rem - 1px);
+}
+
+
+/* Дополнительные стили для красоты */
+#text_preview_box {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+#text_preview_box:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+}
+
+#uni_text_color:hover {
+    box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.2);
+}
+
+#auto_text_color_btn:active {
+    transform: translateY(0) !important;
+}
+
+/* Анимация для элементов предпросмотра */
+#text_preview_heading,
+#text_preview_text,
+#text_preview_link,
+#text_preview_button,
+#text_preview_small {
+    transition: all 0.3s ease;
+}
+
+/* Стили для индикатора контрастности */
+#contrast_bar.good {
+    background: linear-gradient(90deg, #28a745, #20c997);
+}
+
+#contrast_bar.medium {
+    background: linear-gradient(90deg, #ffc107, #ff9800);
+}
+
+#contrast_bar.poor {
+    background: linear-gradient(90deg, #dc3545, #f44336);
+}
+
+.btn-outline-danger {
+    color: #dc3545;
+    border: 2px solid #dc3545;
+    background: white;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-danger:hover {
+    background: #dc3545;
+    color: white;
+}
+
+.btn-danger {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-danger:hover {
+    background: #c82333;
+}
