@@ -1,8 +1,6 @@
 <?php
-// Подключаем database.php
 require_once __DIR__ . '/../config/database.php';
 
-// Функция для получения всех активных категорий
 function getProductCategories($conn) {
     global $cache;
     $cacheKey = "categories_public_all";
@@ -17,9 +15,7 @@ function getProductCategories($conn) {
     return $data;
 }
 
-// Функция для получения категории по slug
 function getCategoryBySlug($conn, $slug) {
-    // $conn = getDBConnection();
     $stmt = $conn->prepare("SELECT * FROM product_categories WHERE slug = ? AND is_active = 1");
     $stmt->bind_param("s", $slug);
     $stmt->execute();
@@ -32,7 +28,6 @@ function getCategoryBySlug($conn, $slug) {
     return null;
 }
 
-// Функция для получения товаров категории
 function getProductsByCategory($conn, $categoryId, $limit = null) {
     global $cache;
     $cacheKey = "products_cat_{$categoryId}_lim_{$limit}";
@@ -57,7 +52,6 @@ function getProductsByCategory($conn, $categoryId, $limit = null) {
     return $data;
 }
 
-// Функция для получения товара по slug
 function getProductBySlug($conn, $slug) {
     global $cache;
     $cacheKey = "product_single_" . md5($slug);
@@ -82,7 +76,6 @@ function getProductBySlug($conn, $slug) {
     return $row;
 }
 
-// Функция для отображения категорий
 function renderCategoriesGrid($categories) {
     echo '<div class="categories-grid">';
     
@@ -90,14 +83,12 @@ function renderCategoriesGrid($categories) {
         echo '<div class="category-card" data-category="' . $category['slug'] . '">';
         echo '<a href="products.php?category=' . $category['slug'] . '" class="category-link">';
         
-        // Изображение категории
         if (!empty($category['image_path'])) {
             echo '<div class="category-image">';
             echo '<img src="' . $category['image_path'] . '" alt="' . htmlspecialchars($category['name']) . '" loading="lazy">';
             echo '</div>';
         }
         
-        // Контент категории
         echo '<div class="category-content">';
         echo '<h3 class="category-name">' . htmlspecialchars($category['name']) . '</h3>';
         
@@ -114,7 +105,6 @@ function renderCategoriesGrid($categories) {
     echo '</div>';
 }
 
-// Функция для отображения товаров
 function renderProductsGrid($products, $columns = 3) {
     echo '<div class="products-grid" style="grid-template-columns: repeat(' . $columns . ', 1fr);">';
     
@@ -122,14 +112,12 @@ function renderProductsGrid($products, $columns = 3) {
         echo '<div class="product-card" data-product="' . $product['slug'] . '">';
         echo '<a href="products.php?product=' . $product['slug'] . '" class="product-link">';
         
-        // Изображение товара
         if (!empty($product['image_path'])) {
             echo '<div class="product-image">';
             echo '<img src="' . $product['image_path'] . '" alt="' . htmlspecialchars($product['name']) . '" loading="lazy">';
             echo '</div>';
         }
         
-        // Контент товара
         echo '<div class="product-content">';
         echo '<h3 class="product-name">' . htmlspecialchars($product['name']) . '</h3>';
         
@@ -137,7 +125,6 @@ function renderProductsGrid($products, $columns = 3) {
             echo '<p class="product-description">' . htmlspecialchars($product['description']) . '</p>';
         }
         
-        // Цена
         if (!empty($product['price'])) {
             echo '<div class="product-price">';
             echo number_format($product['price'], 0, '.', ' ') . ' ₽';
@@ -153,9 +140,7 @@ function renderProductsGrid($products, $columns = 3) {
     echo '</div>';
 }
 
-// Функция для получения похожих товаров
 function getRelatedProducts($conn, $productId, $categoryId, $limit = 3) {
-    // $conn = getDBConnection();
     $stmt = $conn->prepare("SELECT * FROM products 
                            WHERE category_id = ? AND id != ? AND is_active = 1 
                            ORDER BY sort_order LIMIT ?");
@@ -172,7 +157,6 @@ function getRelatedProducts($conn, $productId, $categoryId, $limit = 3) {
 }
 
 function addProductRequest($conn, $data) {
-    // $conn = getDBConnection();
     
     $product_name = cleanInput($data['product_name']);
     $name = cleanInput($data['name']);

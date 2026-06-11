@@ -11,7 +11,6 @@ if (!hasPermission($conn, 'editor')) {
 $action = $_GET['action'] ?? 'list';
 $id = intval($_GET['id'] ?? 0);
 
-// --- ОБРАБОТКА POST ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $formData = [
         'title'       => cleanInput($_POST['title'] ?? ''),
@@ -33,7 +32,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// --- УДАЛЕНИЕ ---
 if ($action === 'delete' && $id) {
     $item = getFeatureById($conn, $id);
     if (deleteFeature($conn, $id)) {

@@ -1,6 +1,4 @@
-// Только необходимые функции для admins.php
 document.addEventListener('DOMContentLoaded', function() {
-    // 1. Переключение сайдбара
     const toggleSidebar = document.getElementById('toggleSidebar');
     const sidebar = document.getElementById('sidebar');
     if (toggleSidebar && sidebar) {
@@ -9,7 +7,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // 2. Уведомления из URL
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.has('message')) {
         showNotification(
@@ -18,7 +15,6 @@ document.addEventListener('DOMContentLoaded', function() {
         );
     }
     
-    // 3. Подтверждение удаления
     const deleteButtons = document.querySelectorAll('.btn-delete');
     deleteButtons.forEach(button => {
         button.addEventListener('click', function(e) {
@@ -28,7 +24,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // 4. Подтверждение выхода (если есть в header-right)
     const logoutLinks = document.querySelectorAll('a[href*="logout"]');
     logoutLinks.forEach(link => {
         link.addEventListener('click', function(e) {
@@ -39,7 +34,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// Функция показа уведомлений (обязательно нужна)
 function showNotification(message, type = 'info') {
     const notification = document.createElement('div');
     notification.className = `notification ${type}`;

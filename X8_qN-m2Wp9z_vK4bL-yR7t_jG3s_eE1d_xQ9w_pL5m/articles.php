@@ -1,15 +1,11 @@
 <?php
 
-// Подключаем функции
 require_once __DIR__. '/includes/functions.php';
 
-// подключаемся к базе 
 $conn = getDBConnection();
 
-// Проверяем авторизацию
 requireAdminAuth($conn);
 
-// Проверяем права доступа
 if (!hasPermission($conn, 'editor')) {
     redirectWithNotification('index.php', 'Недостаточно прав для доступа к этой странице', 'error');
 }
@@ -18,18 +14,15 @@ if (!hasPermission($conn, 'editor')) {
 $action = $_GET['action'] ?? 'list';
 $id = $_GET['id'] ?? 0;
 
-// Обработка добавления/редактирования
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = cleanInput($_POST['title'] ?? '');
     $imagePath = $_POST['existing_image'] ?? '';
 
-    // Картинка
     if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
         $uploadResult = uploadImage($_FILES['image']);
         if ($uploadResult['success']) $imagePath = $uploadResult['path'];
     }
 
-    // Собираем данные
     $data = [
         'title'        => $title,
         'slug'         => generateUniqueArticleSlug($conn, $title, $id),
@@ -54,7 +47,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Обработка удаления
 if ($action === 'delete' && $id) {
     $article = getArticleById($conn, $id);
     if (deleteArticle($conn, $id)) {
@@ -63,10 +55,8 @@ if ($action === 'delete' && $id) {
     }
 }
 
-// Подключаем шапку
 require_once __DIR__. '/includes/header.php';
 
-// Подключаем меню
 require_once __DIR__. '/includes/menu.php';
 ?>
 
@@ -86,7 +76,6 @@ require_once __DIR__. '/includes/menu.php';
         </div>
         
         <?php 
-            // Подключаем правую шапку
             require_once __DIR__. '/includes/header-right.php';
         ?>
     </header>
@@ -216,12 +205,10 @@ require_once __DIR__. '/includes/menu.php';
                             <label for="published_at">Дата публикации</label>
                             <input type="datetime-local" id="published_at" name="published_at" class="form-control" 
                                 value="<?php 
-                                        // Безопасное форматирование даты для datetime-local
                                         $publishedAt = $article['published_at'] ?? '';
                                         if (!empty($publishedAt) && $publishedAt !== '0000-00-00 00:00:00' && $publishedAt !== '0000-00-00') {
                                             $timestamp = strtotime($publishedAt);
                                             if ($timestamp !== false && $timestamp > 0) {
-                                                // Проверяем, что год не 0000
                                                 $year = date('Y', $timestamp);
                                                 if ($year != 0 && $year != '0000') {
                                                     echo date('Y-m-d\TH:i', $timestamp);
@@ -321,6 +308,5 @@ require_once __DIR__. '/includes/menu.php';
 <script src="assets/js/scripts.js"></script>
 
 <?php
-// Подключаем подвал
 require_once __DIR__. '/includes/footer.php';
 ?>

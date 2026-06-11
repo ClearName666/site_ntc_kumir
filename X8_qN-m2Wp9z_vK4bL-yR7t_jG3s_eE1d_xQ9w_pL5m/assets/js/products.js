@@ -1,4 +1,3 @@
-// Автоматическая генерация слага
 document.getElementById('name').addEventListener('input', function() {
     const name = this.value;
     const slug = name.toLowerCase()
@@ -8,7 +7,6 @@ document.getElementById('name').addEventListener('input', function() {
     document.getElementById('slug').value = slug;
 });
 
-// Удаление изображения
 function removeImage() {
     if (confirm('Удалить текущее изображение?')) {
         const existingImage = document.querySelector('.existing-image');
@@ -18,7 +16,6 @@ function removeImage() {
     }
 }
 
-// Управление характеристиками
 document.getElementById('add-spec').addEventListener('click', function() {
     const container = document.getElementById('specifications-container');
     const newRow = document.createElement('div');
@@ -38,13 +35,11 @@ document.getElementById('add-spec').addEventListener('click', function() {
     `;
     container.appendChild(newRow);
     
-    // Добавляем обработчик удаления
     newRow.querySelector('.remove-spec').addEventListener('click', function() {
         newRow.remove();
     });
 });
 
-// Инициализация обработчиков удаления для существующих строк
 document.querySelectorAll('.remove-spec').forEach(button => {
     button.addEventListener('click', function() {
         this.closest('.specification-row').remove();

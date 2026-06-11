@@ -1,14 +1,11 @@
 <?php
 
-// Подключаем функции
 require_once __DIR__ . '/includes/functions.php';
 require_once __DIR__ . '/config/config.php';
 
-// подключаемся к базе 
 $conn = getDBConnection();
 $mainBg = getImage($conn, 'image_background_all');
 
-// Определяем пути
 $headerPath = __DIR__ . '/includes/header.php';
 $footerPath = __DIR__ . '/includes/footer.php';
 ?>

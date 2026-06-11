@@ -1,4 +1,3 @@
-// Автоматическая генерация слага
 document.getElementById('name').addEventListener('input', function() {
     const name = this.value;
     const slug = name.toLowerCase()

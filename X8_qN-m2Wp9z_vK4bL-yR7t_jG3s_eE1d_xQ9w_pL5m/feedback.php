@@ -1,15 +1,11 @@
 <?php
 
-// Подключаем функции
 require_once __DIR__. '/includes/functions.php';
 
-// подключаемся к базе 
 $conn = getDBConnection();
 
-// Проверяем авторизацию
 requireAdminAuth($conn);
 
-// Проверяем права доступа
 if (!hasPermission($conn, 'admin')) {
     redirectWithNotification('index.php', 'Недостаточно прав для доступа к этой странице', 'error');
 }
@@ -17,7 +13,6 @@ if (!hasPermission($conn, 'admin')) {
 $action = $_GET['action'] ?? 'list';
 $id = intval($_GET['id'] ?? 0);
 
-// Обработка действий (Прочитать/Удалить)
 if ($action === 'read' && $id) {
     if (markFeedbackAsRead($conn, $id)) {
         logAdminAction($conn, 'feedback_read', "Обращение ID $id помечено как прочитанное");
@@ -34,10 +29,8 @@ if ($action === 'delete' && $id) {
     }
 }
 
-// Получаем список обращений через функцию, которую мы добавили ранее
 $feedbacks = getAllFeedback($conn);
 
-// Подключаем шапку и меню
 require_once __DIR__. '/includes/header.php';
 require_once __DIR__. '/includes/menu.php';
 ?>
@@ -52,7 +45,6 @@ require_once __DIR__. '/includes/menu.php';
         </div>
         
         <?php 
-            // Подключаем правую шапку
             require_once __DIR__. '/includes/header-right.php';
         ?>
     </header>

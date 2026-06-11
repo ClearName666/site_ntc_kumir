@@ -11,7 +11,6 @@ if (!hasPermission($conn, 'editor')) {
 $action = $_GET['action'] ?? 'list';
 $id = intval($_GET['id'] ?? 0);
 
-// --- ОБРАБОТКА POST (Добавление и Редактирование) ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $formData = [
         'city'       => cleanInput($_POST['city'] ?? ''),
@@ -38,7 +37,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// --- УДАЛЕНИЕ ---
 if ($action === 'delete' && $id) {
     $office = getOfficeById($conn, $id);
     if (deleteOffice($conn, $id)) {
@@ -47,7 +45,6 @@ if ($action === 'delete' && $id) {
     }
 }
 
-// Подключаем шапку и меню
 require_once __DIR__. '/includes/header.php';
 require_once __DIR__. '/includes/menu.php';
 ?>

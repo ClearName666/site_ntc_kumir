@@ -1,4 +1,3 @@
-// Обработка формы вопроса
 document.getElementById('questionForm').addEventListener('submit', function(e) {
     e.preventDefault();
     
@@ -10,12 +9,11 @@ document.getElementById('questionForm').addEventListener('submit', function(e) {
     submitBtn.textContent = 'Отправка...';
     submitBtn.disabled = true;
     
-    // Отправляем запрос на этот же файл (faq.php)
     fetch('faq.php', {
         method: 'POST',
         body: formData,
         headers: {
-            'X-Requested-With': 'XMLHttpRequest' // Пометка для PHP, что это AJAX
+            'X-Requested-With': 'XMLHttpRequest'
         }
     })
     .then(response => response.json())
@@ -37,11 +35,9 @@ document.getElementById('questionForm').addEventListener('submit', function(e) {
     });
 });
 
-// Анимация FAQ элементов
 document.addEventListener('DOMContentLoaded', function() {
     const faqItems = document.querySelectorAll('.faq-item');
     
-    // Автоматическое открытие первого элемента
     if (faqItems.length > 0) {
         setTimeout(() => {
             const firstToggle = faqItems[0].querySelector('.faq-toggle');
@@ -51,7 +47,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 500);
     }
     
-    // Плавное появление при скролле
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
@@ -69,7 +64,6 @@ document.addEventListener('DOMContentLoaded', function() {
         observer.observe(item);
     });
     
-    // Аккордеон - закрытие других при открытии одного
     const faqToggles = document.querySelectorAll('.faq-toggle');
     faqToggles.forEach(toggle => {
         toggle.addEventListener('change', function() {

@@ -1,14 +1,11 @@
 <?php
 
-// Подключаем функции
 require_once __DIR__. '/includes/functions.php';
 require_once __DIR__. '/config/config.php';
 
-// подключаемся к базе 
 $conn = getDBConnection();
 $showForm = (getSetting($conn, 'form_view') == 1);
 
-// --- БЛОК ОБРАБОТКИ AJAX ЗАПРОСА ---
 if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest') {
     header('Content-Type: application/json');
     
@@ -22,27 +19,23 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'
         exit;
     }
 
-    // Используем функцию, которую мы добавили в functions.php
     if (addFAQQuestion($conn, $name, $email, $category, $question)) {
         echo json_encode(['status' => 'success', 'message' => 'Вопрос отправлен и появится после модерации!']);
     } else {
         echo json_encode(['status' => 'error', 'message' => 'Ошибка базы данных.']);
     }
-    exit; // Важно! Прерываем выполнение, чтобы не грузить HTML в ответ на AJAX
+    exit;
 }
 
-// Получаем данные
 $categories = getFAQCategories($conn);
 $selectedCategory = isset($_GET['category']) ? $_GET['category'] : null;
 $faqItems = getFAQ($conn, $selectedCategory);
 $mainBg = getImage($conn, 'image_background_all');
 
-// Устанавливаем мета-данные
 $pageTitle = 'Вопрос-ответ - ' . getSetting($conn, 'site_title');
 $pageDescription = 'Часто задаваемые вопросы и ответы по оборудованию и услугам НТЦ КУМИР.';
 $pageKeyword = "помощь НТЦ КУМИР, поддержка АСКУЭ, настройка модема M32, вопросы по телеметрии, инструкция кумир, как подключить счетчик, технические вопросы ЖКХ, база знаний НТЦ КУМИР, обслуживание подстанций вопросы, FAQ автоматизация";
 
-// --- ДОПОЛНИТЕЛЬНАЯ ПОДГОТОВКА ДЛЯ SEO И СОЦСЕТЕЙ ---
 $defaultSocialImage = getSetting($conn, 'social_default_image');
 $ogImage = !empty($defaultSocialImage) ? $defaultSocialImage : getSetting($conn, 'logo_path');
 
@@ -52,7 +45,6 @@ if (empty($pageDescription)) {
 
 $currentUrl = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 
-// Определяем пути
 $headerPath = __DIR__. '/includes/header.php';
 $footerPath = __DIR__. '/includes/footer.php';
 ?>
@@ -189,7 +181,7 @@ $footerPath = __DIR__. '/includes/footer.php';
     <?php include $footerPath; ?>
     
     <!-- Скрипты -->
-    <script src="assets/js/main.js"></script>
-    <script src="assets/js/faq.js"></script>
+    <script src="/assets/js/main.js"></script>
+    <script src="/assets/js/faq.js"></script>
 </body>
 </html>

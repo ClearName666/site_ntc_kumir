@@ -1,23 +1,16 @@
 <?php
-/**
- * УНИВЕРСАЛЬНЫЙ SITEMAP ГЕНЕРАТОР (Версия 1.0 - на твоих функциях)
- */
 
-// 1. ПОДКЛЮЧЕНИЕ БАЗЫ И КЭША
 require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/Cache.php'; 
 
-// Инициализируем переменные, которые твои функции ждут как global
-$conn = getDBConnection(); // Создаем соединение через твою функцию
-$cache = new Cache();      // Создаем объект кэша
+$conn = getDBConnection();
+$cache = new Cache();
 
-// 2. ПОДКЛЮЧЕНИЕ ТВОИХ ФУНКЦИЙ
 require_once __DIR__ . '/includes/news-functions.php';
 require_once __DIR__ . '/includes/product-functions.php';
 require_once __DIR__ . '/includes/article-functions.php';
 require_once __DIR__ . '/includes/faq-functions.php';
 
-// Блокируем ошибки, чтобы не портить XML
 ini_set('display_errors', 0);
 error_reporting(E_ALL);
 

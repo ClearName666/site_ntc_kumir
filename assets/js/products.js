@@ -1,6 +1,4 @@
-// Анимация появления карточек товаров
 document.addEventListener('DOMContentLoaded', function() {
-    // Intersection Observer для товаров
     const productObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
@@ -13,12 +11,10 @@ document.addEventListener('DOMContentLoaded', function() {
         rootMargin: '0px 0px -50px 0px'
     });
     
-    // Наблюдаем за карточками товаров
     document.querySelectorAll('.product-card').forEach(card => {
         productObserver.observe(card);
     });
     
-    // Параллакс эффект для категорий
     const categoryCards = document.querySelectorAll('.category-card');
     categoryCards.forEach(card => {
         card.addEventListener('mousemove', (e) => {
@@ -45,13 +41,11 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Анимация счетчика цены (если нужно)
     const priceElements = document.querySelectorAll('.product-price-value');
     priceElements.forEach(priceElement => {
         const priceText = priceElement.textContent;
         const priceNumber = parseFloat(priceText.replace(/[^\d]/g, ''));
         
-        // Можно добавить анимацию счетчика при появлении
         if (priceNumber > 0) {
             priceElement.style.opacity = '0';
             priceElement.style.transform = 'translateY(20px)';
@@ -64,7 +58,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Плавный скролл для якорных ссылок
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function(e) {
             e.preventDefault();
@@ -78,7 +71,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Эффект волны при клике на карточку
     document.querySelectorAll('.product-card, .category-card').forEach(card => {
         card.addEventListener('click', function(e) {
             if (!this.querySelector('a').contains(e.target)) return;
@@ -111,7 +103,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Добавляем стиль для ripple эффекта
     const style = document.createElement('style');
     style.textContent = `
         @keyframes ripple {
@@ -130,7 +121,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const openBtns = document.querySelectorAll('.open-kp-modal');
     const closeBtn = document.querySelector('.close-modal');
 
-    // Открытие окна
     openBtns.forEach(btn => {
         btn.addEventListener('click', function() {
             const productName = this.getAttribute('data-product');
@@ -140,12 +130,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Закрытие по крестику
     closeBtn.onclick = function() {
         modal.style.display = 'none';
     }
 
-    // Закрытие при клике вне окна
     window.onclick = function(event) {
         if (event.target == modal) {
             modal.style.display = 'none';
@@ -154,17 +142,15 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 document.addEventListener('DOMContentLoaded', function() {
-    // 1. ЭЛЕМЕНТЫ
     const modal = document.getElementById('kpModal');
     const openBtns = document.querySelectorAll('.open-kp-modal');
     const closeBtn = document.querySelector('.close-modal');
     const kpForm = document.getElementById('kpForm');
 
-    // 2. ЛОГИКА МОДАЛЬНОГО ОКНА
     if (modal && openBtns.length > 0) {
         openBtns.forEach(btn => {
             btn.addEventListener('click', function(e) {
-                e.preventDefault(); // На всякий случай гасим переход
+                e.preventDefault();
                 const productName = this.getAttribute('data-product');
                 document.getElementById('modalProductName').textContent = 'Товар: ' + productName;
                 document.getElementById('kpProductInput').value = productName;
@@ -183,10 +169,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // 3. ОТПРАВКА ФОРМЫ ЧЕРЕЗ AJAX
     if (kpForm) {
         kpForm.addEventListener('submit', function(e) {
-            // ОСТАНАВЛИВАЕМ перезагрузку страницы!
             e.preventDefault();
             e.stopPropagation();
             
@@ -226,11 +210,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 submitBtn.textContent = originalText;
             });
             
-            return false; // Дополнительная страховка от перезагрузки
+            return false;
         });
     }
 
-    // --- Тут можно оставить твой старый код анимаций (Observer и т.д.) ---
     const productObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {

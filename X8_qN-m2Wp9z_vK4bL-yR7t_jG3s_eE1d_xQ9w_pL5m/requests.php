@@ -1,15 +1,11 @@
 <?php
 
-// Подключаем функции
 require_once __DIR__. '/includes/functions.php';
 
-// подключаемся к базе 
 $conn = getDBConnection();
 
-// Проверяем авторизацию
 requireAdminAuth($conn);
 
-// Проверяем права доступа (используем тот же уровень, что и для FAQ)
 if (!hasPermission($conn, 'editor')) {
     redirectWithNotification('index.php', 'Недостаточно прав для доступа к этой странице', 'error');
 }
@@ -17,7 +13,6 @@ if (!hasPermission($conn, 'editor')) {
 $action = $_GET['action'] ?? 'list';
 $id = $_GET['id'] ?? 0;
 
-// Обработка удаления через вынесенную функцию
 if ($action === 'delete' && $id > 0) {
     if (deleteProductRequest($conn, $id)) {
         redirectWithNotification('requests.php', 'Заявка успешно удалена', 'success');
@@ -26,10 +21,8 @@ if ($action === 'delete' && $id > 0) {
     }
 }
 
-// Подключаем шапку
 require_once __DIR__. '/includes/header.php';
 
-// Подключаем меню
 require_once __DIR__. '/includes/menu.php';
 ?>
 
@@ -43,7 +36,6 @@ require_once __DIR__. '/includes/menu.php';
         </div>
         
         <?php 
-            // Подключаем правую шапку
             require_once __DIR__. '/includes/header-right.php';
         ?>
     </header>
@@ -69,7 +61,6 @@ require_once __DIR__. '/includes/menu.php';
                         </thead>
                         <tbody>
                             <?php
-                            // Используем твою стандартную функцию пагинации
                             $pagination = getPagination($conn, 'product_requests', 10);
                             $result = getProductRequests($conn, $pagination['perPage'], $pagination['offset']);
                             
@@ -136,6 +127,5 @@ require_once __DIR__. '/includes/menu.php';
 <script src="assets/js/miniAdminstration.js"></script>
 
 <?php
-// Подключаем скрипты и подвал
 require_once __DIR__. '/includes/footer.php';
 ?>

@@ -1,15 +1,11 @@
 <?php
 
-// Подключаем функции
 require_once __DIR__. '/includes/functions.php';
 
-// подключаемся к базе 
 $conn = getDBConnection();
 
-// Проверяем авторизацию
 requireAdminAuth($conn);
 
-// Проверяем права доступа (только superadmin)
 if (!hasPermission($conn, 'superadmin')) {
     redirectWithNotification('index.php', 'Недостаточно прав для доступа к этой странице', 'error');
 }
@@ -18,19 +14,16 @@ if (!hasPermission($conn, 'superadmin')) {
 $action = $_GET['action'] ?? 'list';
 $id = $_GET['id'] ?? 0;
 
-// Обработка добавления/редактирования
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = cleanInput($_POST['username'] ?? '');
     $email = cleanInput($_POST['email'] ?? '');
     $password = $_POST['password'] ?? '';
     $passwordConfirm = $_POST['password_confirm'] ?? '';
     
-    // Проверка уникальности через функцию
     if (!isAdminUnique($conn, $username, $email, $id)) {
         redirectWithNotification("admins.php?action=$action&id=$id", 'Пользователь уже существует', 'error');
     }
     
-    // Подготовка данных
     $data = [
         'username'  => $username,
         'email'     => $email,
@@ -59,7 +52,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Обработка удаления
 if ($action === 'delete' && $id) {
     if ($id == $_SESSION['admin_id']) {
         redirectWithNotification('admins.php', 'Нельзя удалить себя', 'error');
@@ -72,10 +64,8 @@ if ($action === 'delete' && $id) {
     }
 }
 
-// Подключаем шапку
 require_once __DIR__. '/includes/header.php';
 
-// Подключаем меню
 require_once __DIR__. '/includes/menu.php';
 ?>
 
@@ -93,7 +83,6 @@ require_once __DIR__. '/includes/menu.php';
         </div>
         
         <?php 
-            // Подключаем правую шапку
             require_once __DIR__. '/includes/header-right.php';
         ?>
     </header>
@@ -281,6 +270,5 @@ require_once __DIR__. '/includes/menu.php';
 <script src="assets/js/miniAdminstration.js"></script>
 
 <?php
-// Подключаем подвал
 require_once __DIR__. '/includes/footer.php';
 ?>

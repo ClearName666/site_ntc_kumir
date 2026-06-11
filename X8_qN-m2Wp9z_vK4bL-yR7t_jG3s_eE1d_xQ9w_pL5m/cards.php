@@ -11,7 +11,6 @@ if (!hasPermission($conn, 'editor')) {
 $action = $_GET['action'] ?? 'list';
 $id = (int)($_GET['id'] ?? 0);
 
-// Обработка POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data = [
         'title'       => cleanInput($_POST['title'] ?? ''),
@@ -22,9 +21,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'image_path'  => $_POST['existing_image'] ?? ''
     ];
 
-    // Загрузка изображения
     if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-        $uploadResult = uploadImage($_FILES['image']); // Используем твою функцию из news
+        $uploadResult = uploadImage($_FILES['image']);
         if ($uploadResult['success']) $data['image_path'] = $uploadResult['path'];
     }
 

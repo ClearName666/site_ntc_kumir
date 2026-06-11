@@ -1,12 +1,9 @@
 <?php
-// session_start();
 
 require_once __DIR__. '/includes/functions.php';
 
-// 2. СОЗДАЕМ ПОДКЛЮЧЕНИЕ СРАЗУ (нужно для функции getSetting в HTML)
 $conn = getDBConnection();
 
-// Если пользователь уже авторизован, перенаправляем в админку
 if (isset($_SESSION['admin_id'])) {
     header('Location: index.php');
     exit();
@@ -14,7 +11,6 @@ if (isset($_SESSION['admin_id'])) {
 
 $error = '';
 
-// Обработка формы входа
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = cleanInput($_POST['username'] ?? '');
     $password = $_POST['password'] ?? '';
@@ -31,16 +27,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $admin = $result->fetch_assoc();
             
             if (password_verify($password, $admin['password_hash'])) {
-                // Успешный вход
                 $_SESSION['admin_id'] = $admin['id'];
                 $_SESSION['admin_token'] = bin2hex(random_bytes(32));
                 
-                // Обновляем время последнего входа
                 $updateStmt = $conn->prepare("UPDATE admins SET last_login = NOW() WHERE id = ?");
                 $updateStmt->bind_param("i", $admin['id']);
                 $updateStmt->execute();
                 
-                // Логируем вход
                 logAdminAction($conn, 'login', 'Успешный вход в систему', $admin['id']);
                 
                 header('Location: index.php');

@@ -6,15 +6,13 @@
 (function() {
     'use strict';
 
-    // ==================== КОНФИГУРАЦИЯ ====================
     const CONFIG = {
         animationDelay: 0.1,
-        maxFileSize: 1 * 1024 * 1024, // 1MB
+        maxFileSize: 1 * 1024 * 1024,
         allowedImageTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'],
         notificationDuration: 3000
     };
 
-    // ==================== УТИЛИТЫ ====================
     const Utils = {
         /**
          * Безопасное выполнение callback с обработкой ошибок
@@ -55,13 +53,11 @@
                 return errors;
             }
 
-            // Проверка размера
             if (file.size > CONFIG.maxFileSize) {
                 const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
                 errors.push(`Файл слишком большой (${sizeMB}MB). Максимальный размер: 1MB`);
             }
 
-            // Проверка типа
             if (!CONFIG.allowedImageTypes.includes(file.type)) {
                 errors.push('Неподдерживаемый тип файла. Разрешены: JPG, PNG, GIF, WEBP, SVG');
             }
@@ -70,12 +66,10 @@
         }
     };
 
-    // ==================== СИСТЕМА УВЕДОМЛЕНИЙ ====================
     const Notification = {
         container: null,
 
         init() {
-            // Создаем контейнер для уведомлений, если его нет
             if (!this.container) {
                 this.container = document.createElement('div');
                 this.container.className = 'notifications-container';
@@ -95,7 +89,6 @@
             const notification = document.createElement('div');
             notification.className = `notification notification-${type}`;
             
-            // Иконки для разных типов
             const icons = {
                 success: 'check-circle',
                 error: 'exclamation-circle',
@@ -109,7 +102,6 @@
                 <button class="notification-close">&times;</button>
             `;
 
-            // Стили для уведомления
             notification.style.cssText = `
                 background: ${this.getBackgroundColor(type)};
                 color: white;
@@ -125,7 +117,6 @@
                 min-width: 300px;
             `;
 
-            // Кнопка закрытия
             const closeBtn = notification.querySelector('.notification-close');
             closeBtn.style.cssText = `
                 background: none;
@@ -141,7 +132,6 @@
 
             this.container.appendChild(notification);
 
-            // Автоматическое закрытие
             setTimeout(() => this.close(notification), CONFIG.notificationDuration);
         },
 
@@ -167,7 +157,6 @@
         }
     };
 
-    // ==================== УПРАВЛЕНИЕ САЙДБАРОМ ====================
     const SidebarManager = {
         init() {
             const toggleBtn = document.getElementById('toggleSidebar');
@@ -176,11 +165,9 @@
             if (toggleBtn && sidebar) {
                 toggleBtn.addEventListener('click', () => {
                     sidebar.classList.toggle('active');
-                    // Сохраняем состояние в localStorage
                     localStorage.setItem('sidebarActive', sidebar.classList.contains('active'));
                 });
 
-                // Восстанавливаем состояние
                 const wasActive = localStorage.getItem('sidebarActive') === 'true';
                 if (wasActive) {
                     sidebar.classList.add('active');
@@ -189,7 +176,6 @@
         }
     };
 
-    // ==================== АНИМАЦИИ ====================
     const AnimationManager = {
         init() {
             this.animateStatCards();
@@ -212,7 +198,6 @@
     };
 
 
-    // ==================== ЗАГРУЗКА ФАЙЛОВ ====================
     const FileUploadManager = {
         init() {
             this.initDropZones();
@@ -224,16 +209,12 @@
                 const input = zone.querySelector('.drop-zone__input');
                 if (!input) return;
 
-                // Скрываем input через JS (на всякий случай)
                 input.style.display = 'none';
                 
-                // Получаем превью (изображение или текст)
                 const thumb = zone.querySelector('.drop-zone__thumb');
                 const prompt = zone.querySelector('.drop-zone__prompt');
 
-                // Обработчик клика по всей зоне
                 zone.addEventListener('click', function(e) {
-                    // Проверяем, не кликнули ли по самому input (хотя он скрыт)
                     if (e.target !== input) {
                         e.preventDefault();
                         e.stopPropagation();
@@ -241,7 +222,6 @@
                     }
                 });
 
-                // Если есть изображение, добавляем ему отдельный обработчик
                 if (thumb) {
                     thumb.addEventListener('click', (e) => {
                         e.preventDefault();
@@ -249,11 +229,9 @@
                         input.click();
                     });
                     
-                    // Добавляем стиль указателя, чтобы было понятно, что изображение кликабельно
                     thumb.style.cursor = 'pointer';
                 }
 
-                // Если есть текст-подсказка
                 if (prompt) {
                     prompt.addEventListener('click', (e) => {
                         e.preventDefault();
@@ -262,7 +240,6 @@
                     });
                 }
 
-                // Drag & Drop события
                 zone.addEventListener('dragover', (e) => {
                     e.preventDefault();
                     zone.classList.add('drop-zone--over');
@@ -282,7 +259,6 @@
                     }
                 });
 
-                // Изменение файла
                 input.addEventListener('change', () => {
                     if (input.files.length) {
                         this.handleFileSelect(input, input.files[0], zone);
@@ -305,43 +281,35 @@
         },
 
         handleFileSelect(input, file, zone) {
-            // Валидация
             const errors = Utils.validateImageFile(file);
             
             if (errors.length > 0) {
                 errors.forEach(error => Notification.show(error, 'error'));
-                input.value = ''; // Сбрасываем input
+                input.value = '';
                 return;
             }
 
-            // Обновляем input.files
             const dataTransfer = new DataTransfer();
             dataTransfer.items.add(file);
             input.files = dataTransfer.files;
 
-            // Обновляем превью
             this.updateDropZonePreview(zone, file);
             
-            // Триггерим событие change
             input.dispatchEvent(new Event('change', { bubbles: true }));
         },
 
         updateDropZonePreview(zone, file) {
-            // Удаляем текстовую подсказку, если она есть
             const prompt = zone.querySelector('.drop-zone__prompt');
             if (prompt) {
                 prompt.remove();
             }
 
-            // Ищем существующее изображение
             let thumbnail = zone.querySelector('.drop-zone__thumb');
             
-            // Если изображения нет, создаем новое
             if (!thumbnail) {
                 thumbnail = document.createElement('img');
                 thumbnail.className = 'drop-zone__thumb';
                 
-                // Добавляем обработчик клика на новое изображение
                 thumbnail.addEventListener('click', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
@@ -349,18 +317,15 @@
                     if (input) input.click();
                 });
                 
-                // Вставляем изображение перед input
                 const input = zone.querySelector('.drop-zone__input');
                 zone.insertBefore(thumbnail, input);
             }
 
-            // Добавляем стили
             thumbnail.style.cursor = 'pointer';
             thumbnail.style.maxWidth = '100%';
             thumbnail.style.maxHeight = '150px';
             thumbnail.style.objectFit = 'contain';
 
-            // Загружаем превью
             this.updateImagePreview(file, thumbnail);
         },
 
@@ -380,7 +345,6 @@
         }
     };
 
-    // ==================== УПРАВЛЕНИЕ ФОРМАМИ ====================
     const FormManager = {
         init() {
             this.initFormValidation();
@@ -411,7 +375,6 @@
         },
 
         initDynamicFields() {
-            // Добавление полей
             document.querySelectorAll('[data-add-field]').forEach(button => {
                 button.addEventListener('click', () => {
                     const targetId = button.dataset.addField;
@@ -424,14 +387,12 @@
                             clone.classList.remove('field-template');
                             clone.style.display = 'block';
                             
-                            // Очищаем значения в клоне
                             clone.querySelectorAll('input, select, textarea').forEach(field => {
                                 field.value = '';
                             });
                             
                             container.appendChild(clone);
                             
-                            // Добавляем обработчик удаления
                             const removeBtn = clone.querySelector('.remove-field');
                             if (removeBtn) {
                                 removeBtn.addEventListener('click', () => clone.remove());
@@ -441,7 +402,6 @@
                 });
             });
 
-            // Удаление полей
             document.querySelectorAll('.remove-field').forEach(button => {
                 button.addEventListener('click', function() {
                     const row = this.closest('.field-row, [class*="field"]');
@@ -455,7 +415,6 @@
         }
     };
 
-    // ==================== ТАБЛИЦЫ ====================
     const TableManager = {
         init() {
             this.initSortableHeaders();
@@ -477,11 +436,9 @@
             const tbody = table.querySelector('tbody');
             const rows = Array.from(tbody.querySelectorAll('tr'));
             
-            // Определяем порядок сортировки
             const currentOrder = header.dataset.order || 'asc';
             const newOrder = currentOrder === 'asc' ? 'desc' : 'asc';
             
-            // Сбрасываем сортировку у других заголовков
             table.querySelectorAll('th[data-sortable]').forEach(h => {
                 delete h.dataset.order;
                 h.classList.remove('sorted-asc', 'sorted-desc');
@@ -489,11 +446,9 @@
                 if (icon) icon.remove();
             });
             
-            // Устанавливаем новую сортировку
             header.dataset.order = newOrder;
             header.classList.add(`sorted-${newOrder}`);
             
-            // Добавляем иконку
             let icon = header.querySelector('.sort-icon');
             if (!icon) {
                 icon = document.createElement('i');
@@ -502,7 +457,6 @@
             }
             icon.className = `fas fa-sort-${newOrder === 'asc' ? 'up' : 'down'} sort-icon ml-2`;
             
-            // Сортируем строки (простая текстовая сортировка)
             const columnIndex = Array.from(header.parentNode.children).indexOf(header);
             
             rows.sort((a, b) => {
@@ -514,7 +468,6 @@
                     : bText.localeCompare(aText, 'ru');
             });
             
-            // Обновляем DOM
             rows.forEach(row => tbody.appendChild(row));
         },
 
@@ -539,7 +492,6 @@
         }
     };
 
-    // ==================== УПРАВЛЕНИЕ ССЫЛКАМИ ====================
     const LinkManager = {
         init() {
             this.initLogoutLinks();
@@ -567,7 +519,6 @@
         }
     };
 
-    // ==================== ПАРСИНГ URL ====================
     const UrlParser = {
         init() {
             const urlParams = new URLSearchParams(window.location.search);
@@ -576,23 +527,18 @@
                 const message = decodeURIComponent(urlParams.get('message'));
                 const type = urlParams.get('type') || 'info';
                 
-                // Очищаем URL от параметров
                 const newUrl = window.location.pathname;
                 window.history.replaceState({}, document.title, newUrl);
                 
-                // Показываем уведомление
                 setTimeout(() => Notification.show(message, type), 100);
             }
         }
     };
 
-    // ==================== ИНИЦИАЛИЗАЦИЯ ====================
     function init() {
         Utils.safeExecute(() => {
-            // Добавляем CSS анимации
             addAnimations();
             
-            // Инициализация всех модулей
             SidebarManager.init();
             AnimationManager.init();
             FileUploadManager.init();
@@ -697,14 +643,12 @@
         document.head.appendChild(style);
     }
 
-    // Запускаем после полной загрузки DOM
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
     } else {
         init();
     }
 
-    // Экспортируем глобально для отладки (опционально)
     window.AdminPanel = {
         Notification,
         Utils,

@@ -1,20 +1,15 @@
 <?php
 
-// Подключаем функции
 require_once __DIR__. '/includes/functions.php';
 
-// подключаемся к базе 
 $conn = getDBConnection();
 
-// Проверяем авторизацию
 requireAdminAuth($conn);
 
-// Проверяем права доступа
 if (!hasPermission($conn, 'admin')) {
     redirectWithNotification('index.php', 'Недостаточно прав для доступа к этой странице', 'error');
 }
 
-// Вспомогательная функция для безопасного удаления старого файла
 function deleteOldSectionImage($conn, $imagePathSettingKey) {
     $stmt = $conn->prepare("SELECT setting_value FROM settings WHERE setting_key = ?");
     if ($stmt) {
@@ -31,10 +26,8 @@ function deleteOldSectionImage($conn, $imagePathSettingKey) {
     }
 }
 
-// ОБРАБОТКА POST НАСТРОЕК
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    // ПРОВЕРКА НА СБРОС СТИЛЕЙ
     if (isset($_POST['reset_all_styles'])) {
         $styleKeys = [
             'hero_background', 'hero_bg_type', 'hero_bg_color1', 'hero_bg_color2', 'hero_bg_image_path', 'hero_text_color',
@@ -47,7 +40,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ];
         
         foreach ($styleKeys as $key) {
-            // Удаляем из базы
             $stmt = $conn->prepare("DELETE FROM settings WHERE setting_key = ?");
             $stmt->bind_param("s", $key);
             $stmt->execute();
@@ -59,7 +51,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
 
-    // Обработка чекбоксов
     $_POST['setting_form_view'] = isset($_POST['setting_form_view']) && $_POST['setting_form_view'] == 1 ? 1 : 0;
     $_POST['setting_price_view'] = isset($_POST['setting_price_view']) && $_POST['setting_price_view'] == 1 ? 1 : 0;
     $_POST['setting_site_new_view'] = isset($_POST['setting_site_new_view']) && $_POST['setting_site_new_view'] == 1 ? 1 : 0;
@@ -69,8 +60,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $_POST['setting_about_the_company_view'] = isset($_POST['setting_about_the_company_view']) && $_POST['setting_about_the_company_view'] == 1 ? 1 : 0;
     $_POST['setting_geography_of_application_view'] = isset($_POST['setting_geography_of_application_view']) && $_POST['setting_geography_of_application_view'] == 1 ? 1 : 0;
     $_POST['setting_news_artcles_view'] = isset($_POST['setting_news_artcles_view']) && $_POST['setting_news_artcles_view'] == 1 ? 1 : 0;
+    $_POST['setting_office_view'] = isset($_POST['setting_office_view']) && $_POST['setting_office_view'] == 1 ? 1 : 0;
     
-    // Сохраняем ВСЕ поля, которые пришли
     foreach ($_POST as $key => $value) {
         if (strpos($key, 'setting_') === 0) {
             $settingKey = substr($key, 8);
@@ -78,7 +69,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
     
-    // Сохраняем цвета текста (они без префикса setting_)
     $textColorFields = [
         'hero_text_color',
         'for_whom_text_color',
@@ -95,7 +85,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // Если тип фона сменился на solid или gradient, удаляем старый файл
     foreach ($_POST as $key => $value) {
         if (strpos($key, 'setting_') === 0 && strpos($key, '_bg_type') !== false) {
             if ($value !== 'image') {
@@ -107,7 +96,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // Обработка стандартных изображений
     $imageFields = [
         'logo' => 'logo_path',
         'favicon' => 'favicon_path',
@@ -126,7 +114,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // Обработка фонового изображения
     if (isset($_FILES['universal_bg_file']) && $_FILES['universal_bg_file']['error'] === UPLOAD_ERR_OK) {
         $activeSection = '';
         foreach ($_POST as $key => $value) {
@@ -154,14 +141,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     redirectWithNotification('settings.php', 'Настройки успешно сохранены', 'success');
 }
 
-// Получаем все настройки из базы
 $settingsResult = $conn->query("SELECT * FROM settings");
 $settings = [];
 while ($row = $settingsResult->fetch_assoc()) {
     $settings[$row['setting_key']] = $row['setting_value'];
 }
 
-// Подключаем шапку
 require_once __DIR__. '/includes/header.php';
 require_once __DIR__. '/includes/menu.php';
 ?>
@@ -284,6 +269,13 @@ require_once __DIR__. '/includes/menu.php';
                             <input type="checkbox" id="setting_news_artcles_view" name="setting_news_artcles_view" value="1" 
                                 <?php echo (($settings['news_artcles_view'] ?? 0) == 1) ? 'checked' : ''; ?>>
                             Секция "Статьи и новости"
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label for="setting_office_view">
+                            <input type="checkbox" id="setting_office_view" name="setting_office_view" value="1" 
+                                <?php echo (($settings['office_view'] ?? 0) == 1) ? 'checked' : ''; ?>>
+                            Секция "Наши офисы"
                         </label>
                     </div>
                 </div>

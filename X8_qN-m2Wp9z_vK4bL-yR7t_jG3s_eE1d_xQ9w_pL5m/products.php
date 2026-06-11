@@ -1,15 +1,11 @@
 <?php
 
-// Подключаем функции
 require_once __DIR__. '/includes/functions.php';
 
-// подключаемся к базе 
 $conn = getDBConnection();
 
-// Проверяем авторизацию
 requireAdminAuth($conn);
 
-// Проверяем права доступа
 if (!hasPermission($conn, 'editor')) {
     redirectWithNotification('index.php', 'Недостаточно прав для доступа к этой странице', 'error');
 }
@@ -17,10 +13,8 @@ if (!hasPermission($conn, 'editor')) {
 $action = $_GET['action'] ?? 'list';
 $id = $_GET['id'] ?? 0;
 
-// Получаем список категорий через функцию
 $categories = getActiveCategories($conn);
 
-// Обработка добавления/редактирования
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $categoryId = intval($_POST['category_id'] ?? 0);
     $name = cleanInput($_POST['name'] ?? '');
@@ -32,7 +26,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $sortOrder = intval($_POST['sort_order'] ?? 0);
     $imagePath = $_POST['existing_image'] ?? '';
     
-    // Подготовка спецификаций
     $specifications = [];
     if (isset($_POST['spec_key']) && isset($_POST['spec_value'])) {
         $keys = $_POST['spec_key'];
@@ -50,7 +43,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     $specificationsJson = json_encode($specifications, JSON_UNESCAPED_UNICODE);
     
-    // Генерация слага
     $slug = createSlug($name);
     $counter = 1;
     $originalSlug = $slug;
@@ -60,7 +52,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $counter++;
     }
     
-    // Загрузка изображения
     if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
         $uploadResult = uploadImage($_FILES['image']);
         if ($uploadResult['success']) {
@@ -68,11 +59,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
     
-    // Собираем все данные в массив для функций
     $productData = [
         'category_id' => intval($_POST['category_id'] ?? 0),
         'name' => cleanInput($_POST['name'] ?? ''),
-        'slug' => $slug, // уже сгенерированный вами ранее в коде
+        'slug' => $slug,
         'description' => cleanInput($_POST['description'] ?? ''),
         'full_description' => $_POST['full_description'] ?? '',
         'image_path' => $imagePath,
@@ -97,19 +87,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Обработка удаления
 if ($action === 'delete' && $id) {
-    $product = getProductById($conn, $id); // Используем функцию для лога
+    $product = getProductById($conn, $id);
     if ($product && deleteProduct($conn, $id)) {
         logAdminAction($conn, 'product_delete', "Удален товар: " . $product['name']);
         redirectWithNotification('products.php', 'Товар успешно удален', 'success');
     }
 }
 
-// Подключаем шапку
 require_once __DIR__. '/includes/header.php';
 
-// Подключаем меню
 require_once __DIR__. '/includes/menu.php';
 ?>
 
@@ -127,7 +114,6 @@ require_once __DIR__. '/includes/menu.php';
         </div>
         
         <?php 
-            // Подключаем правую шапку
             require_once __DIR__. '/includes/header-right.php';
         ?>
     </header>
@@ -388,6 +374,5 @@ require_once __DIR__. '/includes/menu.php';
     <script src="assets/js/scripts.js"></script>
 
 <?php
-// Подключаем подвал
 require_once __DIR__. '/includes/footer.php';
 ?>

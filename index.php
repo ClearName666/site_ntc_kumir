@@ -5,17 +5,13 @@ require_once __DIR__. '/includes/functions.php';
 require_once __DIR__. '/config/config.php';
 
 
-// подключаемся к базе 
 $conn = getDBConnection();
 $mainTitle = getContentBlock($conn, 'main_title');
-//$mainBgStart = getImage($conn, 'main_background');
 $heroImage = getImage($conn, 'hero_foreground');
 $mapLocation = getMapLocation($conn);
 $videoId = getSetting($conn, 'video_id');
-// $videoThumb = getImage($conn, 'video_thumbnail'); 
 $mainBg = getImage($conn, 'image_background_all');
 
-// Получение настроек отображения 
 $for_whom_view = (getSetting($conn, 'for_whom_view') == 1);
 $our_products_view = (getSetting($conn, 'our_products_view') == 1);
 $advantages_of_our_system_view = (getSetting($conn, 'advantages_of_our_system_view') == 1);
@@ -25,7 +21,6 @@ $news_artcles_view = (getSetting($conn, 'news_artcles_view') == 1);
 $site_new_view = (getSetting($conn, 'site_new_view') == 1);
 
 
-//  Настройки дизайна секций
 $hero_background = getSetting($conn, 'hero_background');
 $for_whom_background = getSetting($conn, 'for_whom_background');
 $our_products_background = getSetting($conn, 'our_products_background');
@@ -36,7 +31,6 @@ $news_artcles_background = getSetting($conn, 'news_artcles_background');
 
 
 
-// --- ДОПОЛНИТЕЛЬНАЯ ПОДГОТОВКА ДЛЯ SEO И СОЦСЕТЕЙ ---
 $siteTitle = getSetting($conn, 'site_title');
 $pageTitle = $siteTitle;
 $pageDescription = 'НТЦ КУМИР — разработка и производство систем автоматизированного учета ресурсов (АСКУЭ), промышленных модемов серии M32 и программного обеспечения для ЖКХ и промышленности в Иркутске.';
@@ -371,16 +365,13 @@ $currentUrl = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 
         <?php if ($news_artcles_view): ?>
             <?php
-                // Получаем по 3 самых свежих записи (функции взяты из вашей архитектуры)
                 $homeNews = function_exists('getNews') ? getNews($conn, 3, 0) : [];
                 $homeArticles = function_exists('getArticles') ? getArticles($conn) : [];
 
-                // Если функция getArticles возвращает всё, то берем первые 3
                 if (!empty($homeArticles) && count($homeArticles) > 3) {
                     $homeArticles = array_slice($homeArticles, 0, 3);
                 }
 
-                // Проверяем, есть ли хоть какой-то контент для отображения
                 $hasNews = !empty($homeNews);
                 $hasArticles = !empty($homeArticles);
                 $hasAnyMedia = $hasNews || $hasArticles;

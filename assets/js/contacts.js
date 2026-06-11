@@ -10,7 +10,6 @@ document.getElementById('contactForm').addEventListener('submit', function(e) {
             
     const formData = new FormData(form);
             
-    // Отправляем запрос на ЭТОТ ЖЕ файл (contacts.php)
     fetch(window.location.href, {
         method: 'POST',
         body: formData
@@ -37,12 +36,9 @@ document.getElementById('contactForm').addEventListener('submit', function(e) {
 
 
 function copyToClipboard(text, element) {
-    // Используем современный API буфера обмена
     navigator.clipboard.writeText(text).then(function() {
-        // Показываем уведомление об успешном копировании
         showCopyNotification(element, 'Скопировано!');
     }).catch(function(err) {
-        // Запасной вариант для старых браузеров
         fallbackCopyText(text, element);
     });
 }
@@ -66,7 +62,6 @@ function fallbackCopyText(text, element) {
 }
 
 function showCopyNotification(element, message, isError = false) {
-    // Создаем элемент уведомления
     const notification = document.createElement('div');
     notification.textContent = message;
     notification.style.cssText = `
@@ -83,14 +78,12 @@ function showCopyNotification(element, message, isError = false) {
         z-index: 1000;
     `;
     
-    // Добавляем относительное позиционирование для элемента
     if (getComputedStyle(element).position === 'static') {
         element.style.position = 'relative';
     }
     
     element.appendChild(notification);
     
-    // Удаляем уведомление через 2 секунды
     setTimeout(() => {
         notification.remove();
     }, 2000);

@@ -25,19 +25,16 @@
     --radius-lg: 20px;
     --radius-badge: 20px;
     --radius-btn: 50px;
+    --image-border-radius: 20px;
+    --image-frame-padding: 10px;
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ========================================
-   БАЗОВЫЕ СТИЛИ И ФОН
-   ======================================== */
 body {
     position: relative;
     z-index: 0;
     min-height: 100vh;
 }
-
-/* Размытый фоновый слой */
 body::before {
     content: "";
     position: fixed;
@@ -49,8 +46,6 @@ body::before {
     filter: blur(40px);
     transform: scale(1.1);
 }
-
-/* Полупрозрачный оверлей */
 body::after {
     content: "";
     position: fixed;
@@ -59,9 +54,7 @@ body::after {
     background: var(--bg-white-strong);
 }
 
-/* ========================================
-   ОБЩИЕ СТИЛИ СТРАНИЦ НОВОСТЕЙ
-   ======================================== */
+/* ========== ОБЩИЕ СТИЛИ ========== */
 .news-page,
 .news-detail-page {
     padding: 120px 0 60px;
@@ -69,16 +62,11 @@ body::after {
     position: relative;
     z-index: 1;
 }
-
-/* ========================================
-   ШАПКА СПИСКА НОВОСТЕЙ
-   ======================================== */
 .news-header {
     text-align: center;
     margin-bottom: 70px;
     animation: fadeInUp 0.8s ease;
 }
-
 .news-page-title {
     font-size: 3rem;
     color: var(--text-dark);
@@ -87,8 +75,6 @@ body::after {
     position: relative;
     display: inline-block;
 }
-
-/* Декоративная линия под заголовком */
 .news-page-title::after {
     content: '';
     position: absolute;
@@ -100,7 +86,6 @@ body::after {
     background: var(--news-primary);
     border-radius: 2px;
 }
-
 .news-page-description {
     font-size: 1.125rem;
     color: var(--text-dark);
@@ -109,18 +94,14 @@ body::after {
     line-height: 1.6;
 }
 
-/* ========================================
-   СЕТКА НОВОСТЕЙ
-   ======================================== */
+/* ========== СЕТКА КАРТОЧЕК ========== */
 .news-grid {
     display: grid;
     gap: 2rem;
     margin-bottom: 3rem;
 }
 
-/* ========================================
-   КАРТОЧКА НОВОСТИ
-   ======================================== */
+/* ========== КАРТОЧКА НОВОСТИ (С РАМКОЙ ДЛЯ ИЗОБРАЖЕНИЯ) ========== */
 .news-card-stack {
     background: var(--bg-white-card);
     backdrop-filter: blur(10px);
@@ -133,22 +114,16 @@ body::after {
     transform: translateY(30px);
     position: relative;
 }
-
-/* Показ карточки */
 .news-card-stack.visible {
     opacity: 1;
     transform: translateY(0);
 }
-
-/* Эффект при наведении */
 .news-card-stack:hover {
     transform: translateY(-5px);
     box-shadow: var(--shadow-red);
     border-left-width: 8px;
     background: var(--bg-white-strong);
 }
-
-/* Индикатор "Новое" для свежих новостей */
 .news-card-stack.new::before {
     content: 'НОВОЕ';
     position: absolute;
@@ -163,57 +138,61 @@ body::after {
     z-index: 2;
     animation: pulse 2s infinite;
 }
-
-/* Ссылка-обёртка */
 .news-link {
     display: block;
     text-decoration: none;
     color: inherit;
 }
 
-/* ========================================
-   ИЗОБРАЖЕНИЕ НОВОСТИ
-   ======================================== */
+/* ----- Контейнер изображения в карточке (обёртка с рамкой) ----- */
 .news-image-container {
-    height: 220px;
-    overflow: hidden;
     position: relative;
+    overflow: hidden;
+    background-color: #f0f0f0;
+    /* Рамка и скругление */
+    border: 2px solid rgba(255, 255, 255, 0.6);
+    border-radius: var(--image-border-radius);
+    margin: 16px;
+    box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.2);
+    transition: var(--transition-smooth);
 }
-
-/* Градиентное затемнение снизу */
-.news-image-container::before {
+/* Размытый фон (если нужно) */
+.news-image-container::after {
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.1) 100%);
-    z-index: 1;
+    background-size: cover;
+    background-position: center;
+    filter: blur(20px);
+    z-index: 0;
+    background-image: inherit;
 }
-
 .news-image-container img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    transition: transform 0.8s ease;
+    object-fit: contain;
+    position: relative;
+    z-index: 1;
+    transition: transform 0.4s ease;
+    border-radius: calc(var(--image-border-radius) - 4px);
 }
-
-/* Увеличение при наведении */
+/* Эффекты при наведении на карточку */
+.news-card-stack:hover .news-image-container {
+    border-color: var(--news-primary);
+    box-shadow: 0 15px 25px -8px rgba(0, 0, 0, 0.3), 0 0 0 2px rgba(231, 76, 60, 0.3);
+    transform: scale(1.02);
+}
 .news-card-stack:hover .news-image-container img {
-    transform: scale(1.1);
+    transform: scale(1.08);
 }
 
-/* ========================================
-   КОНТЕНТ КАРТОЧКИ
-   ======================================== */
+/* Контентная часть */
 .news-content {
     padding: 1.5rem;
     background: var(--bg-content);
     border-radius: var(--radius-md);
     margin: 0.5rem;
 }
-
-/* ========================================
-   ДАТА
-   ======================================== */
 .news-date {
     display: inline-flex;
     align-items: center;
@@ -226,14 +205,6 @@ body::after {
     font-weight: 500;
     margin-bottom: 1rem;
 }
-
-.date-icon {
-    font-size: 0.875rem;
-}
-
-/* ========================================
-   ЗАГОЛОВОК И ОПИСАНИЕ
-   ======================================== */
 .news-title {
     font-size: 1.25rem;
     color: var(--text-dark);
@@ -241,12 +212,9 @@ body::after {
     line-height: 1.4;
     font-weight: 600;
 }
-
-/* Подсветка при наведении */
 .news-card-stack:hover .news-title {
     color: var(--news-primary);
 }
-
 .news-excerpt {
     color: var(--text-gray);
     font-size: 0.9375rem;
@@ -257,10 +225,6 @@ body::after {
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
-
-/* ========================================
-   МЕТА-ИНФОРМАЦИЯ
-   ======================================== */
 .news-meta {
     display: flex;
     justify-content: space-between;
@@ -269,26 +233,20 @@ body::after {
     border-top: var(--border-light);
     font-size: 0.875rem;
 }
-
 .news-author {
     color: var(--text-light);
     font-style: italic;
 }
-
 .read-more {
     color: var(--news-primary);
     font-weight: 500;
     transition: all 0.3s;
 }
-
-/* Анимация "Подробнее" при наведении */
 .news-card-stack:hover .read-more {
     transform: translateX(5px);
 }
 
-/* ========================================
-   СТРАНИЦА ОТДЕЛЬНОЙ НОВОСТИ
-   ======================================== */
+/* ========== ДЕТАЛЬНАЯ СТРАНИЦА НОВОСТИ ========== */
 .news-detail-container {
     max-width: 1400px;
     margin: 0 auto;
@@ -299,20 +257,16 @@ body::after {
     box-shadow: var(--shadow-md);
     animation: slideUp 0.8s ease;
 }
-
-/* Шапка новости */
 .news-detail-header {
     padding: 3rem 3rem 2rem;
     border-bottom: var(--border-light);
 }
-
 .news-detail-title {
     font-size: 2.5rem;
     color: var(--text-dark);
     margin-bottom: 1rem;
     line-height: 1.3;
 }
-
 .news-detail-meta {
     display: flex;
     gap: 1.5rem;
@@ -322,11 +276,37 @@ body::after {
     margin-top: 1.5rem;
 }
 
-/* Изображение новости */
+/* ----- КРАСИВАЯ РАМКА ДЛЯ БОЛЬШОГО ИЗОБРАЖЕНИЯ (как в статьях) ----- */
+.news-detail-image-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    background: rgba(0, 0, 0, 0.02);
+}
+.image-frame {
+    display: inline-block;
+    padding: 12px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.5), rgba(255,255,255,0.1));
+    border-radius: 32px;
+    box-shadow: 0 25px 35px -12px rgba(0, 0, 0, 0.25), inset 0 1px 1px rgba(255,255,255,0.6);
+    transition: var(--transition-smooth);
+}
+.image-frame:hover {
+    transform: scale(1.01);
+    box-shadow: 0 30px 40px -15px rgba(0, 0, 0, 0.3), inset 0 1px 2px rgba(255,255,255,0.8);
+}
 .news-detail-image {
-    width: 100%;
-    height: 400px;
-    object-fit: cover;
+    max-width: 100%;
+    height: auto;
+    max-height: 500px;
+    object-fit: contain;
+    border-radius: 24px;
+    display: block;
+    transition: transform 0.5s ease;
+}
+.image-frame:hover .news-detail-image {
+    transform: scale(1.02);
 }
 
 /* Тело новости */
@@ -335,30 +315,22 @@ body::after {
     line-height: 1.8;
     font-size: 1.125rem;
 }
-
 .news-detail-body h2,
 .news-detail-body h3 {
     color: var(--text-dark);
     margin: 2rem 0 1rem;
 }
-
 .news-detail-body ul,
 .news-detail-body ol {
     margin: 1rem 0 1rem 2rem;
 }
-
 .news-detail-body li {
     margin-bottom: 0.5rem;
 }
-
-/* ========================================
-   КНОПКА "НАЗАД"
-   ======================================== */
 .back-to-news {
     text-align: center;
     padding: 2rem 0;
 }
-
 .back-to-news .btn {
     display: inline-flex;
     align-items: center;
@@ -372,7 +344,6 @@ body::after {
     transition: var(--transition-smooth);
     box-shadow: var(--shadow-btn);
 }
-
 .back-to-news .btn:hover {
     background: var(--news-dark);
     transform: translateY(-2px);
@@ -380,9 +351,7 @@ body::after {
     gap: 1rem;
 }
 
-/* ========================================
-   ПАГИНАЦИЯ
-   ======================================== */
+/* ========== ПАГИНАЦИЯ ========== */
 .pagination {
     display: flex;
     justify-content: center;
@@ -391,7 +360,6 @@ body::after {
     margin-top: 3rem;
     flex-wrap: wrap;
 }
-
 .page-link {
     display: inline-flex;
     align-items: center;
@@ -407,129 +375,176 @@ body::after {
     font-weight: 500;
     transition: var(--transition-smooth);
 }
-
 .page-link:hover,
 .page-link.active {
     background: var(--news-primary);
     border-color: var(--news-primary);
     color: white;
 }
-
 .page-link.prev,
 .page-link.next {
     min-width: 100px;
 }
-
 .page-dots {
     padding: 0 0.5rem;
     color: var(--text-meta);
 }
-
-/* ========================================
-   ПУСТАЯ СТРАНИЦА
-   ======================================== */
 .no-news {
     text-align: center;
     padding: 4rem 1rem;
 }
-
 .no-news p {
     font-size: 1.125rem;
     color: var(--text-light);
 }
 
-/* ========================================
-   АНИМАЦИИ
-   ======================================== */
+/* ========== АНИМАЦИИ ========== */
 @keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
 }
-
 @keyframes slideUp {
-    from {
-        opacity: 0;
-        transform: translateY(50px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(50px); }
+    to { opacity: 1; transform: translateY(0); }
 }
-
 @keyframes pulse {
     0% { transform: scale(1); }
     50% { transform: scale(1.05); }
     100% { transform: scale(1); }
 }
 
-/* ========================================
-   АДАПТИВНОСТЬ
-   ======================================== */
+/* ========== SKELETON (оставляем без изменений) ========== */
+.skeleton-news {
+    max-width: 900px;
+    margin: 0 auto;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+    background-color: var(--bg-white-semi);
+    backdrop-filter: blur(10px);
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+}
+.skeleton-news-header {
+    padding: 3rem 3rem 2rem;
+    border-bottom: var(--border-light);
+    text-align: center;
+}
+.skeleton-news-body {
+    padding: 2.5rem 3rem 3rem;
+}
+.skeleton-item {
+    position: relative;
+    overflow: hidden;
+    background: #e5e7eb;
+    border-radius: 8px;
+}
+.skeleton-item::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(100deg, transparent 20%, rgba(255,255,255,0.6) 50%, transparent 80%);
+    transform: translateX(-100%);
+    animation: shimmer 1.4s infinite;
+}
+@keyframes shimmer {
+    100% { transform: translateX(100%); }
+}
+.skeleton-title {
+    height: 34px;
+    width: 65%;
+    margin: 0 auto 20px;
+}
+.skeleton-meta {
+    height: 14px;
+    width: 50%;
+    margin: 0 auto;
+}
+.skeleton-image {
+    width: 100%;
+    height: 400px;
+}
+.skeleton-text {
+    height: 16px;
+    margin-bottom: 12px;
+}
+.skeleton-text.short {
+    width: 60%;
+}
+.skeleton-hide {
+    animation: skeletonFadeOut 0.6s ease forwards;
+}
+@keyframes skeletonFadeOut {
+    to { opacity: 0; }
+}
+.content-show {
+    animation: contentFadeIn 0.6s ease forwards;
+}
+@keyframes contentFadeIn {
+    from { opacity: 0; transform: translateY(10px); filter: blur(4px); }
+    to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+.hidden {
+    display: none;
+}
+
+/* ========== АДАПТИВНОСТЬ ========== */
 @media (max-width: 992px) {
     .news-grid {
         grid-template-columns: repeat(2, 1fr);
     }
-    
     .news-detail-title {
         font-size: 2rem;
     }
 }
-
 @media (max-width: 768px) {
     .news-page,
     .news-detail-page {
         padding: 100px 0 40px;
     }
-    
     .news-page-title {
         font-size: 2.25rem;
     }
-    
     .news-grid {
         grid-template-columns: 1fr;
     }
-    
     .news-detail-header,
     .news-detail-body {
         padding: 1.5rem;
     }
-    
     .news-detail-meta {
         flex-direction: column;
         align-items: flex-start;
         gap: 0.5rem;
     }
-    
+    .image-frame {
+        padding: 8px;
+    }
     .news-detail-image {
-        height: 250px;
+        max-height: 350px;
     }
 }
-
 @media (max-width: 480px) {
     .news-page-title {
         font-size: 1.75rem;
     }
-    
     .news-detail-title {
         font-size: 1.5rem;
     }
-    
     .pagination {
         gap: 0.25rem;
     }
-    
     .page-link.prev,
     .page-link.next {
         min-width: 80px;
         font-size: 0.875rem;
     }
+    .image-frame {
+        padding: 6px;
+        border-radius: 24px;
+    }
+    .news-detail-image {
+        border-radius: 18px;
+    }
 }
-
-

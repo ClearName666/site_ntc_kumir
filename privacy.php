@@ -1,17 +1,15 @@
 <?php
-// Подключаем конфигурацию сайта
 require_once __DIR__ . '/config/config.php';
 require_once __DIR__. '/includes/functions.php';
 $footerPath = __DIR__. '/includes/footer.php';
 $headerPath = __DIR__. '/includes/header.php';
 
-// подключаемся к базе 
 $conn = getDBConnection();
 $mainBg = getImage($conn, 'image_background_all');
 $email = getSetting($conn, 'company_email'); 
 $copmany_name = getSetting($conn, 'company_name');
-$domen = "https://ntckumir.ru";
-$privacy = "https://ntckumir.ru/privacy.php";
+$domen = "https:
+$privacy = "https:
 ?>
 <!DOCTYPE html>
 <html lang="ru">

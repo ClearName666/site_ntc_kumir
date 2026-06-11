@@ -1,16 +1,15 @@
 <?php
 
-// define('DB_HOST', 'localhost');
-// define('DB_USER', 'root');
-// define('DB_PASS', 'password');
-// define('DB_NAME', 'ntc-kumir');
-
 define('DB_HOST', 'localhost');
-define('DB_USER', 'admin');
-define('DB_PASS', 'x9zn3gp5');
+define('DB_USER', 'root');
+define('DB_PASS', 'password');
 define('DB_NAME', 'ntc-kumir');
 
-// Функция подключения к БД
+// define('DB_HOST', 'localhost');
+// define('DB_USER', 'admin');
+// define('DB_PASS', 'x9zn3gp5');
+// define('DB_NAME', 'ntc-kumir');
+
 function getDBConnection() {
     static $conn = null;
     
@@ -21,12 +20,10 @@ function getDBConnection() {
             die("Ошибка подключения: " . $conn->connect_error);
         }
         
-        // Устанавливаем кодировку UTF-8 для соединения
         if (!$conn->set_charset("utf8mb4")) {
             die("Ошибка установки кодировки utf8mb4: " . $conn->error);
         }
         
-        // Устанавливаем дополнительные настройки для работы с UTF-8
         $conn->query("SET NAMES 'utf8mb4'");
         $conn->query("SET CHARACTER SET utf8mb4");
         $conn->query("SET character_set_connection = utf8mb4");

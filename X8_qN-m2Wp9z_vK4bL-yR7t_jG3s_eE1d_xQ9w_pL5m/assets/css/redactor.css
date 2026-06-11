@@ -1,4 +1,3 @@
-/* ===== ПЕРЕМЕННЫЕ ЦВЕТОВ ===== */
 :root {
     --bg-modal-overlay: rgba(0, 0, 0, 0.5);
     --bg-white: #ffffff;
@@ -20,12 +19,10 @@
     --transition: all 0.2s ease;
 }
 
-/* ===== ГЛОБАЛЬНЫЕ СТИЛИ РЕДАКТОРА ===== */
 .article-builder {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
-/* ----- Модальное окно ----- */
 .builder-modal {
     display: none;
     position: fixed;
@@ -93,7 +90,6 @@
     padding: 24px;
 }
 
-/* ----- Панель инструментов (sticky, закруглённая) ----- */
 .builder-toolbar {
     background: var(--bg-white);
     border-radius: 60px;
@@ -142,7 +138,6 @@
     transform: translateY(-1px);
 }
 
-/* ----- Сетка блоков (2 колонки) ----- */
 .builder-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -150,7 +145,6 @@
     min-height: 400px;
 }
 
-/* ----- Карточка блока ----- */
 .builder-block {
     background: var(--bg-white);
     border: 2px solid var(--border-light);
@@ -161,7 +155,6 @@
     min-height: 150px;
     display: flex;
     flex-direction: column;
-    /* Убираем cursor: move, чтобы не мешать выделению текста */
     cursor: default;
 }
 
@@ -179,7 +172,6 @@
     background: #eff6ff;
 }
 
-/* ----- Ручка перетаскивания (только за неё) ----- */
 .builder-block__drag-handle {
     position: absolute;
     left: -12px;
@@ -206,7 +198,6 @@
     background: var(--border-medium);
 }
 
-/* ----- Кнопка удаления блока ----- */
 .builder-block__delete {
     position: absolute;
     top: -10px;
@@ -231,7 +222,6 @@
     transform: scale(1.1);
 }
 
-/* ----- Панель форматирования текста ----- */
 .builder-text-toolbar {
     background: var(--bg-gray-50);
     border: 1px solid var(--border-light);
@@ -258,7 +248,6 @@
     background: var(--bg-gray-200);
 }
 
-/* Редактируемая область текста */
 .builder-editable {
     outline: none;
     flex: 1;
@@ -275,7 +264,6 @@
     outline-offset: 2px;
 }
 
-/* ----- Блок изображения ----- */
 .builder-image-block {
     text-align: center;
     min-height: 200px;
@@ -296,7 +284,6 @@
     background: transparent;
 }
 
-/* ----- Слайдер ----- */
 .builder-slider-block {
     position: relative;
     border-radius: 24px;
@@ -410,7 +397,6 @@
     z-index: 10;
 }
 
-/* ----- Блок перечисления (list) ----- */
 .list-block {
     background: var(--bg-white);
 }
@@ -440,7 +426,6 @@
     transform: translateX(4px);
 }
 
-/* Стеклянный эффект (glass-frame) */
 .glass-frame,
 .builder-block.glass-frame {
     background: var(--glass-bg);
@@ -449,7 +434,6 @@
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
-/* ----- Адаптивность (мобильные) ----- */
 @media (max-width: 768px) {
     .builder-grid {
         grid-template-columns: 1fr;
@@ -472,7 +456,6 @@
     }
 }
 
-/* ----- Анимации ----- */
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }

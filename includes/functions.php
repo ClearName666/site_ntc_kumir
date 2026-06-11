@@ -1,31 +1,23 @@
 <?php
 
-require_once __DIR__ . '/../Cache.php'; // путь к классу кэша
+require_once __DIR__ . '/../Cache.php';
 $cache = new Cache();
 
-// Подключаем database.php
 require_once __DIR__ . '/../config/database.php';
 
-// Подключаем функции статей
 require_once __DIR__ . '/article-functions.php';
 
-// Подключаем функции вопрос ответ
 require_once __DIR__ . '/faq-functions.php';
 
-// Подключаем функции новостей
 require_once __DIR__ . '/news-functions.php';
 
-// Подключаем функции продукции
 require_once __DIR__ . '/product-functions.php';
 
-// Подключаем функции контактов и FAQ
 require_once __DIR__ . '/contact-functions.php';
 
-// Подключаем функции аутентификации
 require_once __DIR__ . '/auth-functions.php';
 
 
-// Функция для получения изображения
 function getImage($conn, $key) {
     global $cache;
     $cacheKey = "image_key_" . $key;
@@ -43,9 +35,7 @@ function getImage($conn, $key) {
     return $result;
 }
 
-// Функция для получения координат карты
 function getMapLocation($conn) {
-    // $conn = getDBConnection();
     $result = $conn->query("SELECT latitude, longitude, zoom, marker_title FROM map_location LIMIT 1");
     
     if ($row = $result->fetch_assoc()) {
@@ -55,7 +45,6 @@ function getMapLocation($conn) {
     return ['latitude' => 0, 'longitude' => 0, 'zoom' => 12, 'marker_title' => ''];
 }
 
-// Остальные функции остаются как были, но обновим advantages для отображения в две колонки
 function renderAdvantages($conn) {
     $advantages = getAdvantages($conn);
     echo '<div class="advantages-grid">';
@@ -65,20 +54,16 @@ function renderAdvantages($conn) {
         echo '<div class="advantage-icon">';
         
         $fileName = !empty($advantage['icon_path']) ? basename($advantage['icon_path']) : '';
-        // Полный путь для проверки на сервере (относительно этого файла)
         $serverPath = __DIR__ . '/../assets/images/uploads/' . $fileName;
-        // Путь для браузера
         $browserPath = '/assets/images/uploads/' . $fileName;
 
-        // Если путь в базе не пустой И файл реально существует на диске
         if (!empty($fileName) && file_exists($serverPath)) {
             echo '<img src="' . $browserPath . '" alt="' . htmlspecialchars($advantage['title']) . '">';
         } else {
-            // Если картинки нет или она не нашлась — ставим галочку
             echo '<span>✓</span>';
         }
         
-        echo '</div>'; // Конец .advantage-icon
+        echo '</div>';
 
         echo '<h3 class="advantage-title">' . htmlspecialchars($advantage['title']) . '</h3>';
         echo '</div>';
@@ -88,7 +73,6 @@ function renderAdvantages($conn) {
     echo '</div>';
 }
 
-// PHP-функция: Добавляем пустой span для будущей точки перед текстом
 function renderFeatures($conn) {
     $features = getFeatures($conn);
     foreach ($features as $feature) {
@@ -122,7 +106,6 @@ function renderStatistics($conn) {
     }
 }
 
-// Функция для получения меню из базы данных
 function getNavigationMenu($conn) {
     global $cache;
     $cacheKey = "system_menu";
@@ -139,7 +122,6 @@ function getNavigationMenu($conn) {
 
 
 
-// Функция для безопасного обрезания строки с поддержкой UTF-8
 function safeSubstr($string, $start, $length = null) {
     if (empty($string)) {
         return '';
@@ -151,15 +133,12 @@ function safeSubstr($string, $start, $length = null) {
         }
         return mb_substr($string, $start, $length, 'UTF-8');
     } else {
-        // Используем substr с проверкой мультибайтовых символов
         if ($length === null) {
             return substr($string, $start);
         }
         
-        // Попытка сохранить целостность UTF-8 строки
         $result = substr($string, $start, $length);
         
-        // Если обрезали середину мультибайтового символа, исправляем
         if (strlen($result) > 0) {
             while (strlen($result) > 0 && ord($result[strlen($result) - 1]) > 127) {
                 $result = substr($result, 0, -1);
@@ -170,7 +149,6 @@ function safeSubstr($string, $start, $length = null) {
     }
 }
 
-// Функция для безопасного обрезания строки для мета-описаний
 function truncateDescription($text, $length = 160) {
     $text = strip_tags($text);
     $text = html_entity_decode($text, ENT_QUOTES, 'UTF-8');

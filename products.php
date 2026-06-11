@@ -1,5 +1,4 @@
 <?php
-// Подключаем функции
 require_once __DIR__ . '/includes/functions.php';
 require_once __DIR__ . '/config/config.php';
 
@@ -40,7 +39,6 @@ if ($product) {
     $allCategories = getProductCategories($conn);
 }
 
-// SEO и мета-теги
 $siteTitle = getSetting($conn, 'site_title');
 $defaultSocialImage = getSetting($conn, 'social_default_image');
 $currentUrl = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
@@ -143,11 +141,13 @@ $footerPath = 'includes/footer.php';
                     <div class="product-detail-layout">
                         <div class="product-detail-image">
                             <?php if (!empty($productData['image_path'])): ?>
-                                <img src="<?= $productData['image_path'] ?>" alt="<?= htmlspecialchars($productData['name']) ?>" loading="lazy">
+                                <div class="image-frame">
+                                    <img src="<?= $productData['image_path'] ?>" alt="<?= htmlspecialchars($productData['name']) ?>" loading="lazy">
+                                </div>
                             <?php endif; ?>
                         </div>
-
                     </div>
+
                         <div class="product-sidebar-card">
                             <div class="product-price-value"><?php if ($showPrice) echo number_format($productData['price'], 0, '.', ' ') . ' ₽'; ?></div>
                             <div class="product-availability"><?= $productData['is_available'] ? 'В наличии' : 'Под заказ' ?></div>
@@ -265,8 +265,8 @@ $footerPath = 'includes/footer.php';
         </div>
     </section>
     <?php include $footerPath; ?>
-    <script src="assets/js/main.js"></script>
-    <script src="assets/js/products.js"></script>
+    <script src="/assets/js/main.js"></script>
+    <script src="/assets/js/products.js"></script>
     <script>
         window.addEventListener('load', function() {
             window.scrollBy(0, 1);

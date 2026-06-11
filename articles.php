@@ -1,27 +1,20 @@
 <?php
-// Подключаем функции с правильным путем
 require_once __DIR__. '/includes/functions.php';
 require_once __DIR__. '/config/config.php';
 
-// подключаемся к базе 
 $conn = getDBConnection();
 $mainBg = getImage($conn, 'image_background_all');
-// Проверяем, запрошена ли конкретная статья
 $article = null;
 if (isset($_GET['article']) && !empty($_GET['article'])) {
     $article = getArticleBySlug($conn, $_GET['article']);
     
     if ($article) {
-        // 1. Сначала плюсуем в базе
         incrementArticleViews($conn, $article['id']);
         
-        // 2. Сразу подменяем значение в текущем массиве на актуальное из БД
-        // Таким образом, на текущей странице сразу будет +1
         $article['views'] = getActualViews($conn, $article['id']);
     }
 }
 
-// Устанавливаем мета-данные страницы
 if ($article) {
     $pageTitle = htmlspecialchars($article['title']) . ' - ' . getSetting($conn, 'site_title');
     $pageDescription = htmlspecialchars(strip_tags($article['excerpt'] ?? $article['content']));
@@ -35,12 +28,10 @@ if ($article) {
     $pageImage = getSetting($conn, 'logo_path');
 }
 
-// Подготавливаем данные для страницы со статьями
 if (!$article) {
     $articles = getArticles($conn);
 }
 
-// Определяем путь к header и footer
 $headerPath = __DIR__. '/includes/header.php';
 $footerPath = __DIR__. '/includes/footer.php';
 ?>
@@ -278,12 +269,15 @@ $footerPath = __DIR__. '/includes/footer.php';
                             <span class="article-views">👁 <?= $article['views'] ?> просмотров</span>
                         </div>
                     </header>
-
                     <?php if (!empty($article['image_path'])): ?>
-                        <img src="<?= htmlspecialchars($article['image_path']) ?>"
-                            alt="<?= htmlspecialchars($article['title']) ?>"
-                            class="article-detail-image"
-                            loading="lazy">
+                        <div class="article-detail-image-wrapper">
+                            <div class="image-frame">
+                            <img src="<?= htmlspecialchars($article['image_path']) ?>"
+                                alt="<?= htmlspecialchars($article['title']) ?>"
+                                class="article-detail-image"
+                                loading="lazy">
+                            </div>
+                        </div>
                     <?php endif; ?>
 
                     <div class="article-body">
@@ -334,7 +328,6 @@ $footerPath = __DIR__. '/includes/footer.php';
                 </header>
                 
                 <?php 
-                // Проверяем, есть ли статьи
                 if (isset($articles) && !empty($articles)): 
                 ?>
                     <div class="articles-stack">
@@ -343,12 +336,12 @@ $footerPath = __DIR__. '/includes/footer.php';
                                 <a href="?article=<?= urlencode($item['slug']) ?>" 
                                    class="article-link-stack"
                                    aria-label="Читать статью: <?= htmlspecialchars($item['title']) ?>">
-                                   
+                                
                                     <?php if (!empty($item['image_path'])): ?>
-                                        <div class="article-image-container">
+                                        <div class="article-image-container" style="background-image: url('<?= htmlspecialchars($item['image_path']) ?>');">
                                             <img src="<?= htmlspecialchars($item['image_path']) ?>" 
-                                                 alt="<?= htmlspecialchars($item['title']) ?>"
-                                                 loading="lazy">
+                                                alt="<?= htmlspecialchars($item['title']) ?>"
+                                                loading="lazy">
                                         </div>
                                     <?php endif; ?>
                                     
@@ -397,6 +390,6 @@ $footerPath = __DIR__. '/includes/footer.php';
     <?php include $footerPath; ?>
     
     <!-- Скрипты -->
-    <script src="assets/js/articles.js"></script>
+    <script src="/assets/js/articles.js"></script>
 </body>
 </html>

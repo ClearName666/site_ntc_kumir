@@ -56,22 +56,18 @@ document.addEventListener("DOMContentLoaded", function() {
         gradColor1.value = data.c1 || '#ffffff';
         gradColor2.value = data.c2 || '#ffffff';
         
-        // ЗАГРУЖАЕМ СОХРАНЕННЫЙ ЦВЕТ ТЕКСТА
         if (textColorInput && data.textColor && data.textColor !== '') {
             textColorInput.value = data.textColor;
-            textColorInput.dataset.manuallySet = 'true'; // Важно! Чтобы не перезаписался
+            textColorInput.dataset.manuallySet = 'true';
         } else if (textColorInput) {
-            // Если нет сохраненного цвета - подбираем автоматически
             textColorInput.value = getContrastColor(data.c1 || '#ffffff');
             textColorInput.dataset.manuallySet = 'false';
         }
 
-        // Обновляем отображение hex-кода
         if (textColorHex && textColorInput) {
             textColorHex.textContent = textColorInput.value;
         }
 
-        // Загружаем превью изображения
         if (data.img && data.type === 'image') {
             imageThumb.src = '../' + data.img;
             imageThumb.style.display = 'block';
@@ -119,7 +115,6 @@ document.addEventListener("DOMContentLoaded", function() {
             currentBgColor = '#ffffff';
         }
 
-        // Автоподбор цвета текста ТОЛЬКО если не был установлен вручную
         if (textColorInput && !textColorInput.dataset.manuallySet || textColorInput.dataset.manuallySet === 'false') {
             const autoColor = getContrastColor(currentBgColor);
             textColorInput.value = autoColor;
@@ -128,7 +123,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
         previewBox.innerText = sectionSelector.options[sectionSelector.selectedIndex].text;
 
-        // Настройка скрытых полей
         let prefix = currentSection.replace('_background', '');
         
         finalCss.name = `setting_${currentSection}`;
@@ -143,22 +137,19 @@ document.addEventListener("DOMContentLoaded", function() {
         finalColor2.name = `setting_${prefix}_bg_color2`;
         finalColor2.value = c2_val;
 
-        // Цвет текста - сохраняем БЕЗ префикса setting_
         if (finalTextColor && textColorInput) {
             finalTextColor.name = `${prefix}_text_color`;
             finalTextColor.value = textColorInput.value;
         }
 
-        // Обновляем предпросмотр текста
         if (textColorInput) {
             updateTextPreview(textColorInput.value);
         }
     }
 
-    // Обработчики событий
     if (textColorInput) {
         textColorInput.addEventListener('input', function() {
-            this.dataset.manuallySet = 'true'; // Пользователь вручную выбрал цвет
+            this.dataset.manuallySet = 'true';
             updateTextPreview(this.value);
             renderUpdates();
         });
@@ -173,24 +164,21 @@ document.addEventListener("DOMContentLoaded", function() {
             
             const contrastColor = getContrastColor(bgColor);
             textColorInput.value = contrastColor;
-            textColorInput.dataset.manuallySet = 'true'; // Автоподбор тоже считается ручной установкой
+            textColorInput.dataset.manuallySet = 'true';
             updateTextPreview(contrastColor);
             renderUpdates();
         });
     }
 
     sectionSelector.addEventListener('change', function() {
-        // При смене секции загружаем её настройки
         loadSectionSettings();
     });
     
     bgTypeSelect.addEventListener('change', function() {
-        // При смене типа фона НЕ сбрасываем ручной цвет текста
         renderUpdates();
     });
     
     colorSolid.addEventListener('input', function() {
-        // При изменении цвета фона, если цвет текста не задан вручную - автоподбор
         if (textColorInput && (!textColorInput.dataset.manuallySet || textColorInput.dataset.manuallySet === 'false')) {
             const autoColor = getContrastColor(this.value);
             textColorInput.value = autoColor;
@@ -227,6 +215,5 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // Начальная загрузка
     loadSectionSettings();
 });

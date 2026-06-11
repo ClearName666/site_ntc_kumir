@@ -4,25 +4,20 @@ session_start();
 include 'deleteFile.php';
 require_once __DIR__ . '/../../Cache.php'; 
 
-$cache = new Cache(); // Вот эта строчка создает объект
+$cache = new Cache();
 
-// Определяем корень сайта относительно этого файла
 if (!defined('BASE_PATH')) {
     define('BASE_PATH', realpath(__DIR__ . '/../../'));
 }
 
-// Подключаем базу данных уже через константу
 require_once BASE_PATH . '/config/database.php';
 
-// Проверка авторизации администратора
 function requireAdminAuth($conn) {
     if (!isset($_SESSION['admin_id']) || !isset($_SESSION['admin_token'])) {
         header('Location: login.php');
         exit();
     }
     
-    // Проверка валидности токена
-    // $conn = getDBConnection();
     $stmt = $conn->prepare("SELECT id FROM admins WHERE id = ? AND is_active = 1");
     $stmt->bind_param("i", $_SESSION['admin_id']);
     $stmt->execute();
@@ -35,13 +30,11 @@ function requireAdminAuth($conn) {
     }
 }
 
-// Получение информации о текущем администраторе
 function getCurrentAdmin($conn) {
     if (!isset($_SESSION['admin_id'])) {
         return null;
     }
     
-    // $conn = getDBConnection();
     $stmt = $conn->prepare("SELECT * FROM admins WHERE id = ?");
     $stmt->bind_param("i", $_SESSION['admin_id']);
     $stmt->execute();
@@ -50,7 +43,6 @@ function getCurrentAdmin($conn) {
     return $result->fetch_assoc();
 }
 
-// Проверка прав администратора
 function hasPermission($conn, $requiredRole = 'admin') {
     $admin = getCurrentAdmin($conn);
     
@@ -67,15 +59,7 @@ function hasPermission($conn, $requiredRole = 'admin') {
     return $roles[$admin['role']] >= $roles[$requiredRole];
 }
 
-// // Функция для установки уведомления
-// function setNotification($message, $type = 'info') {
-//     $_SESSION['notification'] = [
-//         'message' => $message,
-//         'type' => $type
-//     ];
-// }
 
-// Функция для установки уведомления в сессию
 function setNotification($message, $type = 'info') {
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
@@ -86,7 +70,6 @@ function setNotification($message, $type = 'info') {
     ];
 }
 
-// Функция для получения и очистки уведомления
 function getNotification() {
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
@@ -101,16 +84,13 @@ function getNotification() {
     return null;
 }
 
-// Функция для редиректа с уведомлением
 function redirectWithNotification($url, $message, $type = 'info') {
     setNotification($message, $type);
     header("Location: $url");
     exit();
 }
 
-// Функция для получения пагинации
 function getPagination($conn, $table, $perPage = 10, $where = '') {
-    // $conn = getDBConnection();
     
     if ($where) {
         $countQuery = "SELECT COUNT(*) as total FROM $table WHERE $where";
@@ -135,7 +115,6 @@ function getPagination($conn, $table, $perPage = 10, $where = '') {
     ];
 }
 
-// Функция для генерации ссылок пагинации
 function generatePaginationLinks($pagination, $urlParams = '') {
     $currentPage = $pagination['currentPage'];
     $totalPages = $pagination['totalPages'];
@@ -146,13 +125,11 @@ function generatePaginationLinks($pagination, $urlParams = '') {
     
     $links = '<div class="pagination">';
     
-    // Предыдущая страница
     if ($currentPage > 1) {
         $prevPage = $currentPage - 1;
         $links .= '<a href="?page=' . $prevPage . $urlParams . '" class="page-link"><i class="fas fa-chevron-left"></i></a>';
     }
     
-    // Номера страниц
     $startPage = max(1, $currentPage - 2);
     $endPage = min($totalPages, $currentPage + 2);
     
@@ -161,7 +138,6 @@ function generatePaginationLinks($pagination, $urlParams = '') {
         $links .= '<a href="?page=' . $i . $urlParams . '" class="page-link' . $activeClass . '">' . $i . '</a>';
     }
     
-    // Следующая страница
     if ($currentPage < $totalPages) {
         $nextPage = $currentPage + 1;
         $links .= '<a href="?page=' . $nextPage . $urlParams . '" class="page-link"><i class="fas fa-chevron-right"></i></a>';
@@ -172,9 +148,7 @@ function generatePaginationLinks($pagination, $urlParams = '') {
     return $links;
 }
 
-// Функция для логирования действий администратора
 function logAdminAction($conn, $action, $description = null, $adminId = null) {
-    // $conn = getDBConnection();
     
     if ($adminId === null && isset($_SESSION['admin_id'])) {
         $adminId = $_SESSION['admin_id'];
@@ -182,7 +156,6 @@ function logAdminAction($conn, $action, $description = null, $adminId = null) {
     
     $ipAddress = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
     
-    // Подготовка описания для UTF-8
     $description = $description ?? '';
     
     $stmt = $conn->prepare("INSERT INTO admin_logs (admin_id, action, description, ip_address) VALUES (?, ?, ?, ?)");
@@ -200,9 +173,7 @@ function logAdminAction($conn, $action, $description = null, $adminId = null) {
     $stmt->close();
 }
 
-// Функция для очистки входных данных
 function cleanInput($data) {
-    // Проверяем, что данные не null
     if ($data === null) {
         return '';
     }
@@ -213,16 +184,13 @@ function cleanInput($data) {
     return $data;
 }
 
-// Функция для создания слага (URL-friendly строка)
 function createSlug($string) {
-    // Приводим к нижнему регистру
     if (function_exists('mb_strtolower')) {
         $string = mb_strtolower($string, 'UTF-8');
     } else {
         $string = strtolower($string);
     }
     
-    // Транслитерация русских букв
     $ru = ['а','б','в','г','д','е','ё','ж','з','и','й','к','л','м','н','о','п',
            'р','с','т','у','ф','х','ц','ч','ш','щ','ъ','ы','ь','э','ю','я',
            'А','Б','В','Г','Д','Е','Ё','Ж','З','И','Й','К','Л','М','Н','О','П',
@@ -234,21 +202,16 @@ function createSlug($string) {
     
     $string = str_replace($ru, $en, $string);
     
-    // Заменяем все не-латинские буквы, цифры и дефисы
     $string = preg_replace('/[^a-z0-9\-]/', '-', $string);
     
-    // Удаляем повторяющиеся дефисы
     $string = preg_replace('/-+/', '-', $string);
     
-    // Удаляем дефисы в начале и конце
     $string = trim($string, '-');
     
     return $string;
 }
 
-// Функция для проверки уникальности слага
 function isSlugUnique($conn, $table, $slug, $excludeId = null) {
-    // $conn = getDBConnection();
     
     if ($excludeId) {
         $stmt = $conn->prepare("SELECT COUNT(*) as count FROM $table WHERE slug = ? AND id != ?");
@@ -265,7 +228,6 @@ function isSlugUnique($conn, $table, $slug, $excludeId = null) {
     return $row['count'] == 0;
 }
 
-// Функция для загрузки изображения (исправленная версия)
 function uploadImage($file, $targetDir = '../assets/images/uploads/', $maxSize = 1048576) {
     if (!isset($file['error']) || $file['error'] === UPLOAD_ERR_NO_FILE) {
         return ['success' => false, 'error' => 'Файл не выбран'];
@@ -287,14 +249,12 @@ function uploadImage($file, $targetDir = '../assets/images/uploads/', $maxSize =
         return ['success' => false, 'error' => 'Ошибка загрузки: ' . $file['error']];
     }
 
-    // ПРОВЕРКА РАЗМЕРА ФАЙЛА (добавлено)
     if ($file['size'] > $maxSize) {
         $sizeInMB = $maxSize / 1048576;
         $fileSizeInMB = round($file['size'] / 1048576, 2);
         return ['success' => false, 'error' => "Файл слишком большой. Максимальный размер: {$sizeInMB} МБ. Ваш файл: {$fileSizeInMB} МБ"];
     }
     
-    // 1. РАЗРЕШАЕМ SVG И ЛЮБОЙ РЕГИСТР
     $fileName = $file['name'];
     $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
     $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'];
@@ -303,9 +263,8 @@ function uploadImage($file, $targetDir = '../assets/images/uploads/', $maxSize =
         return ['success' => false, 'error' => 'Недопустимый тип: ' . $fileExtension];
     }
     
-    // 2. ОБРАБОТКА SVG (getimagesize для них не работает)
     $isSvg = ($fileExtension === 'svg');
-    $imageInfo = [0, 0, 'mime' => 'image/svg+xml']; // Значения по умолчанию для SVG
+    $imageInfo = [0, 0, 'mime' => 'image/svg+xml'];
 
     if (!$isSvg) {
         $imageInfo = @getimagesize($file['tmp_name']);
@@ -318,14 +277,12 @@ function uploadImage($file, $targetDir = '../assets/images/uploads/', $maxSize =
             return ['success' => false, 'error' => 'Недопустимый MIME тип: ' . $imageInfo['mime']];
         }
     } else {
-        // Простая проверка безопасности для SVG (что это действительно XML/SVG)
         $svgContent = file_get_contents($file['tmp_name']);
         if (strpos($svgContent, '<svg') === false) {
             return ['success' => false, 'error' => 'Файл SVG поврежден или не валиден'];
         }
     }
 
-    // 3. ОПРЕДЕЛЯЕМ ПУТИ (используем твою логику с BASE_PATH)
     $projectRoot = defined('BASE_PATH') ? BASE_PATH : realpath(__DIR__ . '/../../');
     $absolutePath = $projectRoot . '/assets/images/uploads/';
 
@@ -333,7 +290,6 @@ function uploadImage($file, $targetDir = '../assets/images/uploads/', $maxSize =
         mkdir($absolutePath, 0755, true);
     }
     
-    // 4. ГЕНЕРАЦИЯ ИМЕНИ
     $safeFileName = preg_replace('/[^a-zA-Z0-9._-]/', '_', basename($file['name']));
     $newFileName = uniqid() . '_' . time() . '_' . $safeFileName;
     $targetPath = $absolutePath . $newFileName;
@@ -354,7 +310,6 @@ function uploadImage($file, $targetDir = '../assets/images/uploads/', $maxSize =
     return ['success' => false, 'error' => 'Не удалось сохранить файл на сервере'];
 }
 
-// Функция для безопасного обрезания строки с поддержкой UTF-8
 function safeSubstr($string, $start, $length = null) {
     if (empty($string)) {
         return '';
@@ -373,10 +328,7 @@ function safeSubstr($string, $start, $length = null) {
     }
 }
 
-// Получить все обращения
 function getAllFeedback($conn) {
-    // $conn = getDBConnection();
-    // Сортируем: сначала новые (непрочитанные), затем по дате
     $result = $conn->query("SELECT * FROM feedback ORDER BY is_read ASC, created_at DESC");
     $items = [];
     while ($row = $result->fetch_assoc()) {
@@ -385,23 +337,16 @@ function getAllFeedback($conn) {
     return $items;
 }
 
-// Пометить как прочитанное
 function markFeedbackAsRead($conn, $id) {
-    // $conn = getDBConnection();
     $id = intval($id);
     return $conn->query("UPDATE feedback SET is_read = 1 WHERE id = $id");
 }
 
-// Удалить обращение
 function deleteFeedback($conn, $id) {
-    // $conn = getDBConnection();
     $id = intval($id);
     return $conn->query("DELETE FROM feedback WHERE id = $id");
 }
 
-/**
- * Получает все запросы на КП из базы данных
- */
 function getProductRequests($conn, $perPage, $offset) {
     $stmt = $conn->prepare("SELECT * FROM product_requests ORDER BY created_at DESC LIMIT ? OFFSET ?");
     $stmt->bind_param("ii", $perPage, $offset);
@@ -409,13 +354,8 @@ function getProductRequests($conn, $perPage, $offset) {
     return $stmt->get_result();
 }
 
-/**
- * Удаляет заявку на КП и записывает действие в лог
- */
 function deleteProductRequest($conn, $id) {
-    // $conn = getDBConnection();
     
-    // 1. Получаем данные для лога перед удалением
     $stmt = $conn->prepare("SELECT product_name, name FROM product_requests WHERE id = ?");
     $stmt->bind_param("i", $id);
     $stmt->execute();
@@ -423,15 +363,13 @@ function deleteProductRequest($conn, $id) {
     $requestData = $result->fetch_assoc();
     
     if (!$requestData) {
-        return false; // Заявка уже удалена или не существует
+        return false;
     }
     
-    // 2. Удаляем запись
     $stmt = $conn->prepare("DELETE FROM product_requests WHERE id = ?");
     $stmt->bind_param("i", $id);
     
     if ($stmt->execute()) {
-        // 3. Логируем действие, как в твоем FAQ
         logAdminAction($conn, 'request_delete', "Удалена заявка на " . $requestData['product_name'] . " от " . $requestData['name']);
         return true;
     }
@@ -445,19 +383,14 @@ function deleteProductRequest($conn, $id) {
 
 
 
-// SETTINGS
 
-// Функция для сброса кэша
 function clearCache($conn) {
     global $cache;
     
-    // Очищаем файлы кэша
     $result = $cache->clearAll();
     
-    // Логируем действие
     logAdminAction($conn, "clear_cache", "Очистка кэша: " . $result['message']);
     
-    // Проверяем результат
     if ($result['success'] && $result['errors'] === 0) {
         return [
             'success' => true, 
@@ -472,9 +405,6 @@ function clearCache($conn) {
 }
 
 
-/**
- * Получить все настройки из базы в виде ассоциативного массива
- */
 function getAllSettings($conn) {
     $result = $conn->query("SELECT setting_key, setting_value FROM settings ORDER BY setting_key");
     $settings = [];
@@ -484,9 +414,6 @@ function getAllSettings($conn) {
     return $settings;
 }
 
-/**
- * Сохранить или обновить текстовую настройку
- */
 function updateOrInsertSetting($conn, $key, $value) {
     $stmt = $conn->prepare("SELECT id FROM settings WHERE setting_key = ?");
     $stmt->bind_param("s", $key);
@@ -504,13 +431,9 @@ function updateOrInsertSetting($conn, $key, $value) {
     }
 }
 
-/**
- * Специальная функция для обновления путей к изображениям (в две таблицы сразу)
- */
 function updateImageSettings($conn, $imageKey, $settingKey, $path) {
     global $cache;
 
-    // --- ДОБАВЛЕНО: Сначала узнаем старый путь, чтобы было что удалять ---
     $oldPath = null;
     $sel = $conn->prepare("SELECT setting_value FROM settings WHERE setting_key = ?");
     $sel->bind_param("s", $settingKey);
@@ -520,16 +443,13 @@ function updateImageSettings($conn, $imageKey, $settingKey, $path) {
         $oldPath = $row['setting_value'];
     }
     $sel->close();
-    // --------------------------------------------------------------------
 
-    // 1. Обновляем таблицу settings
     $stmt1 = $conn->prepare("UPDATE settings SET setting_value = ?, updated_at = NOW() WHERE setting_key = ?");
     $stmt1->bind_param("ss", $path, $settingKey);
-    $success = $stmt1->execute(); // Выполняем ОДИН раз и сохраняем результат
+    $success = $stmt1->execute();
     $stmt1->close();
 
     if ($success) {
-        // Если в базе обновилось — удаляем старое физически
         if (!empty($oldPath) && $oldPath !== $path) {
             deleteImageFromServer($oldPath);
         }
@@ -537,16 +457,12 @@ function updateImageSettings($conn, $imageKey, $settingKey, $path) {
         $cache->deleteByPrefix("image_key_");
     }
 
-    return $success; // Возвращаем результат выполнения
+    return $success;
 }
 
 
-// IMAGE
 
 
-/**
- * Получает все изображения из таблицы images с поддержкой кэширования
- */
 function getAllImagesFromDB($conn) {
     global $cache;
     $cacheKey = 'all_site_images';
@@ -566,13 +482,9 @@ function getAllImagesFromDB($conn) {
     return $images;
 }
 
-/**
- * Обновляет путь к изображению в таблице images, удаляет старый файл и чистит кэш
- */
 function updateImageInTable($conn, $id, $newPath) {
     global $cache;
 
-    // 1. Получаем путь к СТАРОМУ изображению перед обновлением
     $oldPath = null;
     $stmtGet = $conn->prepare("SELECT image_path FROM images WHERE id = ?");
     $stmtGet->bind_param("i", $id);
@@ -583,19 +495,16 @@ function updateImageInTable($conn, $id, $newPath) {
     }
     $stmtGet->close();
 
-    // 2. Обновляем путь в базе данных на НОВЫЙ
     $stmt = $conn->prepare("UPDATE images SET image_path = ? WHERE id = ?");
     $stmt->bind_param("si", $newPath, $id);
     $res = $stmt->execute();
     $stmt->close();
 
     if ($res) {
-        // 3. Если запрос в базу прошел успешно — удаляем старый файл с сервера
         if ($oldPath && $oldPath !== $newPath) {
             deleteImageFromServer($oldPath); 
         }
 
-        // Очищаем кэш
         $cache->delete('all_site_images');
         $cache->deleteByPrefix('settings_');
         $cache->deleteByPrefix('image_key_');
@@ -609,11 +518,7 @@ function updateImageInTable($conn, $id, $newPath) {
 
 
 
-// PROFILE
 
-/**
- * Проверка уникальности email для администратора
- */
 function isEmailTaken($conn, $email, $excludeId) {
     $stmt = $conn->prepare("SELECT id FROM admins WHERE email = ? AND id != ?");
     $stmt->bind_param("si", $email, $excludeId);
@@ -621,18 +526,12 @@ function isEmailTaken($conn, $email, $excludeId) {
     return $stmt->get_result()->num_rows > 0;
 }
 
-/**
- * Обновление основных данных профиля
- */
 function updateAdminProfile($conn, $id, $fullName, $email) {
     $stmt = $conn->prepare("UPDATE admins SET full_name = ?, email = ? WHERE id = ?");
     $stmt->bind_param("ssi", $fullName, $email, $id);
     return $stmt->execute();
 }
 
-/**
- * Обновление пароля администратора
- */
 function updateAdminPassword($conn, $id, $newPassword) {
     $hash = password_hash($newPassword, PASSWORD_DEFAULT);
     $stmt = $conn->prepare("UPDATE admins SET password_hash = ? WHERE id = ?");
@@ -640,9 +539,6 @@ function updateAdminPassword($conn, $id, $newPassword) {
     return $stmt->execute();
 }
 
-/**
- * Получение расширенной статистики администратора
- */
 function getAdminStats($conn, $adminId) {
     return [
         'logins' => $conn->query("SELECT COUNT(*) as count FROM admin_logs WHERE admin_id = $adminId AND action LIKE '%login%'")->fetch_assoc()['count'],
@@ -654,19 +550,12 @@ function getAdminStats($conn, $adminId) {
 
 
 
-// PRODUCTS
 
 
-/**
- * Получить список активных категорий
- */
 function getActiveCategories($conn) {
     return $conn->query("SELECT id, name FROM product_categories WHERE is_active = 1 ORDER BY sort_order")->fetch_all(MYSQLI_ASSOC);
 }
 
-/**
- * Получить один товар по ID
- */
 function getProductById($conn, $id) {
     global $cache;
     $cacheKey = "product_id_" . intval($id);
@@ -683,9 +572,6 @@ function getProductById($conn, $id) {
     return $data;
 }
 
-/**
- * Получить список товаров с пагинацией и названием категории
- */
 function getProductsList($conn, $limit, $offset) {
     global $cache;
     $cacheKey = "admin_product_list_l{$limit}_o{$offset}";
@@ -702,15 +588,12 @@ function getProductsList($conn, $limit, $offset) {
     ");
     $stmt->bind_param("ii", $limit, $offset);
     $stmt->execute();
-    $data = $stmt->get_result()->fetch_all(MYSQLI_ASSOC); // Сразу в массив!
+    $data = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     
     $cache->set($cacheKey, $data);
     return $data;
 }
 
-/**
- * Добавить новый товар
- */
 function addProduct($conn, $data) {
     global $cache;
     $stmt = $conn->prepare("INSERT INTO products (category_id, name, slug, description, full_description, image_path, price, specifications, is_available, sort_order, is_active) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
@@ -731,13 +614,9 @@ function addProduct($conn, $data) {
     return false;
 }
 
-/**
- * Обновить существующий товар (с автоматической зачисткой старой картинки)
- */
 function updateProduct($conn, $id, $data) {
     global $cache;
 
-    // 1. Сначала узнаем путь к текущему изображению, которое лежит в базе
     $oldImagePath = null;
     $sel = $conn->prepare("SELECT image_path FROM products WHERE id = ?");
     $sel->bind_param("i", $id);
@@ -748,7 +627,6 @@ function updateProduct($conn, $id, $data) {
     }
     $sel->close();
 
-    // 2. Обновляем данные товара
     $stmt = $conn->prepare("UPDATE products SET category_id = ?, name = ?, slug = ?, description = ?, full_description = ?, image_path = ?, price = ?, specifications = ?, is_available = ?, sort_order = ?, is_active = ?, updated_at = NOW() WHERE id = ?");
     $stmt->bind_param("isssssdsiiii", 
         $data['category_id'], $data['name'], $data['slug'], 
@@ -761,13 +639,10 @@ function updateProduct($conn, $id, $data) {
     $stmt->close();
 
     if ($res) {
-        // 3. Если в базе всё успешно обновилось, проверяем: изменилась ли картинка?
-        // Если пришел новый путь, а старый не пустой и они разные — удаляем старый файл.
         if (!empty($oldImagePath) && $oldImagePath !== $data['image_path']) {
             deleteImageFromServer($oldImagePath);
         }
 
-        // Чистим кэш
         $cache->deleteByPrefix("product_");
         $cache->deleteByPrefix("admin_product_");
         $cache->deleteByPrefix("products_cat_");
@@ -777,13 +652,9 @@ function updateProduct($conn, $id, $data) {
     return $res;
 }
 
-/**
- * Удалить товар и его изображение с сервера
- */
 function deleteProduct($conn, $id) {
     global $cache;
 
-    // 1. Сначала получаем путь к картинке, чтобы знать, что удалять
     $imagePath = null;
     $sel = $conn->prepare("SELECT image_path FROM products WHERE id = ?");
     $sel->bind_param("i", $id);
@@ -794,19 +665,16 @@ function deleteProduct($conn, $id) {
     }
     $sel->close();
 
-    // 2. Удаляем саму запись из базы данных
     $stmt = $conn->prepare("DELETE FROM products WHERE id = ?");
     $stmt->bind_param("i", $id);
     $res = $stmt->execute();
     $stmt->close();
     
     if ($res) {
-        // 3. Если из базы удалено успешно — сносим файл с сервера
         if (!empty($imagePath)) {
             deleteImageFromServer($imagePath);
         }
 
-        // Чистим кэш
         $cache->deleteByPrefix("product_");
         $cache->deleteByPrefix("admin_product_");
         $cache->deleteByPrefix("products_cat_");
@@ -817,13 +685,9 @@ function deleteProduct($conn, $id) {
 }
 
 
-// NEWS
 
 
 
-/**
- * Получить список новостей с пагинацией
- */
 function getNewsList($conn, $perPage, $offset) {
     global $cache;
     $cacheKey = "admin_news_list_p" . $perPage . "_o" . $offset;
@@ -835,16 +699,12 @@ function getNewsList($conn, $perPage, $offset) {
     $stmt->bind_param("ii", $perPage, $offset);
     $stmt->execute();
     
-    // ВАЖНО: Кэшируем результат как массив, а не объект mysqli_result
     $data = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     
     $cache->set($cacheKey, $data);
     return $data;
 }
 
-/**
- * Получить одну новость по ID
- */
 function getNewsById($conn, $id) {
     global $cache;
     $cacheKey = "news_id_" . intval($id);
@@ -861,9 +721,6 @@ function getNewsById($conn, $id) {
     return $data;
 }
 
-/**
- * Добавить новую новость
- */
 function addNews($conn, $data) {
     global $cache;
     $stmt = $conn->prepare("INSERT INTO news (title, slug, excerpt, content, author, image_path, is_published, published_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
@@ -879,20 +736,15 @@ function addNews($conn, $data) {
     );
     $res = $stmt->execute();
     if ($res) {
-        // Очищаем кэш и для фронтенда, и для админки
         $cache->deleteByPrefix("news_"); 
         $cache->deleteByPrefix("admin_news_"); 
     }
     return $res;
 }
 
-/**
- * Обновить существующую новость (с автоматической зачисткой старой картинки)
- */
 function updateNews($conn, $id, $data) {
     global $cache;
 
-    // 1. Чекаем старый путь к картинке перед тем, как перезаписать его
     $oldImagePath = null;
     $sel = $conn->prepare("SELECT image_path FROM news WHERE id = ?");
     $sel->bind_param("i", $id);
@@ -903,7 +755,6 @@ function updateNews($conn, $id, $data) {
     }
     $sel->close();
 
-    // 2. Обновляем данные в базе
     $stmt = $conn->prepare("UPDATE news SET title = ?, slug = ?, excerpt = ?, content = ?, author = ?, image_path = ?, is_published = ?, published_at = ?, updated_at = NOW() WHERE id = ?");
     $stmt->bind_param("ssssssisi", 
         $data['title'], 
@@ -921,13 +772,10 @@ function updateNews($conn, $id, $data) {
     $stmt->close();
 
     if ($res) {
-        // 3. Если в базе обновилось — прибираемся на сервере
-        // Удаляем, если путь изменился и старый файл вообще существовал
         if (!empty($oldImagePath) && $oldImagePath !== $data['image_path']) {
             deleteImageFromServer($oldImagePath);
         }
 
-        // Сбрасываем кэш
         $cache->deleteByPrefix("news_"); 
         $cache->deleteByPrefix("admin_news_");
         $cache->delete("news_id_" . $id);
@@ -936,13 +784,9 @@ function updateNews($conn, $id, $data) {
     return $res;
 }
 
-/**
- * Удалить новость и её изображение с сервера
- */
 function deleteNews($conn, $id) {
     global $cache;
 
-    // 1. Получаем путь к картинке перед удалением записи
     $imagePath = null;
     $sel = $conn->prepare("SELECT image_path FROM news WHERE id = ?");
     $sel->bind_param("i", $id);
@@ -953,19 +797,16 @@ function deleteNews($conn, $id) {
     }
     $sel->close();
 
-    // 2. Удаляем новость из базы
     $stmt = $conn->prepare("DELETE FROM news WHERE id = ?");
     $stmt->bind_param("i", $id);
     $res = $stmt->execute();
     $stmt->close();
 
     if ($res) {
-        // 3. Если из базы удалено — удаляем файл
         if (!empty($imagePath)) {
             deleteImageFromServer($imagePath);
         }
 
-        // Чистим кэш
         $cache->deleteByPrefix("news_"); 
         $cache->deleteByPrefix("admin_news_");
         $cache->delete("news_id_" . $id);
@@ -976,11 +817,7 @@ function deleteNews($conn, $id) {
 
 
 
-// MENU
 
-/**
- * Получить все пункты меню из базы
- */
 function getAllMenuItems($conn) {
     global $cache;
     $cacheKey = "admin_menu_all";
@@ -995,9 +832,6 @@ function getAllMenuItems($conn) {
     return $data;
 }
 
-/**
- * Получить данные одного пункта меню
- */
 function getMenuItemById($conn, $id) {
     global $cache;
     $cacheKey = "menu_item_" . intval($id);
@@ -1008,15 +842,12 @@ function getMenuItemById($conn, $id) {
     $stmt = $conn->prepare("SELECT * FROM menu_items WHERE id = ?");
     $stmt->bind_param("i", $id);
     $stmt->execute();
-    $data = $stmt->get_result()->fetch_assoc(); // Важно: fetch_assoc()
+    $data = $stmt->get_result()->fetch_assoc();
 
     if ($data) $cache->set($cacheKey, $data);
     return $data;
 }
 
-/**
- * Добавить новый пункт
- */
 function addMenuItem($conn, $data) {
     global $cache;
     $stmt = $conn->prepare("INSERT INTO menu_items (title, url, sort_order, is_active) VALUES (?, ?, ?, ?)");
@@ -1024,16 +855,12 @@ function addMenuItem($conn, $data) {
     
     $success = $stmt->execute();
     if ($success) {
-        // Очищаем всё, что связано с меню
-        $cache->deleteByPrefix("system_menu"); // кэш для пользователей
-        $cache->deleteByPrefix("admin_menu");  // кэш для админки
+        $cache->deleteByPrefix("system_menu");
+        $cache->deleteByPrefix("admin_menu");
     }
     return $success;
 }
 
-/**
- * Обновить существующий пункт
- */
 function updateMenuItem($conn, $id, $data) {
     global $cache;
     $stmt = $conn->prepare("UPDATE menu_items SET title = ?, url = ?, sort_order = ?, is_active = ? WHERE id = ?");
@@ -1048,9 +875,6 @@ function updateMenuItem($conn, $id, $data) {
     return $success;
 }
 
-/**
- * Удалить пункт меню
- */
 function deleteMenuItem($conn, $id) {
     global $cache;
     $stmt = $conn->prepare("DELETE FROM menu_items WHERE id = ?");
@@ -1065,9 +889,6 @@ function deleteMenuItem($conn, $id) {
     return $success;
 }
 
-/**
- * Проверить наличие подпунктов перед удалением
- */
 function hasChildMenu($conn, $id) {
     $stmt = $conn->prepare("SELECT COUNT(*) as count FROM menu_items WHERE parent_id = ?");
     $stmt->bind_param("i", $id);
@@ -1076,9 +897,6 @@ function hasChildMenu($conn, $id) {
     return $row['count'] > 0;
 }
 
-/**
- * Рекурсивное построение дерева меню
- */
 function buildMenuTree($items, $parentId = 0) {
     $tree = [];
     foreach ($items as $item) {
@@ -1093,10 +911,6 @@ function buildMenuTree($items, $parentId = 0) {
     return $tree;
 }
 
-/**
- * Получить список потенциальных родителей (только верхний уровень)
- * Исключаем текущий ID, чтобы не зациклить дерево
- */
 function getPotentialParents($conn, $excludeId = 0) {
     $excludeId = intval($excludeId);
     $sql = "SELECT id, title FROM menu_items WHERE parent_id = 0";
@@ -1110,12 +924,8 @@ function getPotentialParents($conn, $excludeId = 0) {
 
 
 
-// LOGS
 
 
-/**
- * Получить список логов с учетом фильтров
- */
 function getAdminLogs($conn, $filters = [], $limit = 100) {
     $where = "1=1";
     $params = [];
@@ -1161,9 +971,6 @@ function getAdminLogs($conn, $filters = [], $limit = 100) {
     return $stmt->get_result();
 }
 
-/**
- * Очистить старые логи
- */
 function clearOldLogs($conn, $days) {
     $days = intval($days);
     $date = date('Y-m-d H:i:s', strtotime("-$days days"));
@@ -1172,9 +979,6 @@ function clearOldLogs($conn, $days) {
     return $stmt->execute();
 }
 
-/**
- * Список всех админов для выпадающего списка
- */
 function getAdminsList($conn) {
     return $conn->query("SELECT id, username FROM admins ORDER BY username")->fetch_all(MYSQLI_ASSOC);
 }
@@ -1182,13 +986,8 @@ function getAdminsList($conn) {
 
 
 
-// INDEX 
 
-/**
- * Получить общую статистику сайта для дашборда
- */
 function getDashboardStats($conn) {
-    // Вспомогательная функция внутри для сокращения кода
     $getCount = function($table, $where = "") use ($conn) {
         $sql = "SELECT COUNT(*) as count FROM " . $table . ($where ? " WHERE $where" : "");
         $result = $conn->query($sql);
@@ -1209,9 +1008,6 @@ function getDashboardStats($conn) {
     ];
 }
 
-/**
- * Получить список последних действий администраторов
- */
 function getRecentAdminLogs($conn, $limit = 10) {
     $limit = intval($limit);
     $sql = "SELECT al.*, a.username 
@@ -1224,9 +1020,6 @@ function getRecentAdminLogs($conn, $limit = 10) {
     return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
 }
 
-/**
- * Определяет иконку для типа действия (для верстки)
- */
 function getLogIcon($action) {
     if (strpos($action, 'login') !== false) return 'fa-sign-in-alt';
     if (strpos($action, 'logout') !== false) return 'fa-sign-out-alt';
@@ -1238,12 +1031,8 @@ function getLogIcon($action) {
 
 
 
-// FAQ
 
 
-/**
- * Общая функция для сброса всего кэша FAQ
- */
 function clearFaqCache() {
     global $cache;
     $cache->deleteByPrefix("faq_");
@@ -1251,9 +1040,6 @@ function clearFaqCache() {
 }
 
 
-/**
- * Получить список FAQ с пагинацией
- */
 function getFaqList($conn, $limit, $offset) {
     global $cache;
     $cacheKey = "admin_faq_list_l{$limit}_o{$offset}";
@@ -1270,9 +1056,6 @@ function getFaqList($conn, $limit, $offset) {
     return $data;
 }
 
-/**
- * Получить один вопрос по ID
- */
 function getFaqById($conn, $id) {
     global $cache;
     $cacheKey = "faq_item_" . intval($id);
@@ -1291,9 +1074,6 @@ function getFaqById($conn, $id) {
     return $data;
 }
 
-/**
- * Добавить новый вопрос
- */
 function addFaq($conn, $data) {
     $stmt = $conn->prepare("INSERT INTO faq (question, answer, category, sort_order, is_active) VALUES (?, ?, ?, ?, ?)");
     $stmt->bind_param("sssii", $data['question'], $data['answer'], $data['category'], $data['sort_order'], $data['is_active']);
@@ -1302,9 +1082,6 @@ function addFaq($conn, $data) {
     return $res;
 }
 
-/**
- * Обновить существующий вопрос
- */
 function updateFaq($conn, $id, $data) {
     $stmt = $conn->prepare("UPDATE faq SET question = ?, answer = ?, category = ?, sort_order = ?, is_active = ? WHERE id = ?");
     $stmt->bind_param("sssiii", $data['question'], $data['answer'], $data['category'], $data['sort_order'], $data['is_active'], $id);
@@ -1317,9 +1094,6 @@ function updateFaq($conn, $id, $data) {
     return $res;
 }
 
-/**
- * Удалить вопрос
- */
 function deleteFaq($conn, $id) {
     $stmt = $conn->prepare("DELETE FROM faq WHERE id = ?");
     $stmt->bind_param("i", $id);
@@ -1331,11 +1105,7 @@ function deleteFaq($conn, $id) {
 
 
 
-// CONTANT
 
-/**
- * Получить все контент-блоки
- */
 function getAllContentBlocks($conn) {
     global $cache;
     $cacheKey = "admin_content_blocks_all";
@@ -1350,9 +1120,6 @@ function getAllContentBlocks($conn) {
     return $data;
 }
 
-/**
- * Получить конкретный блок по ID
- */
 function getContentBlockById($conn, $id) {
     global $cache;
     $cacheKey = "content_block_id_" . intval($id);
@@ -1371,9 +1138,6 @@ function getContentBlockById($conn, $id) {
     return $data;
 }
 
-/**
- * Обновить контент-блок
- */
 function updateContentBlock($conn, $id, $title, $content) {
     global $cache;
     
@@ -1382,11 +1146,8 @@ function updateContentBlock($conn, $id, $title, $content) {
     $res = $stmt->execute();
     
     if ($res) {
-        // Очищаем кэш по ID
         $cache->delete("content_block_id_" . $id);
         
-        // ВАЖНО: Очищаем вообще ВСЕ контентные блоки для сайта и админки,
-        // так как мы не знаем block_key в этой функции, а сайт запрашивает данные по нему.
         $cache->deleteByPrefix("content_block_");
         $cache->deleteByPrefix("admin_content_blocks_");
     }
@@ -1394,9 +1155,6 @@ function updateContentBlock($conn, $id, $title, $content) {
     return $res;
 }
 
-/**
- * Вспомогательная функция для обрезки текста (превью)
- */
 function getContentPreview($text, $limit = 100) {
     $text = htmlspecialchars($text);
     if (function_exists('mb_substr')) {
@@ -1408,12 +1166,8 @@ function getContentPreview($text, $limit = 100) {
 
 
 
-// CONTACTS
 
 
-/**
- * Получить список всех контактов с учетом пагинации
- */
 function getContactsList($conn, $perPage, $offset) {
     global $cache;
     $cacheKey = "contacts_list_p{$perPage}_o{$offset}";
@@ -1430,9 +1184,6 @@ function getContactsList($conn, $perPage, $offset) {
     return $data;
 }
 
-/**
- * Получить данные одного контакта
- */
 function getContactById($conn, $id) {
     global $cache;
     $cacheKey = "contact_item_" . intval($id);
@@ -1450,9 +1201,6 @@ function getContactById($conn, $id) {
     }
     return $data;
 }
-/**
- * Добавить контакт
- */
 function addContact($conn, $data) {
     global $cache;
     $stmt = $conn->prepare("INSERT INTO contacts (contact_type, title, value, icon, sort_order, is_active) VALUES (?, ?, ?, ?, ?, ?)");
@@ -1463,16 +1211,12 @@ function addContact($conn, $data) {
     
     $result = $stmt->execute();
     if ($result) {
-        // Убиваем все списки контактов (и админские, и фронтенд)
         $cache->deleteByPrefix("contacts_list");
         $cache->deleteByPrefix("contacts_type");
     }
     return $result;
 }
 
-/**
- * Обновить контакт
- */
 function updateContact($conn, $id, $data) {
     global $cache;
     $stmt = $conn->prepare("UPDATE contacts SET contact_type = ?, title = ?, value = ?, icon = ?, sort_order = ?, is_active = ? WHERE id = ?");
@@ -1483,17 +1227,12 @@ function updateContact($conn, $id, $data) {
     
     $result = $stmt->execute();
     if ($result) {
-        // Удаляем конкретный айтем
         $cache->delete("contact_item_" . $id);
-        // Удаляем все списки, так как в них данные этого контакта теперь неверные
         $cache->deleteByPrefix("contacts_list");
         $cache->deleteByPrefix("contacts_type");
     }
     return $result;
 }
-/**
- * Удалить контакт
- */
 function deleteContact($conn, $id) {
     global $cache;
     $stmt = $conn->prepare("DELETE FROM contacts WHERE id = ?");
@@ -1509,11 +1248,7 @@ function deleteContact($conn, $id) {
 }
 
 
-// CATEGORIES
 
-/**
- * Получить все категории с подсчетом товаров
- */
 function getAllCategoriesWithCount($conn) {
     global $cache;
     $cacheKey = "categories_all_with_count";
@@ -1534,9 +1269,6 @@ function getAllCategoriesWithCount($conn) {
 }
 
 
-/**
- * Получить данные одной категории
- */
 function getCategoryById($conn, $id) {
     global $cache;
     $cacheKey = "categories_item_" . intval($id);
@@ -1555,9 +1287,6 @@ function getCategoryById($conn, $id) {
     return $data;
 }
 
-/**
- * Добавить категорию
- */
 function addCategory($conn, $data) {
     global $cache;
     $stmt = $conn->prepare("INSERT INTO product_categories (name, slug, description, image_path, sort_order, is_active) VALUES (?, ?, ?, ?, ?, ?)");
@@ -1565,19 +1294,14 @@ function addCategory($conn, $data) {
     
     $success = $stmt->execute();
     if ($success) {
-        // Очищаем всё, что связано с категориями
         $cache->deleteByPrefix("categories_");
     }
     return $success;
 }
 
-/**
- * Обновить категорию (с автоматической очисткой старого изображения)
- */
 function updateCategory($conn, $id, $data) {
     global $cache;
 
-    // 1. Получаем старый путь к картинке категории из базы
     $oldImagePath = null;
     $sel = $conn->prepare("SELECT image_path FROM product_categories WHERE id = ?");
     $sel->bind_param("i", $id);
@@ -1588,7 +1312,6 @@ function updateCategory($conn, $id, $data) {
     }
     $sel->close();
 
-    // 2. Обновляем данные категории
     $stmt = $conn->prepare("UPDATE product_categories SET name = ?, slug = ?, description = ?, image_path = ?, sort_order = ?, is_active = ? WHERE id = ?");
     $stmt->bind_param("ssssiii", 
         $data['name'], 
@@ -1604,12 +1327,10 @@ function updateCategory($conn, $id, $data) {
     $stmt->close();
 
     if ($success) {
-        // 3. Если запись обновилась — проверяем, нужно ли удалять старый файл
         if (!empty($oldImagePath) && $oldImagePath !== $data['image_path']) {
             deleteImageFromServer($oldImagePath);
         }
 
-        // Сбрасываем кэш этой категории и всех списков
         $cache->deleteByPrefix("categories_");
         $cache->deleteByPrefix("product_");
         $cache->deleteByPrefix("admin_product_");
@@ -1618,9 +1339,6 @@ function updateCategory($conn, $id, $data) {
     return $success;
 }
 
-/**
- * Проверить, есть ли товары в категории перед удалением
- */
 function getCategoryProductCount($conn, $categoryId) {
     $stmt = $conn->prepare("SELECT COUNT(*) as count FROM products WHERE category_id = ?");
     $stmt->bind_param("i", $categoryId);
@@ -1628,9 +1346,6 @@ function getCategoryProductCount($conn, $categoryId) {
     return $stmt->get_result()->fetch_assoc()['count'] ?? 0;
 }
 
-/**
- * Генерация уникального слага
- */
 function generateUniqueCategorySlug($conn, $name, $currentId = 0) {
     $slug = createSlug($name);
     $originalSlug = $slug;
@@ -1643,13 +1358,9 @@ function generateUniqueCategorySlug($conn, $name, $currentId = 0) {
     return $slug;
 }
 
-/**
- * Полное удаление категории и её изображения
- */
 function deleteCategory($conn, $id) {
     global $cache;
 
-    // 1. Получаем путь к картинке, пока запись еще жива
     $imagePath = null;
     $sel = $conn->prepare("SELECT image_path FROM product_categories WHERE id = ?");
     $sel->bind_param("i", $id);
@@ -1660,36 +1371,27 @@ function deleteCategory($conn, $id) {
     }
     $sel->close();
 
-    // 2. Удаляем категорию из базы
     $stmt = $conn->prepare("DELETE FROM product_categories WHERE id = ?");
     $stmt->bind_param("i", $id);
     $success = $stmt->execute();
     $stmt->close();
 
     if ($success) {
-        // 3. Если из базы удалено — сносим файл
         if (!empty($imagePath)) {
             deleteImageFromServer($imagePath);
         }
 
-        // Чистим кэш
         $cache->deleteByPrefix("categories_");
-        // Также стоит сбросить кэш товаров, так как их категории больше нет
         $cache->deleteByPrefix("product_");
     }
 
     return $success;
 }
 
-// ARTICLES
 
 
-/**
- * Получить список статей с пагинацией
- */
 function getArticlesList($conn, $perPage, $offset) {
     global $cache;
-    // Ключ уникален для каждой страницы пагинации
     $cacheKey = "articles_list_p{$perPage}_o{$offset}";
     
     $cached = $cache->get($cacheKey);
@@ -1699,16 +1401,12 @@ function getArticlesList($conn, $perPage, $offset) {
     $stmt->bind_param("ii", $perPage, $offset);
     $stmt->execute();
     
-    // Преобразуем в массив, так как объект результата нельзя кэшировать
     $data = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     
     $cache->set($cacheKey, $data);
     return $data;
 }
 
-/**
- * Получить данные одной статьи
- */
 function getArticleById($conn, $id) {
     global $cache;
     $cacheKey = "article_item_" . intval($id);
@@ -1727,9 +1425,6 @@ function getArticleById($conn, $id) {
     return $data;
 }
 
-/**
- * Добавить статью
- */
 function addArticle($conn, $data) {
     global $cache;
     $stmt = $conn->prepare("INSERT INTO articles (title, slug, excerpt, content, author, image_path, is_published, published_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
@@ -1741,7 +1436,6 @@ function addArticle($conn, $data) {
     
     $success = $stmt->execute();
     if ($success) {
-        // Сбрасываем все списки статей, так как появилась новая запись
         $cache->deleteByPrefix("articles_list");
         $cache->deleteByPrefix("article_slug");
 
@@ -1749,13 +1443,9 @@ function addArticle($conn, $data) {
     return $success;
 }
 
-/**
- * Обновить статью (с автоматической зачисткой старого изображения)
- */
 function updateArticle($conn, $id, $data) {
     global $cache;
 
-    // 1. Получаем старый путь к картинке из базы перед обновлением
     $oldImagePath = null;
     $sel = $conn->prepare("SELECT image_path FROM articles WHERE id = ?");
     $sel->bind_param("i", $id);
@@ -1766,7 +1456,6 @@ function updateArticle($conn, $id, $data) {
     }
     $sel->close();
 
-    // 2. Обновляем статью
     $stmt = $conn->prepare("UPDATE articles SET title = ?, slug = ?, excerpt = ?, content = ?, author = ?, image_path = ?, is_published = ?, published_at = ?, updated_at = NOW() WHERE id = ?");
     $stmt->bind_param("ssssssisi", 
         $data['title'], 
@@ -1784,14 +1473,11 @@ function updateArticle($conn, $id, $data) {
     $stmt->close();
 
     if ($success) {
-        // 3. Если в базе всё ок, проверяем: изменился ли путь к картинке?
         if (!empty($oldImagePath) && $oldImagePath !== $data['image_path']) {
             deleteImageFromServer($oldImagePath);
         }
 
-        // Удаляем кэш самой статьи
         $cache->delete("article_item_" . $id);
-        // Сбрасываем списки
         $cache->deleteByPrefix("articles_list");
         $cache->deleteByPrefix("article_slug");
     }
@@ -1799,13 +1485,9 @@ function updateArticle($conn, $id, $data) {
     return $success;
 }
 
-/**
- * Удалить статью и её изображение с сервера
- */
 function deleteArticle($conn, $id) {
     global $cache;
 
-    // 1. Получаем путь к картинке перед тем, как удалить строку из БД
     $imagePath = null;
     $sel = $conn->prepare("SELECT image_path FROM articles WHERE id = ?");
     $sel->bind_param("i", $id);
@@ -1816,30 +1498,24 @@ function deleteArticle($conn, $id) {
     }
     $sel->close();
 
-    // 2. Удаляем статью из базы
     $stmt = $conn->prepare("DELETE FROM articles WHERE id = ?");
     $stmt->bind_param("i", $id);
     $success = $stmt->execute();
     $stmt->close();
     
     if ($success) {
-        // 3. Если из базы удалено — удаляем файл физически
         if (!empty($imagePath)) {
             deleteImageFromServer($imagePath);
         }
 
-        // Полная очистка кэша
         $cache->delete("article_slug_" . $id);
-        $cache->delete("article_item_" . $id); // Добавил для верности
+        $cache->delete("article_item_" . $id);
         $cache->deleteByPrefix("articles_list");
     }
 
     return $success;
 }
 
-/**
- * Генерация уникального слага для статьи
- */
 function generateUniqueArticleSlug($conn, $title, $currentId = 0) {
     $slug = createSlug($title);
     $originalSlug = $slug;
@@ -1853,31 +1529,21 @@ function generateUniqueArticleSlug($conn, $title, $currentId = 0) {
 
 
 
-// ADMINS
 
-/**
- * Получить список всех администраторов
- */
 function getAllAdmins($conn) {
     global $cache;
     $cacheKey = "admins_all";
 
-    // Проверяем кэш
     $cached = $cache->get($cacheKey);
     if ($cached !== null) return $cached;
 
-    // Если кэша нет, идем в БД
     $result = $conn->query("SELECT * FROM admins ORDER BY role, username");
     $data = $result->fetch_all(MYSQLI_ASSOC);
     
-    // Сохраняем результат
     $cache->set($cacheKey, $data);
     return $data;
 }
 
-/**
- * Получить данные одного админа
- */
 function getAdminById($conn, $id) {
     global $cache;
     $cacheKey = "admin_item_" . intval($id);
@@ -1896,9 +1562,6 @@ function getAdminById($conn, $id) {
     return $data;
 }
 
-/**
- * Проверка уникальности username или email
- */
 function isAdminUnique($conn, $username, $email, $excludeId = 0) {
     $stmt = $conn->prepare("SELECT id FROM admins WHERE (username = ? OR email = ?) AND id != ?");
     $stmt->bind_param("ssi", $username, $email, $excludeId);
@@ -1906,9 +1569,6 @@ function isAdminUnique($conn, $username, $email, $excludeId = 0) {
     return $stmt->get_result()->num_rows === 0;
 }
 
-/**
- * Добавить нового администратора
- */
 function addAdmin($conn, $data) {
     global $cache;
     $passwordHash = password_hash($data['password'], PASSWORD_DEFAULT);
@@ -1917,41 +1577,31 @@ function addAdmin($conn, $data) {
     
     $success = $stmt->execute();
     if ($success) {
-        // Очищаем весь кэш админов (списки и поиск)
         $cache->deleteByPrefix("admins_");
     }
     return $success;
 }
 
-/**
- * Обновить данные администратора
- */
 function updateAdmin($conn, $id, $data) {
     global $cache;
     
     if (!empty($data['password'])) {
-        // Если пароль меняется
         $passwordHash = password_hash($data['password'], PASSWORD_DEFAULT);
         $stmt = $conn->prepare("UPDATE admins SET username = ?, email = ?, password_hash = ?, full_name = ?, role = ?, is_active = ? WHERE id = ?");
         $stmt->bind_param("sssssii", $data['username'], $data['email'], $passwordHash, $data['full_name'], $data['role'], $data['is_active'], $id);
     } else {
-        // Если пароль НЕ меняется
         $stmt = $conn->prepare("UPDATE admins SET username = ?, email = ?, full_name = ?, role = ?, is_active = ? WHERE id = ?");
         $stmt->bind_param("ssssii", $data['username'], $data['email'], $data['full_name'], $data['role'], $data['is_active'], $id);
     }
     
     $success = $stmt->execute();
     if ($success) {
-        // Удаляем кэш конкретного админа и общие списки
         $cache->delete("admin_item_" . $id);
         $cache->deleteByPrefix("admins_");
     }
     return $success;
 }
 
-/**
- * Удалить администратора
- */
 function deleteAdmin($conn, $id) {
     global $cache;
     $stmt = $conn->prepare("DELETE FROM admins WHERE id = ?");
@@ -1959,7 +1609,6 @@ function deleteAdmin($conn, $id) {
     
     $success = $stmt->execute();
     if ($success) {
-        // Чистим всё, что связано с админами
         $cache->delete("admin_item_" . $id);
         $cache->deleteByPrefix("admins_");
     }
@@ -1968,13 +1617,9 @@ function deleteAdmin($conn, $id) {
 
 
 
-// FEATURES
 
 
 
-/**
- * Получить список всех преимуществ (для админки с пагинацией)
- */
 function getAdminFeaturesList($conn, $limit, $offset) {
     global $cache;
     $cacheKey = "admin_features_list_l{$limit}_o{$offset}";
@@ -1991,9 +1636,6 @@ function getAdminFeaturesList($conn, $limit, $offset) {
     return $data;
 }
 
-/**
- * Получить одно преимущество по ID
- */
 function getFeatureById($conn, $id) {
     global $cache;
     $cacheKey = "feature_item_" . intval($id);
@@ -2010,9 +1652,6 @@ function getFeatureById($conn, $id) {
     return $data;
 }
 
-/**
- * Добавить преимущество
- */
 function addFeature($conn, $data) {
     global $cache;
     $stmt = $conn->prepare("INSERT INTO features (title, description, sort_order, is_active) VALUES (?, ?, ?, ?)");
@@ -2020,21 +1659,16 @@ function addFeature($conn, $data) {
     
     $res = $stmt->execute();
     if ($res) {
-        $cache->deleteByPrefix("features_active_"); // чистим фронтенд
-        $cache->deleteByPrefix("admin_features_"); // чистим админку
+        $cache->deleteByPrefix("features_active_");
+        $cache->deleteByPrefix("admin_features_");
     }
     return $res;
 }
 
-/**
- * Обновить преимущество
- */
 function updateFeature($conn, $id, $data) {
     global $cache;
-    // Убрали updated_at, так как этой колонки нет в таблице
     $stmt = $conn->prepare("UPDATE features SET title = ?, description = ?, sort_order = ?, is_active = ? WHERE id = ?");
     
-    // В bind_param теперь 4 строки/числа для данных и 1 для ID (ssii + i)
     $stmt->bind_param("ssiii", 
         $data['title'], 
         $data['description'], 
@@ -2045,7 +1679,6 @@ function updateFeature($conn, $id, $data) {
     
     $res = $stmt->execute();
     if ($res) {
-        // Чистим кэш, чтобы изменения сразу появились на сайте
         $cache->delete("feature_item_" . $id);
         $cache->deleteByPrefix("features_active_");
         $cache->deleteByPrefix("admin_features_");
@@ -2053,9 +1686,6 @@ function updateFeature($conn, $id, $data) {
     return $res;
 }
 
-/**
- * Удалить преимущество
- */
 function deleteFeature($conn, $id) {
     global $cache;
     $stmt = $conn->prepare("DELETE FROM features WHERE id = ?");
@@ -2075,11 +1705,7 @@ function deleteFeature($conn, $id) {
 
 
 
-// Advantages
 
-/**
- * Получить список всех преимуществ (админка)
- */
 function getAdminAdvantagesList($conn, $limit, $offset) {
     global $cache;
     $cacheKey = "admin_advantages_list_l{$limit}_o{$offset}";
@@ -2096,7 +1722,6 @@ function getAdminAdvantagesList($conn, $limit, $offset) {
 
 function addAdvantage($conn, $data) {
     global $cache;
-    // Исправлено: icon_path в запросе
     $sql = "INSERT INTO advantages (title, description, icon_path, sort_order, is_active) VALUES (?, ?, ?, ?, ?)";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param('sssii', $data['title'], $data['description'], $data['icon_path'], $data['sort_order'], $data['is_active']);
@@ -2109,13 +1734,9 @@ function addAdvantage($conn, $data) {
     return $res;
 }
 
-/**
- * Обновить преимущество (с автоматическим удалением старой иконки)
- */
 function updateAdvantage($conn, $id, $data) {
     global $cache;
 
-    // 1. Получаем текущий путь к иконке из базы
     $oldIconPath = null;
     $sel = $conn->prepare("SELECT icon_path FROM advantages WHERE id = ?");
     $sel->bind_param("i", $id);
@@ -2126,7 +1747,6 @@ function updateAdvantage($conn, $id, $data) {
     }
     $sel->close();
 
-    // 2. Обновляем данные преимущества
     $sql = "UPDATE advantages SET title = ?, description = ?, icon_path = ?, sort_order = ?, is_active = ? WHERE id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param('sssiii', 
@@ -2142,12 +1762,10 @@ function updateAdvantage($conn, $id, $data) {
     $stmt->close();
 
     if ($res) {
-        // 3. Если в базе обновилось — проверяем, нужно ли удалять старый файл иконки
         if (!empty($oldIconPath) && $oldIconPath !== $data['icon_path']) {
             deleteImageFromServer($oldIconPath);
         }
 
-        // Чистим кэш
         $cache->deleteByPrefix("advantages_active_");
         $cache->deleteByPrefix("admin_advantages_");
         $cache->deleteByPrefix("advantage_item_");
@@ -2155,9 +1773,6 @@ function updateAdvantage($conn, $id, $data) {
 
     return $res;
 }
-/**
- * Получить преимущество по ID с кэшированием
- */
 function getAdvantageById($conn, $id) {
     global $cache;
     $id = intval($id);
@@ -2166,7 +1781,6 @@ function getAdvantageById($conn, $id) {
     $cached = $cache->get($cacheKey);
     if ($cached !== null) return $cached;
 
-    // Исправлено: запрашиваем icon_path
     $stmt = $conn->prepare("SELECT id, title, description, icon_path, sort_order, is_active FROM advantages WHERE id = ?");
     $stmt->bind_param("i", $id);
     $stmt->execute();
@@ -2178,13 +1792,9 @@ function getAdvantageById($conn, $id) {
     return $data;
 }
 
-/**
- * Удалить преимущество и его иконку с сервера
- */
 function deleteAdvantage($conn, $id) {
     global $cache;
 
-    // 1. Получаем путь к иконке перед удалением записи
     $iconPath = null;
     $sel = $conn->prepare("SELECT icon_path FROM advantages WHERE id = ?");
     $sel->bind_param("i", $id);
@@ -2195,19 +1805,16 @@ function deleteAdvantage($conn, $id) {
     }
     $sel->close();
 
-    // 2. Удаляем запись из базы
     $stmt = $conn->prepare("DELETE FROM advantages WHERE id = ?");
     $stmt->bind_param("i", $id);
     $res = $stmt->execute();
     $stmt->close();
 
     if ($res) {
-        // 3. Если в базе удалено — удаляем иконку физически
         if (!empty($iconPath)) {
             deleteImageFromServer($iconPath);
         }
 
-        // Чистим кэш
         $cache->deleteByPrefix("advantages_active_");
         $cache->deleteByPrefix("admin_advantages_");
         $cache->deleteByPrefix("advantage_item_");
@@ -2216,9 +1823,6 @@ function deleteAdvantage($conn, $id) {
     return $res;
 }
 
-/**
- * Получает список всех преимуществ для админки с кэшированием
- */
 function getAdvantagesList($conn, $limit = 100, $offset = 0) {
     global $cache;
     $cacheKey = "admin_advantages_list_l{$limit}_o{$offset}";
@@ -2236,12 +1840,8 @@ function getAdvantagesList($conn, $limit = 100, $offset = 0) {
     return $data;
 }
 
-// Offices
 
 
-/**
- * Получить список всех офисов (админка)
- */
 function getAdminOfficesList($conn) {
     global $cache;
     $cacheKey = "admin_offices_all";
@@ -2264,7 +1864,7 @@ function addOffice($conn, $data) {
     );
     $res = $stmt->execute();
     if ($res) {
-        $cache->deleteByPrefix("office"); // Удалит и office_main, и offices_all
+        $cache->deleteByPrefix("office");
         $cache->deleteByPrefix("admin_offices_");
         $cache->deleteByPrefix("office_item_");
     }
@@ -2289,9 +1889,6 @@ function updateOffice($conn, $id, $data) {
 }
 
 
-/**
- * Получить офис по ID (для формы редактирования)
- */
 function getOfficeById($conn, $id) {
     global $cache;
     $id = intval($id);
@@ -2311,9 +1908,6 @@ function getOfficeById($conn, $id) {
     return $data;
 }
 
-/**
- * Удалить офис
- */
 function deleteOffice($conn, $id) {
     global $cache;
     $stmt = $conn->prepare("DELETE FROM offices WHERE id = ?");
@@ -2328,9 +1922,7 @@ function deleteOffice($conn, $id) {
 }
 
 
-// STATISTIC
 
-/** --- Функции для работы со СТАТИСТИКОЙ --- **/
 
 function getStatsList($conn, $perPage, $offset) {
     global $cache;
@@ -2339,7 +1931,6 @@ function getStatsList($conn, $perPage, $offset) {
     $cached = $cache->get($cacheKey);
     if ($cached !== null) return $cached;
 
-    // Сортируем по sort_order, как в таблице
     $stmt = $conn->prepare("SELECT * FROM statistics ORDER BY sort_order ASC LIMIT ? OFFSET ?");
     $stmt->bind_param("ii", $perPage, $offset);
     $stmt->execute();
@@ -2422,9 +2013,7 @@ function deleteStat($conn, $id) {
 
 
 
-//  cards
 
-/** --- Функции для работы с КАРТОЧКАМИ (cards) --- **/
 
 function getCardsList($conn, $perPage, $offset) {
     global $cache;
@@ -2479,13 +2068,9 @@ function addCard($conn, $data) {
     return $res;
 }
 
-/**
- * Обновить карточку (с автоматической зачисткой старого изображения)
- */
 function updateCard($conn, $id, $data) {
     global $cache;
 
-    // 1. Берем старый путь к картинке из базы
     $oldPath = null;
     $sel = $conn->prepare("SELECT image_path FROM cards WHERE id = ?");
     $sel->bind_param("i", $id);
@@ -2496,7 +2081,6 @@ function updateCard($conn, $id, $data) {
     }
     $sel->close();
 
-    // 2. Обновляем данные карточки
     $stmt = $conn->prepare("UPDATE cards SET title = ?, description = ?, image_path = ?, color = ?, sort_order = ?, is_active = ? WHERE id = ?");
     $stmt->bind_param("ssssiii", 
         $data['title'], 
@@ -2512,12 +2096,10 @@ function updateCard($conn, $id, $data) {
     $stmt->close();
 
     if ($res) {
-        // 3. Если в базе обновилось — удаляем старый файл, если он изменился
         if (!empty($oldPath) && $oldPath !== $data['image_path']) {
             deleteImageFromServer($oldPath);
         }
 
-        // Чистим кэш
         $cache->deleteByPrefix("card_"); 
         $cache->deleteByPrefix("cards_active_all"); 
         $cache->deleteByPrefix("admin_cards_");
@@ -2527,13 +2109,9 @@ function updateCard($conn, $id, $data) {
     return $res;
 }
 
-/**
- * Удалить карточку и её изображение с сервера
- */
 function deleteCard($conn, $id) {
     global $cache;
 
-    // 1. Сначала узнаем путь к картинке, пока запись еще в базе
     $imagePath = null;
     $sel = $conn->prepare("SELECT image_path FROM cards WHERE id = ?");
     $sel->bind_param("i", $id);
@@ -2544,19 +2122,16 @@ function deleteCard($conn, $id) {
     }
     $sel->close();
 
-    // 2. Удаляем карточку из базы данных
     $stmt = $conn->prepare("DELETE FROM cards WHERE id = ?");
     $stmt->bind_param("i", $id);
     $res = $stmt->execute();
     $stmt->close();
 
     if ($res) {
-        // 3. Если из базы удалено успешно — удаляем файл
         if (!empty($imagePath)) {
             deleteImageFromServer($imagePath);
         }
 
-        // Чистим кэш
         $cache->deleteByPrefix("card_"); 
         $cache->deleteByPrefix("cards_active_all"); 
         $cache->deleteByPrefix("admin_cards_");

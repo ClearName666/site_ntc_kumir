@@ -1,9 +1,6 @@
 <?php 
 
-    // подключаемся к базе 
-    // $conn = getDBConnection();
 
-    // Получаем информацию о текущем администраторе
     $admin = getCurrentAdmin($conn);
 ?>
 

@@ -1,13 +1,10 @@
 <?php
 
-// Подключаем функции
 require_once __DIR__. '/includes/functions.php';
 require_once __DIR__. '/config/config.php';
 
-// подключаемся к базе 
 $conn = getDBConnection();
 $mainBg = getImage($conn, 'image_background_all');
-// --- БЛОК ОБРАБОТКИ ФОРМЫ ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'send_feedback') {
     header('Content-Type: application/json');
     
@@ -22,7 +19,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         exit;
     }
 
-    // Используем функцию saveFeedback, которую ты добавил в includes/functions.php
     if (saveFeedback($conn, $name, $email, $phone, $subject, $message)) {
         echo json_encode(['status' => 'success', 'message' => 'Сообщение успешно отправлено!']);
     } else {
@@ -32,36 +28,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 }
 
 
-// Получаем данные
 $contacts = getContactsByType($conn);
 $offices = getOffices($conn);
 $mainOffice = getMainOffice($conn);
 $showForm = (getSetting($conn, 'form_view') == 1);
 
-/// Устанавливаем мета-данные
 $pageTitle = 'Контакты - ' . getSetting($conn, 'site_title');
 $pageDescription = 'Контактная информация компании НТЦ КУМИР. Адреса, телефоны, email для связи.';
 $pageKeyword = "контакты НТЦ КУМИР, адрес НТЦ КУМИР Иркутск, телефон техподдержки КУМИР, купить модем M32 Иркутск, обратная связь НТЦ КУМИР, офис НТЦ КУМИР, техническая поддержка АСКУЭ, автоматизация ЖКХ контакты, заказать приборы учета Иркутск, поддержка пользователей модем M32";
 
-// --- ДОПОЛНИТЕЛЬНАЯ ПОДГОТОВКА ДЛЯ SEO И СОЦСЕТЕЙ ---
-// Дефолтная картинка для соцсетей (настройте в БД или укажите путь)
 $defaultSocialImage = getSetting($conn, 'social_default_image');
 $ogImage = !empty($defaultSocialImage) ? $defaultSocialImage : getSetting($conn, 'logo_path');
 
-// Если описание пустое (маловероятно) — ставим запасной текст
 if (empty($pageDescription)) {
     $pageDescription = 'Свяжитесь с нами любым удобным способом. Адреса, телефоны, email – НТЦ КУМИР';
 }
 
 $currentUrl = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 
-// Определяем пути
 $headerPath = __DIR__. '/includes/header.php';
 $footerPath = __DIR__. '/includes/footer.php';
 
-// Координаты для карты (основной офис)
 $mapLat = $mainOffice ? $mainOffice['latitude'] : 52.275444;
 $mapLng = $mainOffice ? $mainOffice['longitude'] : 104.278817;
+
+
+$office_view = (getSetting($conn, 'office_view') == 1);
 ?>
 <!DOCTYPE html>
 <html lang="ru">
@@ -117,19 +109,22 @@ $mapLng = $mainOffice ? $mainOffice['longitude'] : 104.278817;
                 <p class="page-description">Свяжитесь с нами любым удобным способом. Мы всегда рады помочь!</p>
             </header>
             
-            <!-- Контактная информация -->
-            <section class="contacts-section">
-                <h2 class="section-title">Контактная информация</h2>
-                <div class="contacts-grid">
-                    <?php renderContacts($contacts); ?>
+            <!-- ДВЕ КОЛОНКИ: КАРТА + КОНТАКТЫ -->
+            <div class="contacts-map-wrapper">
+
+                <!-- Правая колонка: Контактная информация -->
+                <div class="contacts-col">
+                    <h2 class="section-title">Контактная информация</h2>
+                    <div class="contacts-grid">
+                        <?php renderContacts($contacts); ?>
+                    </div>
                 </div>
-            </section>
-            
-            <!-- Карта -->
-            <section class="map-section" id="map-location">
-                <h2 class="section-title">Мы на карте</h2>
-                <div class="map-container">
-                    <div id="yandex-map"></div>
+
+                <!-- Левая колонка: Карта -->
+                <div class="map-col">
+                    <h2 class="section-title">Мы на карте</h2>
+                    <div class="map-container">
+                        <div id="yandex-map"></div>
                         <div class="map-info-card map-overlay">
                             <h3 class="map-info-title"><?= $mainOffice ? htmlspecialchars($mainOffice['city']) : 'Иркутск' ?></h3>
                             <p class="map-address">
@@ -137,7 +132,7 @@ $mapLng = $mainOffice ? $mainOffice['longitude'] : 104.278817;
                             </p>
                             <div class="map-actions">
                                 <a href="https://yandex.ru/maps/?text=<?= urlencode($mainOffice ? $mainOffice['address'] : 'Иркутск Университетский микрорайон 114/1') ?>" 
-                                   class="map-btn" target="_blank">
+                                class="map-btn" target="_blank">
                                     Построить маршрут
                                 </a>
                                 <button onclick="copyAddress()" class="map-btn">
@@ -145,17 +140,20 @@ $mapLng = $mainOffice ? $mainOffice['longitude'] : 104.278817;
                                 </button>
                             </div>
                         </div>
+                    </div>
                 </div>
-            </section>
+            </div>
             
             <!-- Офисы -->
-            <section class="offices-section">
-                <h2 class="section-title">Наши офисы</h2>
-                <div class="offices-grid">
-                    <?php renderOffices($offices); ?>
-                </div>
-            </section><br>
             
+            <?php if ($office_view): ?>
+                <section class="offices-section">
+                    <h2 class="section-title">Наши офисы</h2>
+                    <div class="offices-grid">
+                        <?php renderOffices($offices); ?>
+                    </div>
+                </section><br>
+            <?php endif ?>
             <!-- Форма обратной связи -->
              <?php if ($showForm): ?>
             <section class="contact-form-section">
@@ -215,11 +213,8 @@ $mapLng = $mainOffice ? $mainOffice['longitude'] : 104.278817;
     <?php include $footerPath; ?>
     
     <!-- Скрипты -->
-    <script src="assets/js/main.js"></script>
+    <script src="/assets/js/main.js"></script>
     <script>
-
-
-
 
     // Инициализация Яндекс Карты
     ymaps.ready(initMap);
@@ -286,6 +281,6 @@ $mapLng = $mainOffice ? $mainOffice['longitude'] : 104.278817;
         });
 
     </script>
-    <script src="assets/js/contacts.js"></script>
+    <script src="/assets/js/contacts.js"></script>
 </body>
 </html>

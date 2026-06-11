@@ -3,8 +3,8 @@ document.querySelector('form').addEventListener('submit', function(e) {
     const confirm = document.getElementById('password_confirm').value;
 
     if (pass !== confirm) {
-        e.preventDefault(); // Останавливаем отправку формы
-        alert('Пароли не совпадают!'); // Или выведи красивое уведомление
+        e.preventDefault();
+        alert('Пароли не совпадают!');
         document.getElementById('password_confirm').style.borderColor = 'red';
     }
 });

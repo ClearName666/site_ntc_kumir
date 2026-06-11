@@ -1,4 +1,3 @@
-// ===== РЕДАКТОР СТАТЕЙ =====
 
 let articleBuilder = null;
 
@@ -15,7 +14,7 @@ function escapeHtml(str) {
 class ArticleBuilder {
     constructor(existingContent = null) {
         this.blocks = [];
-        this.dragSourceIndex = null; // для перетаскивания через ручку
+        this.dragSourceIndex = null;
         this.load(existingContent);
         this.render();
     }
@@ -38,7 +37,6 @@ class ArticleBuilder {
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = html;
         
-        // Ищем главную сетку блоков
         let grid = tempDiv.querySelector('.article-builder-grid');
         if (!grid) {
             const text = tempDiv.innerHTML.trim();
@@ -55,11 +53,9 @@ class ArticleBuilder {
             return;
         }
         
-        // Проходим по всем дочерним элементам сетки строго по порядку
         const children = Array.from(grid.children);
         for (const child of children) {
             if (child.classList.contains('article-builder-block')) {
-                // Может быть list-block, image-block, или обычный
                 if (child.classList.contains('list-block')) {
                     const titleEl = child.querySelector('.list-title');
                     const title = titleEl ? titleEl.innerText : 'Список';
@@ -84,7 +80,6 @@ class ArticleBuilder {
                         });
                     }
                 } else {
-                    // Обычный текстовый блок
                     let fontSize = 16;
                     const styleAttr = child.getAttribute('style');
                     if (styleAttr) {
@@ -102,7 +97,6 @@ class ArticleBuilder {
                     });
                 }
             } else if (child.classList.contains('article-slider')) {
-                // Слайдер
                 const images = [];
                 const imgs = child.querySelectorAll('img');
                 imgs.forEach(img => {
@@ -312,7 +306,6 @@ class ArticleBuilder {
         input.click();
     }
     
-    // Перетаскивание блоков через ручку
     onDragStartHandle(e, index) {
         this.dragSourceIndex = index;
         e.dataTransfer.setData('text/plain', index);
@@ -349,7 +342,6 @@ class ArticleBuilder {
         const blockDiv = e.target.closest('.builder-block');
         if (blockDiv) blockDiv.style.opacity = '';
         this.dragSourceIndex = null;
-        // Сбросить тени у всех блоков
         document.querySelectorAll('.builder-block').forEach(b => b.style.boxShadow = 'none');
     }
     
@@ -370,13 +362,11 @@ class ArticleBuilder {
             blockDiv.className = `builder-block ${block.wide ? 'block-wide' : ''}`;
             blockDiv.setAttribute('data-block-id', block.id);
             blockDiv.setAttribute('data-index', index);
-            // Блок не draggable, перетаскивание только через ручку
             blockDiv.style.position = 'relative';
             blockDiv.style.borderRadius = '24px';
             blockDiv.style.transition = 'all 0.3s ease';
             if (block.wide) blockDiv.style.gridColumn = 'span 2';
             
-            // Стили в зависимости от типа
             if (block.type === 'slider' || block.type === 'image') {
                 blockDiv.style.padding = '0';
                 blockDiv.style.background = 'transparent';
@@ -399,7 +389,6 @@ class ArticleBuilder {
                 blockDiv.style.boxShadow = '0 8px 32px rgba(0,0,0,0.1)';
             }
             
-            // Ручка перетаскивания (draggable)
             const dragHandle = document.createElement('div');
             dragHandle.innerHTML = '<i class="fas fa-grip-vertical"></i>';
             dragHandle.draggable = true;
@@ -407,7 +396,6 @@ class ArticleBuilder {
             dragHandle.addEventListener('dragstart', (e) => this.onDragStartHandle(e, index));
             dragHandle.addEventListener('dragend', (e) => this.onDragEndHandle(e));
             
-            // Кнопка удаления
             const deleteBtn = document.createElement('button');
             deleteBtn.innerHTML = '×';
             deleteBtn.style.cssText = 'position:absolute; top:-10px; right:-10px; width:28px; height:28px; background:#ef4444; color:white; border:none; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:18px; z-index:20;';
@@ -416,12 +404,10 @@ class ArticleBuilder {
             blockDiv.appendChild(dragHandle);
             blockDiv.appendChild(deleteBtn);
             
-            // Обработчики drop на самом блоке (не на ручке)
             blockDiv.addEventListener('dragover', (e) => this.onDragOverBlock(e, index));
             blockDiv.addEventListener('dragleave', (e) => this.onDragLeaveBlock(e));
             blockDiv.addEventListener('drop', (e) => this.onDropOnBlock(e, index));
             
-            // --- Текстовый блок ---
             if (block.type === 'text') {
                 const controls = document.createElement('div');
                 controls.style.cssText = 'position:absolute; bottom:10px; left:50%; transform:translateX(-50%); display:flex; gap:8px; z-index:20; background:rgba(0,0,0,0.6); padding:6px 12px; border-radius:30px; backdrop-filter:blur(4px);';
@@ -457,7 +443,6 @@ class ArticleBuilder {
                 `;
                 const slider = toolbar.querySelector('input[type="range"]');
                 const valSpan = toolbar.querySelector('.font-size-val');
-                // внутри toolbar, после создания слайдера и valSpan
                 slider.value = block.fontSize || 16;
                 valSpan.textContent = (block.fontSize || 16) + 'px';
                 slider.addEventListener('input', (e) => {
@@ -479,7 +464,6 @@ class ArticleBuilder {
                 editable.className = 'builder-editable';
                 editable.style.cssText = 'outline:none; flex:1; min-height:120px; line-height:1.6; word-wrap:break-word; white-space:pre-wrap;';
                 editable.innerHTML = block.content || '<p>Введите текст...</p>';
-                // Восстанавливаем размер шрифта
                 if (block.fontSize) {
                     editable.style.fontSize = block.fontSize + 'px';
                 } else {
@@ -488,7 +472,6 @@ class ArticleBuilder {
                 }
                 editable.oninput = () => this.updateContent(block.id, editable.innerHTML);
 
-                // Обработка вставки (сбрасываем форматирование)
                 editable.addEventListener('paste', (e) => {
                     e.preventDefault();
                     const text = (e.clipboardData || window.clipboardData).getData('text/plain');
@@ -506,7 +489,6 @@ class ArticleBuilder {
                 blockDiv.appendChild(toolbar);
                 blockDiv.appendChild(editable);
             }
-            // --- Блок изображения ---
             else if (block.type === 'image') {
                 const controls = document.createElement('div');
                 controls.style.cssText = 'position:absolute; bottom:10px; left:50%; transform:translateX(-50%); display:flex; gap:8px; z-index:20; background:rgba(0,0,0,0.6); padding:6px 12px; border-radius:30px;';
@@ -553,7 +535,6 @@ class ArticleBuilder {
                 }
                 blockDiv.appendChild(container);
             }
-            // --- Слайдер ---
             else if (block.type === 'slider') {
                 
                 const sliderContainer = document.createElement('div');
@@ -602,7 +583,6 @@ class ArticleBuilder {
                         currentIdx = (currentIdx - 1 + block.images.length) % block.images.length; 
                         updateTransform(); 
                         updateDots(); 
-                        // обновить миниатюры
                         document.querySelectorAll(`[data-thumb-for="${block.id}"]`).forEach((thumb, i) => {
                             thumb.style.borderColor = i === currentIdx ? '#3b82f6' : 'transparent';
                         });
@@ -611,7 +591,6 @@ class ArticleBuilder {
                         currentIdx = (currentIdx + 1) % block.images.length; 
                         updateTransform(); 
                         updateDots(); 
-                        // обновить миниатюры
                         document.querySelectorAll(`[data-thumb-for="${block.id}"]`).forEach((thumb, i) => {
                             thumb.style.borderColor = i === currentIdx ? '#3b82f6' : 'transparent';
                         });
@@ -647,7 +626,6 @@ class ArticleBuilder {
                     addPhotoBtn.onclick = () => this.selectImageFile(block.id, true);
                     inner.appendChild(addPhotoBtn);
 
-                    // ======= ВСТАВИТЬ МИНИАТЮРЫ =======
                         const thumbsContainer = document.createElement('div');
                         thumbsContainer.style.cssText = 'position: absolute; bottom: 16px; right: 16px; display: flex; gap: 8px; z-index: 10; background: rgba(0,0,0,0.5); padding: 8px; border-radius: 16px; backdrop-filter: blur(4px); overflow-x: auto; max-width: calc(100% - 100px);';
                         block.images.forEach((imgSrc, idx) => {
@@ -662,7 +640,6 @@ class ArticleBuilder {
                             currentIdx = idx;
                             track.style.transform = `translateX(-${currentIdx * 100}%)`;
                             updateDots();
-                            // Обновить border активной миниатюры
                             document.querySelectorAll(`[data-thumb-for="${block.id}"]`).forEach(t => t.style.borderColor = 'transparent');
                             thumb.style.borderColor = '#3b82f6';
                         };
@@ -674,9 +651,7 @@ class ArticleBuilder {
                 }
                 blockDiv.appendChild(sliderContainer);
             }
-            // --- Блок перечисления (list) ---
             else if (block.type === 'list') {
-                // Стеклянный стиль, если включен
                 if (block.glassFrame) {
                     blockDiv.style.background = 'rgba(255, 255, 255, 0.2)';
                     blockDiv.style.backdropFilter = 'blur(12px)';
@@ -825,7 +800,6 @@ class ArticleBuilder {
     }
 }
 
-// ===== ГЛОБАЛЬНЫЕ ФУНКЦИИ =====
 function openArticleBuilder() {
     const modal = document.getElementById('articleBuilderModal');
     if (modal) {

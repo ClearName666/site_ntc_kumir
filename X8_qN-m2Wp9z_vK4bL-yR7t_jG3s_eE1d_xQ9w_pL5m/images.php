@@ -7,7 +7,6 @@ if (!hasPermission($conn, 'admin')) {
     redirectWithNotification('index.php', 'Недостаточно прав', 'error');
 }
 
-// ОБРАБОТКА ЗАГРУЗКИ
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['image_id'])) {
     $imageId = (int)$_POST['image_id'];
     

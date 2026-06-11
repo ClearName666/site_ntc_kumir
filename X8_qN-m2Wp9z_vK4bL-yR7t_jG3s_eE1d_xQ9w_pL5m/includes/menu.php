@@ -1,10 +1,8 @@
 <?php
-// загружаем ее через нашу новую функцию
 if (!isset($stats)) {
     $stats = getDashboardStats($conn);
 }
 
-// Определяем активную страницу
 $current_page = basename($_SERVER['PHP_SELF']);
 ?>
 

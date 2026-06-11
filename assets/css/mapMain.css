@@ -1,6 +1,3 @@
-/* ==========================================================================
-   СЕКЦИЯ ГЕОГРАФИИ ПРИМЕНЕНИЯ (RED NEON & GLASSMORPHISM ВЕРСИЯ)
-   ========================================================================= */
 
 .geography-section {
     padding-top: 40px;
@@ -9,12 +6,11 @@
     background-color: #ffffff;
 }
 
-/* Резиновый контейнер на основе пропорций оригинальной карты */
 .map-wrapper {
     position: relative;
     width: 100%;
     max-width: 1300px;
-    aspect-ratio: 1300 / 560; /* Фиксирует пропорции, чтобы плашки не съезжали */
+    aspect-ratio: 1300 / 560;
     margin: 0 auto;
 }
 
@@ -30,7 +26,6 @@
     display: block;
 }
 
-/* Базовые стили интерактивных плашек городов */
 .map-badge {
     position: absolute;
     z-index: 3;
@@ -45,7 +40,6 @@
     z-index: 10;
 }
 
-/* Светящаяся точка города на конце линии — ТЕПЕРЬ КРАСНАЯ */
 .badge-dot {
     width: 10px;
     height: 10px;
@@ -56,9 +50,8 @@
     display: none; 
 }
 
-/* Контейнер со списком городов (темные плашки) */
 .badge-content {
-    background: rgba(26, 31, 54, 0.85); /* Темный технологичный фон */
+    background: rgba(26, 31, 54, 0.85);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 12px;
     padding: 10px 14px;
@@ -85,10 +78,9 @@
 
 .map-badge:hover .badge-content {
     background: rgba(26, 31, 54, 0.98);
-    border-color: #ff2a2a; /* Красная рамка при ховере */
+    border-color: #ff2a2a;
 }
 
-/* --- КООРДИНАТЫ ГОРОДОВ НА КАРТЕ (%) --- */
 .pos-spb { top: 50%; left: 15%; }
 .pos-moscow { top: 60%; left: 19%; }
 .pos-saratov { top: 67%; left: 26%; }
@@ -101,9 +93,6 @@
 .pos-kamchatka { top: 65%; left: 82%; }
 
 
-/* ==========================================================================
-   СТИЛЬ ДЛЯ ПОЛУПРОЗРАЧНОГО БЛОКА О КОМПАНИИ С БЛЮРОМ
-   ========================================================================== */
 
 .pos-logo-brand {
     top: 5%; 
@@ -112,7 +101,6 @@
     position: absolute;
     display: flex;
     
-    /* Добавляем ширину родителю, чтобы он не зажимал внутренности */
     width: 30vw; 
     min-width: 450px; 
     max-width: 650px;
@@ -124,7 +112,6 @@
     transform: scale(1.02); 
 }
 
-/* В самом блоке меняем ширину на 100% от родителя */
 .map-about-box-white {
     position: relative;
     background: rgba(255, 255, 255, 0.65); 
@@ -139,7 +126,6 @@
     align-items: center; 
     gap: 18px; 
     
-    /* ТЕПЕРЬ ОН ЗАЙМЕТ ВСЮ ШИРИНУ РОДИТЕЛЯ */
     width: 100%; 
     
     height: auto;
@@ -148,14 +134,12 @@
     transition: box-shadow 0.25s ease, background-color 0.25s ease;
 }
 
-/* Идеально закругленная КРАСНАЯ неоновая рамка */
 .map-about-box-white::before {
     content: "";
     position: absolute;
     inset: 0;
     border-radius: 20px; 
-    padding: 2px; /* Толщина переливающейся линии */
-    /* Переливы в красно-бордово-алой гамме */
+    padding: 2px;
     background: conic-gradient(from var(--gradient-angle), #ff2a2a, #990000, #ff5252, #990000, #ff2a2a);
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
@@ -166,14 +150,13 @@
 
 .pos-logo-brand:hover .map-about-box-white {
     background: rgba(255, 255, 255, 0.75);
-    box-shadow: 0 20px 40px rgba(255, 42, 42, 0.15); /* Мягкое алое свечение */
+    box-shadow: 0 20px 40px rgba(255, 42, 42, 0.15);
 }
 
 .pos-logo-brand:hover .map-about-box-white::before {
-    animation-duration: 3s; /* Ускорение перелива при ховере */
+    animation-duration: 3s;
 }
 
-/* Левая колонка: Логотип (остается фиксированным, ему тянуться не нужно) */
 .about-white-logo {
     flex: 0 0 85px; 
     background: rgba(26, 31, 54, 0.95); 
@@ -201,11 +184,9 @@
     filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
 }
 
-/* Средняя колонка: Фичи (Черный текст) */
 .about-white-right {
-    /* Заберет вторую половину свободного пространства, деля его со средней колонкой 50/50 */
     flex: 1 1 0%; 
-    min-width: 180px; /* Защита от сжатия описания */
+    min-width: 180px;
     color: #2d3748 !important;
     word-wrap: break-word; 
     overflow-wrap: break-word;
@@ -227,7 +208,6 @@
     margin: 0;
 }
 
-/* Элементы списка: запрещаем тексту переноситься там, где это не нужно */
 .about-white-features li {
     position: relative;
     padding-left: 20px; 
@@ -239,12 +219,9 @@
     display: flex;
     align-items: center; 
     
-    /* white-space: normal разрешает перенос, но благодаря flex: 1 1 0% 
-       строка теперь станет намного длиннее, прежде чем перенесется */
     white-space: normal; 
 }
 
-/* Живой КРАСНЫЙ неоновый кругляшок вместо старого маркера */
 .about-white-features li::before {
     content: "" !important; 
     position: absolute;
@@ -254,25 +231,21 @@
     
     width: 7px; 
     height: 7px;
-    background: #ff2a2a; /* Чистый неоновый красный */
+    background: #ff2a2a;
     border-radius: 50%;
     
-    /* Мощное красное сияние */
     box-shadow: 0 0 6px #ff2a2a, 0 0 12px #ff2a2a, 0 0 18px rgba(255, 42, 42, 0.5);
     
-    /* Анимация пульсации */
     animation: neon-pulse-about-red 2.5s ease-in-out infinite;
     
     transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
-/* Эффект при наведении на конкретную строчку списка */
 .about-white-features li:hover::before {
     transform: translateY(-50%) scale(1.25);
     box-shadow: 0 0 10px #ff2a2a, 0 0 18px #ff2a2a, 0 0 25px rgba(255, 42, 42, 0.8);
 }
 
-/* Правая колонка: Описание */
 .about-white-right {
     flex: 1 1 auto; 
     color: #2d3748 !important;
@@ -290,12 +263,8 @@
 }
 
 
-/* ==========================================================================
-   ОБЪЕДИНЕННЫЙ АДАПТИВ (ПЛАНШЕТЫ И МОБИЛЬНЫЕ СМАРТФОНЫ)
-   ========================================================================== */
 
 @media (max-width: 1024px) {
-    /* Полностью скрываем блок о компании на мобильных/планшетах */
     .pos-logo-brand {
         display: none !important; 
     }
@@ -340,18 +309,13 @@
 }
 
 
-/* ==========================================================================
-   СЛУЖЕБНЫЕ НАСТРОЙКИ АНИМАЦИЙ И КЛЮЧЕВЫХ КАДРОВ
-   ========================================================================== */
 
-/* Регистрация кастомной переменной угла для работы конического градиента */
 @property --gradient-angle {
     syntax: "<angle>";
     initial-value: 0deg;
     inherits: false;
 }
 
-/* Анимация вращения градиента рамки */
 @keyframes rotate-gradient {
     0% {
         --gradient-angle: 0deg;
@@ -361,7 +325,6 @@
     }
 }
 
-/* Пульсация красного неона для маленьких точек */
 @keyframes neon-pulse-about-red {
     0%, 100% {
         box-shadow: 0 0 6px #ff2a2a, 0 0 12px #ff2a2a, 0 0 18px rgba(255, 42, 42, 0.5);

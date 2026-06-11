@@ -4,7 +4,6 @@ require_once __DIR__. '/includes/functions.php';
 $conn = getDBConnection();
 requireAdminAuth($conn);
 
-// Проверка прав (в вашем коде была проверка 'editor', оставляем её)
 if (!hasPermission($conn, 'editor')) {
     redirectWithNotification('index.php', 'Недостаточно прав', 'error');
 }
@@ -12,10 +11,9 @@ if (!hasPermission($conn, 'editor')) {
 $action = $_GET['action'] ?? 'list';
 $id = intval($_GET['id'] ?? 0);
 
-// --- ОБРАБОТКА СОХРАНЕНИЯ ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'edit' && $id) {
     $title = cleanInput($_POST['title'] ?? '');
-    $content = $_POST['content'] ?? ''; // Контент обычно не чистим через cleanInput, если там HTML
+    $content = $_POST['content'] ?? '';
     
     if (updateContentBlock($conn, $id, $title, $content)) {
         logAdminAction($conn, 'content_edit', "Отредактирован блок: $title");
@@ -25,11 +23,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'edit' && $id) {
     }
 }
 
-// --- ПОДГОТОВКА ДАННЫХ ДЛЯ ВЫВОДА ---
 $blocks = ($action === 'list') ? getAllContentBlocks($conn) : [];
 $currentBlock = ($action === 'edit' && $id) ? getContentBlockById($conn, $id) : null;
 
-// Если зашли в редактирование, а блока нет — уходим
 if ($action === 'edit' && !$currentBlock) {
     redirectWithNotification('content.php', 'Блок не найден', 'error');
 }

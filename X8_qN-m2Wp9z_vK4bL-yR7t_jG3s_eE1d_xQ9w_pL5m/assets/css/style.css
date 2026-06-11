@@ -1,50 +1,38 @@
-/* ==========================================================================
-   ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ (ЦВЕТОВАЯ СХЕМА)
-   ========================================================================== */
 
 :root {
-    /* Размеры и геометрия */
-    --sidebar-width: 250px;          /* Ширина бокового меню в десктопной версии */
-    --sidebar-width-collapsed: 70px; /* Ширина свернутого бокового меню */
-    --header-height: 70px;           /* Высота верхней панели навигации */
+    --sidebar-width: 250px;
+    --sidebar-width-collapsed: 70px;
+    --header-height: 70px;
 
-    /* Основные цвета бренда */
-    --primary-color: #3498db;        /* Основной акцентный цвет (кнопки, ссылки, активные элементы) */
-    --secondary-color: #2c3e50;      /* Вторичный цвет (сайдбар, заголовки) */
-    --success-color: #27ae60;        /* Цвет успеха (активные статусы, положительные действия) */
-    --warning-color: #f39c12;        /* Цвет предупреждения (внимание, важные уведомления) */
-    --danger-color: #e74c3c;         /* Цвет опасности/ошибки (удаление, критические действия) */
-    --info-color: #17a2b8;           /* Информационный цвет (подсказки, системные сообщения) */
+    --primary-color: #3498db;
+    --secondary-color: #2c3e50;
+    --success-color: #27ae60;
+    --warning-color: #f39c12;
+    --danger-color: #e74c3c;
+    --info-color: #17a2b8;
 
-    /* Нейтральные и служебные цвета */
-    --light-color: #f8f9fa;          /* Светлый фон (для наведений, подсветок) */
-    --dark-color: #343a40;           /* Темный текст/фон */
-    --border-color: #dee2e6;         /* Цвет границ и разделителей */
-    --text-color: #333;              /* Основной цвет текста */
-    --text-muted: #6c757d;           /* Приглушенный текст (подписи, даты) */
-    --text-light: #95a5a6;           /* Очень светлый текст (неактивные элементы) */
-    --background-body: #f5f7fa;      /* Фон всей страницы */
-    --background-dark-overlay: rgba(0,0,0,0.5); /* Затемнение для модальных окон */
+    --light-color: #f8f9fa;
+    --dark-color: #343a40;
+    --border-color: #dee2e6;
+    --text-color: #333;
+    --text-muted: #6c757d;
+    --text-light: #95a5a6;
+    --background-body: #f5f7fa;
+    --background-dark-overlay: rgba(0,0,0,0.5);
 
-    /* Эффекты и анимации */
-    --shadow: 0 5px 15px rgba(0,0,0,0.08);        /* Стандартная тень для карточек */
-    --shadow-large: 0 15px 30px rgba(0,0,0,0.15); /* Увеличенная тень при наведении */
-    --shadow-dropdown: 0 10px 30px rgba(0,0,0,0.1); /* Тень для выпадающих меню */
-    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* Плавность всех переходов */
+    --shadow: 0 5px 15px rgba(0,0,0,0.08);
+    --shadow-large: 0 15px 30px rgba(0,0,0,0.15);
+    --shadow-dropdown: 0 10px 30px rgba(0,0,0,0.1);
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ==========================================================================
-   СБРОС И БАЗОВЫЕ СТИЛИ
-   ========================================================================== */
 
-/* Сброс отступов и установка box-sizing для всех элементов */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-/* Основные стили тела документа */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: var(--background-body);
@@ -53,11 +41,7 @@ body {
     min-height: 100vh;
 }
 
-/* ==========================================================================
-   КОМПОНЕНТ: САЙДБАР (БОКОВОЕ МЕНЮ)
-   ========================================================================== */
 
-/* Основной контейнер сайдбара */
 .sidebar {
     width: var(--sidebar-width);
     background: var(--secondary-color);
@@ -69,14 +53,12 @@ body {
     z-index: 1000;
 }
 
-/* Шапка сайдбара с логотипом */
 .sidebar-header {
     padding: 25px 20px;
     background: rgba(0,0,0,0.2);
     border-bottom: 1px solid rgba(255,255,255,0.1);
 }
 
-/* Контейнер логотипа и ссылка */
 .sidebar-logo {
     display: flex;
     align-items: center;
@@ -85,13 +67,11 @@ body {
     color: white;
 }
 
-/* Изображение логотипа */
 .sidebar-logo img {
     width: 40px;
     height: 40px;
 }
 
-/* Текстовая часть логотипа */
 .logo-text h2 {
     font-size: 1.25rem;
     margin-bottom: 5px;
@@ -102,12 +82,10 @@ body {
     opacity: 0.8;
 }
 
-/* Контейнер пунктов меню */
 .sidebar-menu {
     padding: 20px 0;
 }
 
-/* Заголовок группы пунктов меню */
 .menu-title {
     padding: 10px 20px;
     font-size: 0.75rem;
@@ -117,7 +95,6 @@ body {
     margin-bottom: 10px;
 }
 
-/* Отдельный пункт меню */
 .menu-item {
     display: flex;
     align-items: center;
@@ -129,32 +106,27 @@ body {
     border-left: 3px solid transparent;
 }
 
-/* Эффект при наведении на пункт меню */
 .menu-item:hover {
     background: rgba(255,255,255,0.1);
     color: white;
     border-left-color: var(--primary-color);
 }
 
-/* Активный пункт меню */
 .menu-item.active {
     background: rgba(52, 152, 219, 0.2);
     color: white;
     border-left-color: var(--primary-color);
 }
 
-/* Иконка в пункте меню */
 .menu-item i {
     width: 20px;
     text-align: center;
 }
 
-/* Текст пункта меню (занимает все свободное пространство) */
 .menu-item span {
     flex: 1;
 }
 
-/* Бейдж с числом/количеством в меню */
 .menu-badge {
     background: var(--primary-color);
     color: white;
@@ -163,22 +135,14 @@ body {
     font-size: 0.75rem;
 }
 
-/* ==========================================================================
-   КОМПОНЕНТ: ОСНОВНОЙ КОНТЕНТ
-   ========================================================================== */
 
-/* Обертка основного контента (отступ под сайдбар) */
 .main-content {
     flex: 1;
     margin-left: var(--sidebar-width);
     min-height: 100vh;
 }
 
-/* ==========================================================================
-   КОМПОНЕНТ: ВЕРХНЯЯ ШАПКА (HEADER)
-   ========================================================================== */
 
-/* Верхняя панель навигации */
 .header {
     height: var(--header-height);
     background: white;
@@ -192,14 +156,12 @@ body {
     z-index: 100;
 }
 
-/* Левая часть шапки (кнопка и заголовок) */
 .header-left {
     display: flex;
     align-items: center;
     gap: 20px;
 }
 
-/* Кнопка сворачивания/разворачивания сайдбара (по умолчанию скрыта) */
 .toggle-sidebar {
     background: none;
     border: none;
@@ -209,21 +171,18 @@ body {
     display: none;
 }
 
-/* Заголовок текущей страницы */
 .header-title {
     font-size: 1.5rem;
     font-weight: 600;
     color: var(--secondary-color);
 }
 
-/* Правая часть шапки (пользовательское меню) */
 .header-right {
     display: flex;
     align-items: center;
     gap: 20px;
 }
 
-/* Меню пользователя */
 .user-menu {
     display: flex;
     align-items: center;
@@ -233,7 +192,6 @@ body {
     position: relative;
 }
 
-/* Аватар пользователя (круг с инициалами) */
 .user-avatar {
     width: 40px;
     height: 40px;
@@ -246,7 +204,6 @@ body {
     font-weight: 600;
 }
 
-/* Текстовая информация о пользователе */
 .user-info h4 {
     font-size: 0.9375rem;
     font-weight: 600;
@@ -257,7 +214,6 @@ body {
     color: var(--text-muted);
 }
 
-/* Выпадающее меню пользователя */
 .user-dropdown {
     position: absolute;
     top: 100%;
@@ -271,13 +227,11 @@ body {
     z-index: 100;
 }
 
-/* Показываем дропдаун при наведении */
 .user-menu:hover .user-dropdown {
     display: block;
     animation: fadeIn 0.3s ease;
 }
 
-/* Пункт выпадающего меню */
 .dropdown-item {
     display: flex;
     align-items: center;
@@ -297,16 +251,11 @@ body {
     color: var(--text-muted);
 }
 
-/* ==========================================================================
-   КОМПОНЕНТ: КОНТЕЙНЕРЫ И КАРТОЧКИ
-   ========================================================================== */
 
-/* Основной контейнер для контента внутри main-content */
 .content-container {
     padding: 30px;
 }
 
-/* Базовая карточка (белый фон, скругление, тень) */
 .card {
     background: white;
     border-radius: 15px;
@@ -315,7 +264,6 @@ body {
     overflow: hidden;
 }
 
-/* Заголовок карточки */
 .card-header {
     padding: 25px;
     border-bottom: 1px solid var(--border-color);
@@ -328,16 +276,11 @@ body {
     font-size: 1.5rem;
 }
 
-/* Тело карточки */
 .card-body {
     padding: 25px;
 }
 
-/* ==========================================================================
-   КОМПОНЕНТ: КНОПКИ (BUTTONS)
-   ========================================================================== */
 
-/* Базовая кнопка */
 .btn {
     display: inline-flex;
     align-items: center;
@@ -352,19 +295,17 @@ body {
     text-decoration: none;
 }
 
-/* Основная акцентная кнопка */
 .btn-primary {
     background: var(--primary-color);
     color: white;
 }
 
 .btn-primary:hover {
-    background: #2980b9; /* Темный оттенок primary-color */
+    background: #2980b9;
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
 }
 
-/* Вторичная кнопка */
 .btn-secondary {
     background: var(--text-muted);
     color: white;
@@ -374,19 +315,16 @@ body {
     background: #5a6268;
 }
 
-/* Кнопка успеха */
 .btn-success {
     background: var(--success-color);
     color: white;
 }
 
-/* Кнопка предупреждения */
 .btn-warning {
     background: var(--warning-color);
     color: white;
 }
 
-/* Кнопка опасности (удаление) */
 .btn-danger {
     background: var(--danger-color);
     color: white;
@@ -396,22 +334,16 @@ body {
     background: #c0392b;
 }
 
-/* Маленькая кнопка */
 .btn-sm {
     padding: 8px 16px;
     font-size: 0.875rem;
 }
 
-/* ==========================================================================
-   КОМПОНЕНТ: ФОРМЫ (FORMS)
-   ========================================================================== */
 
-/* Группа полей формы */
 .form-group {
     margin-bottom: 20px;
 }
 
-/* Подпись к полю */
 .form-group label {
     display: block;
     margin-bottom: 8px;
@@ -420,7 +352,6 @@ body {
     font-size: 0.9375rem;
 }
 
-/* Стили для полей ввода */
 .form-group input[type="text"],
 .form-group input[type="email"],
 .form-group input[type="password"],
@@ -437,7 +368,6 @@ body {
     transition: var(--transition);
 }
 
-/* Фокус на поле ввода */
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
@@ -446,21 +376,18 @@ body {
     box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
 }
 
-/* Горизонтальный ряд формы (сетка) */
 .form-row {
     display: flex;
     flex-wrap: wrap;
     margin: 0 -10px;
 }
 
-/* Колонка на 6 сеточных единиц (50% ширины) */
 .form-group.col-md-6 {
     flex: 0 0 50%;
     max-width: 50%;
     padding: 0 10px;
 }
 
-/* Метка для чекбокса с выравниванием */
 .checkbox-label {
     display: flex;
     align-items: center;
@@ -474,7 +401,6 @@ body {
     height: 18px;
 }
 
-/* Контейнер для кнопок действий формы */
 .form-actions {
     display: flex;
     gap: 15px;
@@ -483,22 +409,16 @@ body {
     border-top: 1px solid var(--border-color);
 }
 
-/* ==========================================================================
-   КОМПОНЕНТ: ТАБЛИЦЫ (TABLES)
-   ========================================================================== */
 
-/* Адаптивный контейнер для таблицы (горизонтальный скролл) */
 .table-responsive {
     overflow-x: auto;
 }
 
-/* Основная таблица данных */
 .data-table {
     width: 100%;
     border-collapse: collapse;
 }
 
-/* Заголовок таблицы */
 .data-table th {
     background: var(--light-color);
     padding: 15px;
@@ -508,23 +428,17 @@ body {
     border-bottom: 2px solid var(--border-color);
 }
 
-/* Ячейка таблицы */
 .data-table td {
     padding: 15px;
     border-bottom: 1px solid var(--border-color);
     vertical-align: middle;
 }
 
-/* Подсветка строки при наведении */
 .data-table tr:hover {
     background: var(--light-color);
 }
 
-/* ==========================================================================
-   КОМПОНЕНТ: БЕЙДЖИ И СТАТУСЫ
-   ========================================================================== */
 
-/* Базовый бейдж статуса */
 .status-badge {
     display: inline-block;
     padding: 5px 12px;
@@ -535,7 +449,6 @@ body {
     letter-spacing: 0.5px;
 }
 
-/* Успешный статус (опубликовано, активно, доступно) */
 .status-badge.published,
 .status-badge.active,
 .status-badge.available {
@@ -543,7 +456,6 @@ body {
     color: var(--success-color);
 }
 
-/* Неактивный/черновой статус */
 .status-badge.draft,
 .status-badge.inactive,
 .status-badge.not-available {
@@ -551,7 +463,6 @@ body {
     color: var(--text-muted);
 }
 
-/* Базовый бейдж */
 .badge {
     display: inline-block;
     padding: 4px 8px;
@@ -560,41 +471,32 @@ body {
     font-weight: 600;
 }
 
-/* Бейдж основного цвета */
 .badge-primary {
     background: rgba(52, 152, 219, 0.1);
     color: var(--primary-color);
 }
 
-/* Бейдж вторичного цвета */
 .badge-secondary {
     background: rgba(108, 117, 125, 0.1);
     color: var(--text-muted);
 }
 
-/* Бейдж успеха */
 .badge-success {
     background: rgba(39, 174, 96, 0.1);
     color: var(--success-color);
 }
 
-/* Бейдж предупреждения */
 .badge-warning {
     background: rgba(243, 156, 18, 0.1);
     color: var(--warning-color);
 }
 
-/* Бейдж опасности */
 .badge-danger {
     background: rgba(231, 76, 60, 0.1);
     color: var(--danger-color);
 }
 
-/* ==========================================================================
-   КОМПОНЕНТ: ПАГИНАЦИЯ
-   ========================================================================== */
 
-/* Контейнер пагинации */
 .pagination {
     display: flex;
     gap: 5px;
@@ -602,7 +504,6 @@ body {
     justify-content: center;
 }
 
-/* Ссылка пагинации */
 .page-link {
     display: flex;
     align-items: center;
@@ -622,18 +523,13 @@ body {
     border-color: var(--primary-color);
 }
 
-/* Активная страница пагинации */
 .page-link.active {
     background: var(--primary-color);
     color: white;
     border-color: var(--primary-color);
 }
 
-/* ==========================================================================
-   КОМПОНЕНТ: УВЕДОМЛЕНИЯ (NOTIFICATIONS)
-   ========================================================================== */
 
-/* Уведомление (фиксированное, всплывающее) */
 .notification {
     position: fixed;
     top: 20px;
@@ -649,31 +545,23 @@ body {
     gap: 10px;
 }
 
-/* Успешное уведомление */
 .notification.success {
     background: var(--success-color);
 }
 
-/* Уведомление об ошибке */
 .notification.error {
     background: var(--danger-color);
 }
 
-/* Предупреждающее уведомление */
 .notification.warning {
     background: var(--warning-color);
 }
 
-/* Информационное уведомление */
 .notification.info {
     background: var(--primary-color);
 }
 
-/* ==========================================================================
-   КОМПОНЕНТ: МОДАЛЬНЫЕ ОКНА (MODALS)
-   ========================================================================== */
 
-/* Затемнение фона модального окна */
 .modal {
     display: none;
     position: fixed;
@@ -687,12 +575,10 @@ body {
     justify-content: center;
 }
 
-/* Активное модальное окно */
 .modal.active {
     display: flex;
 }
 
-/* Контент модального окна */
 .modal-content {
     background: white;
     border-radius: 15px;
@@ -702,7 +588,6 @@ body {
     overflow-y: auto;
 }
 
-/* Заголовок модального окна */
 .modal-header {
     padding: 20px;
     border-bottom: 1px solid var(--border-color);
@@ -716,7 +601,6 @@ body {
     color: var(--secondary-color);
 }
 
-/* Кнопка закрытия модального окна */
 .modal-close {
     background: none;
     border: none;
@@ -725,12 +609,10 @@ body {
     color: var(--text-muted);
 }
 
-/* Тело модального окна */
 .modal-body {
     padding: 20px;
 }
 
-/* Нижняя часть (футер) модального окна */
 .modal-footer {
     padding: 20px;
     border-top: 1px solid var(--border-color);
@@ -739,11 +621,7 @@ body {
     gap: 10px;
 }
 
-/* ==========================================================================
-   КОМПОНЕНТ: ПРОГРЕСС-БАР
-   ========================================================================== */
 
-/* Контейнер прогресс-бара */
 .progress {
     height: 10px;
     background: var(--light-color);
@@ -752,7 +630,6 @@ body {
     margin: 10px 0;
 }
 
-/* Заполненная часть прогресс-бара */
 .progress-bar {
     height: 100%;
     background: var(--primary-color);
@@ -760,11 +637,7 @@ body {
     transition: width 0.3s ease;
 }
 
-/* ==========================================================================
-   КОМПОНЕНТ: КАРТОЧКИ СТАТИСТИКИ (DASHBOARD)
-   ========================================================================== */
 
-/* Сетка статистических карточек */
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -772,7 +645,6 @@ body {
     margin-bottom: 30px;
 }
 
-/* Карточка статистики */
 .stat-card {
     background: white;
     border-radius: 15px;
@@ -783,18 +655,15 @@ body {
     animation: fadeIn 0.6s ease;
 }
 
-/* Индивидуальные цвета для карточек */
 .stat-card:nth-child(2) { border-left-color: var(--success-color); }
 .stat-card:nth-child(3) { border-left-color: var(--warning-color); }
 .stat-card:nth-child(4) { border-left-color: var(--danger-color); }
 
-/* Эффект при наведении */
 .stat-card:hover {
     transform: translateY(-5px);
     box-shadow: var(--shadow-large);
 }
 
-/* Шапка карточки статистики */
 .stat-header {
     display: flex;
     align-items: center;
@@ -802,7 +671,6 @@ body {
     margin-bottom: 15px;
 }
 
-/* Иконка статистики */
 .stat-icon {
     width: 50px;
     height: 50px;
@@ -815,7 +683,6 @@ body {
     font-size: 1.5rem;
 }
 
-/* Заголовок статистики */
 .stat-title {
     font-size: 0.875rem;
     color: var(--text-muted);
@@ -823,7 +690,6 @@ body {
     letter-spacing: 1px;
 }
 
-/* Числовое значение статистики */
 .stat-value {
     font-size: 2rem;
     font-weight: 700;
@@ -831,17 +697,12 @@ body {
     margin-bottom: 5px;
 }
 
-/* Изменение показателя (рост/падение) */
 .stat-change {
     font-size: 0.875rem;
     color: var(--success-color);
 }
 
-/* ==========================================================================
-   КОМПОНЕНТ: БЫСТРЫЕ ДЕЙСТВИЯ (QUICK ACTIONS)
-   ========================================================================== */
 
-/* Блок быстрых действий */
 .quick-actions {
     background: white;
     border-radius: 15px;
@@ -850,7 +711,6 @@ body {
     margin-bottom: 30px;
 }
 
-/* Заголовок секции */
 .section-title {
     font-size: 1.5rem;
     color: var(--secondary-color);
@@ -864,14 +724,12 @@ body {
     color: var(--primary-color);
 }
 
-/* Сетка кнопок действий */
 .actions-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 15px;
 }
 
-/* Кнопка быстрого действия */
 .action-btn {
     display: flex;
     align-items: center;
@@ -891,7 +749,6 @@ body {
     transform: translateY(-3px);
 }
 
-/* Иконка действия */
 .action-icon {
     width: 40px;
     height: 40px;
@@ -904,7 +761,6 @@ body {
     font-size: 1.25rem;
 }
 
-/* Текст действия */
 .action-text h4 {
     font-size: 1rem;
     margin-bottom: 5px;
@@ -915,11 +771,7 @@ body {
     color: var(--text-muted);
 }
 
-/* ==========================================================================
-   КОМПОНЕНТ: ПОСЛЕДНИЕ ДЕЙСТВИЯ (RECENT ACTIVITY)
-   ========================================================================== */
 
-/* Блок последних действий */
 .recent-activity {
     background: white;
     border-radius: 15px;
@@ -927,13 +779,11 @@ body {
     box-shadow: var(--shadow);
 }
 
-/* Список действий */
 .activity-list {
     max-height: 300px;
     overflow-y: auto;
 }
 
-/* Элемент действия */
 .activity-item {
     display: flex;
     align-items: center;
@@ -947,7 +797,6 @@ body {
     background: var(--light-color);
 }
 
-/* Иконка действия */
 .activity-icon {
     width: 40px;
     height: 40px;
@@ -959,7 +808,6 @@ body {
     color: var(--primary-color);
 }
 
-/* Контент действия */
 .activity-content {
     flex: 1;
 }
@@ -979,11 +827,7 @@ body {
     color: var(--text-light);
 }
 
-/* ==========================================================================
-   КОМПОНЕНТ: ПРИВЕТСТВИЕ (WELCOME SECTION)
-   ========================================================================== */
 
-/* Секция приветствия с градиентом */
 .welcome-section {
     background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
     color: white;
@@ -993,7 +837,6 @@ body {
     animation: slideUp 0.6s ease;
 }
 
-/* Шапка секции приветствия */
 .welcome-header {
     display: flex;
     align-items: center;
@@ -1016,17 +859,12 @@ body {
     opacity: 0.2;
 }
 
-/* ==========================================================================
-   КОМПОНЕНТ: КНОПКИ ДЕЙСТВИЙ В ТАБЛИЦАХ
-   ========================================================================== */
 
-/* Контейнер для кнопок действий */
 .action-buttons {
     display: flex;
     gap: 8px;
 }
 
-/* Кнопка редактирования */
 .btn-edit {
     background: rgba(52, 152, 219, 0.1);
     color: var(--primary-color);
@@ -1041,7 +879,6 @@ body {
     color: white;
 }
 
-/* Кнопка удаления */
 .btn-delete {
     background: rgba(231, 76, 60, 0.1);
     color: var(--danger-color);
@@ -1056,11 +893,7 @@ body {
     color: white;
 }
 
-/* ==========================================================================
-   КОМПОНЕНТ: СЕТКА КОНТЕНТ-БЛОКОВ
-   ========================================================================== */
 
-/* Сетка блоков контента */
 .content-blocks-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -1068,7 +901,6 @@ body {
     margin-top: 20px;
 }
 
-/* Карточка контент-блока */
 .content-block-card {
     background: white;
     border: 1px solid var(--border-color);
@@ -1082,7 +914,6 @@ body {
     box-shadow: var(--shadow);
 }
 
-/* Шапка блока */
 .block-header {
     display: flex;
     justify-content: space-between;
@@ -1095,7 +926,6 @@ body {
     color: var(--secondary-color);
 }
 
-/* Категория блока */
 .block-category {
     font-size: 0.75rem;
     background: var(--light-color);
@@ -1104,35 +934,27 @@ body {
     border-radius: 4px;
 }
 
-/* Содержимое блока */
 .block-content {
     margin-bottom: 15px;
     color: #666;
 }
 
-/* ==========================================================================
-   КОМПОНЕНТ: РОЛИ И СТАТУСЫ
-   ========================================================================== */
 
-/* Бейдж суперадмина */
 .role-superadmin {
     background: rgba(231, 76, 60, 0.1);
     color: var(--danger-color);
 }
 
-/* Бейдж администратора */
 .role-admin {
     background: rgba(52, 152, 219, 0.1);
     color: var(--primary-color);
 }
 
-/* Бейдж редактора */
 .role-editor {
     background: rgba(39, 174, 96, 0.1);
     color: var(--success-color);
 }
 
-/* Бейдж для действий в логах */
 .badge-action {
     background: rgba(52, 152, 219, 0.1);
     color: var(--primary-color);
@@ -1140,18 +962,13 @@ body {
     font-size: 0.75rem;
 }
 
-/* ==========================================================================
-   КОМПОНЕНТ: ЗАГРУЗКА ИЗОБРАЖЕНИЙ (DROPZONE)
-   ========================================================================== */
 
-/* Контейнер для загрузки изображений */
 .image-upload-container {
     display: flex;
     flex-direction: column;
     gap: 10px;
 }
 
-/* Контейнер для трех полей изображений */
 .form-row.images-container {
     display: flex;
     flex-wrap: wrap;
@@ -1159,13 +976,11 @@ body {
     margin-top: 15px;
 }
 
-/* Колонка поля загрузки изображения */
 .image-field-col {
     flex: 1;
     min-width: 250px;
 }
 
-/* Зона перетаскивания файла */
 .drop-zone {
     width: 100%;
     height: 150px;
@@ -1184,25 +999,21 @@ body {
     box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
-/* Эффект при наведении на зону загрузки */
 .drop-zone:hover, .drop-zone--over {
     border-color: #007bff;
     background: #f0f7ff;
 }
 
-/* Скрытый input для выбора файла */
 .drop-zone__input {
     display: none;
 }
 
-/* Миниатюра загруженного изображения */
 .drop-zone__thumb {
     width: 100%;
     height: 100%;
     object-fit: contain;
 }
 
-/* Текст-подсказка в зоне загрузки */
 .drop-zone__prompt {
     font-size: 14px;
     color: #777;
@@ -1219,17 +1030,12 @@ body {
     transform: translateY(-2px);
 }
 
-/* ==========================================================================
-   АНИМАЦИИ (ANIMATIONS)
-   ========================================================================== */
 
-/* Анимация появления (fade in) */
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
 }
 
-/* Анимация выезда справа */
 @keyframes slideInRight {
     from {
         opacity: 0;
@@ -1241,7 +1047,6 @@ body {
     }
 }
 
-/* Анимация подъема */
 @keyframes slideUp {
     from {
         opacity: 0;
@@ -1253,17 +1058,12 @@ body {
     }
 }
 
-/* ==========================================================================
-   АДАПТИВНОСТЬ (MEDIA QUERIES)
-   ========================================================================== */
 
-/* Планшеты и маленькие ноутбуки (до 992px) - сворачиваем сайдбар */
 @media (max-width: 992px) {
     :root {
         --sidebar-width: var(--sidebar-width-collapsed);
     }
     
-    /* Скрываем текстовые элементы в свернутом сайдбаре */
     .logo-text,
     .menu-item span,
     .menu-badge,
@@ -1295,14 +1095,11 @@ body {
     }
 }
 
-/* Мобильные устройства (до 768px) - гамбургер-меню */
 @media (max-width: 768px) {
-    /* Сайдбар скрыт за экраном */
     .sidebar {
         transform: translateX(-100%);
     }
     
-    /* Показываем сайдбар при активном классе */
     .sidebar.active {
         transform: translateX(0);
     }
@@ -1311,7 +1108,6 @@ body {
         margin-left: 0;
     }
     
-    /* Показываем кнопку-гамбургер */
     .toggle-sidebar {
         display: block;
     }
@@ -1320,14 +1116,12 @@ body {
         padding: 20px;
     }
     
-    /* Колонки формы становятся на 100% ширины */
     .form-group.col-md-6 {
         flex: 0 0 100%;
         max-width: 100%;
     }
 }
 
-/* Маленькие мобильные устройства (до 480px) */
 @media (max-width: 480px) {
     .header {
         padding: 0 15px;

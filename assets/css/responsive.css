@@ -1,6 +1,3 @@
-/* ========================================
-   АНИМАЦИИ (Глобальные)
-   ======================================== */
 @keyframes slideDown {
     from {
         opacity: 0;
@@ -30,7 +27,6 @@
     }
 }
 
-/* Пульсация глубокого синего неона для точек */
 @keyframes neon-pulse {
     0%, 100% {
         box-shadow: 0 0 8px #0055ff, 0 0 15px #0055ff, 0 0 25px rgba(0, 85, 255, 0.6);
@@ -42,24 +38,8 @@
     }
 }
 
-/* Пульсация зеленого неона для иконки карты */
-/* @keyframes neon-green-pulse {
-    0%, 100% {
-        box-shadow: 0 0 8px rgba(57, 255, 20, 0.4), 
-                    inset 0 0 6px rgba(57, 255, 20, 0.2);
-        border-color: rgba(57, 255, 20, 0.8);
-    }
-    50% {
-        box-shadow: 0 0 16px rgba(57, 255, 20, 0.8), 
-                    inset 0 0 10px rgba(57, 255, 20, 0.4);
-        border-color: rgba(57, 255, 20, 1);
-    }
-} */
 
 
-/* ========================================
-   Mobile Menu (Общие стили)
-   ======================================== */
 .mobile-menu {
     display: none;
     position: fixed;
@@ -104,9 +84,6 @@
 }
 
 
-/* ========================================
-   АДАПТИВНОСТЬ: ЭКРАНЫ ДО 1200px
-   ======================================== */
 @media (max-width: 1200px) {
     .hero-main {
         gap: 40px;
@@ -126,9 +103,6 @@
 }
 
 
-/* ========================================
-   АДАПТИВНОСТЬ: ЭКРАНЫ ДО 1024px
-   ======================================== */
 @media (max-width: 1024px) and (min-width: 769px) {
     .hero-card {
         width: 28%;
@@ -145,9 +119,6 @@
 }
 
 
-/* ========================================
-   АДАПТИВНОСТЬ: ЭКРАНЫ ДО 992px
-   ======================================== */
 @media (max-width: 992px) {
     .main-nav {
         display: none !important;
@@ -204,7 +175,6 @@
     }
 }
 
-/* Адаптация dropdown (для десктопов обратно возвращаем) */
 @media (min-width: 993px) {
     .dropdown-menu {
         display: block !important;
@@ -212,11 +182,7 @@
 }
 
 
-/* ========================================
-   АДАПТИВНОСТЬ: ЭКРАНЫ ДО 768px (Смартфоны)
-   ======================================== */
 @media (max-width: 768px) {
-    /* --- Элементы шапки --- */
     .header-content {
         padding: 12px 0;
     }
@@ -254,13 +220,11 @@
         display: flex;
     }
     
-    /* Коррекция высоты мобильного меню под узкую шапку */
     .mobile-menu {
         top: 64px;
         height: calc(100vh - 64px);
     }
 
-    /* --- Секция HERO и фикс КАРТОЧЕК ПОВЕРХ КАРТИНКИ --- */
     .hero {
         min-height: auto;
     }
@@ -284,12 +248,10 @@
         transform: none !important;
     }
     
-    /* Оптимальная высота, чтобы вместить три карточки снизу */
     .hero-image {
         height: 420px; 
     }
 
-    /* Абсолютные карточки в виде компактных плашек */
     .hero-card {
         position: absolute !important;
         width: calc(100% - 30px) !important;
@@ -316,12 +278,10 @@
         transform: translateY(-1px) !important;
     }
 
-    /* Шаг по вертикали для карточек */
     .card-energy { top: 45% !important; }
     .card-analytics { top: 62% !important; }
     .card-control { top: 79% !important; }
 
-    /* Мелкие круглые иконки в карточках */
     .card-pattern-box {
         flex: 0 0 34px;
         width: 34px;
@@ -344,7 +304,6 @@
         line-height: 1.2;
     }
 
-    /* --- Карта и Обертки (Твой старый рабочий код) --- */
     .map-badge.pos-logo-brand.company-about-fullwidth {
         position: relative;
         width: calc(100% - 40px);
@@ -390,9 +349,6 @@
 }
 
 
-/* ========================================
-   АДАПТИВНОСТЬ: ЭКРАНЫ ДО 576px
-   ======================================== */
 @media (max-width: 576px) {
     .container {
         padding: 0 15px;

@@ -11,18 +11,15 @@ if (!hasPermission($conn, 'editor')) {
 $action = $_GET['action'] ?? 'list';
 $id = intval($_GET['id'] ?? 0);
 
-// --- ОБРАБОТКА POST ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = cleanInput($_POST['name'] ?? '');
     $imagePath = $_POST['existing_image'] ?? '';
     
-    // 1. Работа с изображением
     if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
         $uploadResult = uploadImage($_FILES['image']);
         if ($uploadResult['success']) $imagePath = $uploadResult['path'];
     }
     
-    // 2. Подготовка данных
     $data = [
         'name'        => $name,
         'slug'        => generateUniqueCategorySlug($conn, $name, $id),
@@ -45,7 +42,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// --- ОБРАБОТКА УДАЛЕНИЯ ---
 if ($action === 'delete' && $id) {
     if (getCategoryProductCount($conn, $id) > 0) {
         redirectWithNotification('categories.php', 'Нельзя удалить категорию с товарами', 'error');
@@ -53,7 +49,6 @@ if ($action === 'delete' && $id) {
     
     $category = getCategoryById($conn, $id);
     
-    // ВЫНОСИМ ЗАПРОС:
     if (deleteCategory($conn, $id)) {
         logAdminAction($conn, 'category_delete', "Удалена категория: " . ($category['name'] ?? $id));
         redirectWithNotification('categories.php', 'Категория успешно удалена', 'success');
@@ -63,10 +58,8 @@ if ($action === 'delete' && $id) {
 }
 
 
-// Подключаем шапку
 require_once __DIR__. '/includes/header.php';
 
-// Подключаем меню
 require_once __DIR__. '/includes/menu.php';
 ?>
 
@@ -84,7 +77,6 @@ require_once __DIR__. '/includes/menu.php';
         </div>
         
         <?php 
-            // Подключаем правую шапку
             require_once __DIR__. '/includes/header-right.php';
         ?>
     </header>
@@ -179,7 +171,6 @@ require_once __DIR__. '/includes/menu.php';
         <?php
         $category = [];
         if ($action === 'edit' && $id) {
-            // ИСПОЛЬЗУЕМ ФУНКЦИЮ:
             $category = getCategoryById($conn, $id);
             
             if (!$category) {
@@ -261,6 +252,5 @@ require_once __DIR__. '/includes/menu.php';
 <script src="assets/js/scripts.js"></script>
 
 <?php
-// Подключаем подвал
 require_once __DIR__. '/includes/footer.php';
 ?>

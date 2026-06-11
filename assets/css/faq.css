@@ -32,9 +32,6 @@
     --transition-answer: max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ========================================
-   БАЗОВЫЕ СТИЛИ И ФОН
-   ======================================== */
 body {
     position: relative;
     z-index: 0;
@@ -42,7 +39,6 @@ body {
     background: url('/static/background.jpg') center/cover no-repeat fixed;
 }
 
-/* Размытый фоновый слой */
 body::before {
     content: "";
     position: fixed;
@@ -55,7 +51,6 @@ body::before {
     transform: scale(1.1);
 }
 
-/* Полупрозрачный оверлей */
 body::after {
     content: "";
     position: fixed;
@@ -65,7 +60,6 @@ body::after {
     backdrop-filter: blur(10px);
 }
 
-/* Основной контент */
 .faq-page {
     position: relative;
     z-index: 1;
@@ -79,9 +73,6 @@ body::after {
     padding: 0 20px;
 }
 
-/* ========================================
-   ШАПКА СТРАНИЦЫ
-   ======================================== */
 .page-header {
     text-align: center;
     margin-bottom: 70px;
@@ -97,7 +88,6 @@ body::after {
     display: inline-block;
 }
 
-/* Декоративная линия */
 .page-title::after {
     content: '';
     position: absolute;
@@ -118,9 +108,6 @@ body::after {
     line-height: 1.6;
 }
 
-/* ========================================
-   КАТЕГОРИИ ВОПРОСОВ
-   ======================================== */
 .categories-section {
     margin-bottom: 3rem;
 }
@@ -138,7 +125,6 @@ body::after {
     justify-content: center;
 }
 
-/* Кнопка категории */
 .category-btn {
     padding: 0.75rem 1.5rem;
     background: var(--bg-white-semi);
@@ -153,7 +139,6 @@ body::after {
     display: inline-block;
 }
 
-/* Активная категория и ховер */
 .category-btn:hover,
 .category-btn.active {
     background: var(--faq-primary);
@@ -162,22 +147,17 @@ body::after {
     transform: translateY(-2px);
 }
 
-/* Кнопка "Все вопросы" */
 .category-btn.all {
     background: rgba(254, 245, 231, 0.8);
     border-color: var(--faq-primary);
     color: var(--faq-dark);
 }
 
-/* ========================================
-   СПИСОК FAQ
-   ======================================== */
 .faq-list {
     max-width: 800px;
     margin: 0 auto;
 }
 
-/* Элемент FAQ */
 .faq-item {
     margin-bottom: 1rem;
     background: var(--bg-white-semi);
@@ -188,19 +168,16 @@ body::after {
     animation: slideUp 0.6s ease both;
 }
 
-/* Задержки для каскадной анимации */
 .faq-item:nth-child(1) { animation-delay: 0.1s; }
 .faq-item:nth-child(2) { animation-delay: 0.2s; }
 .faq-item:nth-child(3) { animation-delay: 0.3s; }
 .faq-item:nth-child(4) { animation-delay: 0.4s; }
 .faq-item:nth-child(5) { animation-delay: 0.5s; }
 
-/* Скрытый чекбокс для аккордеона */
 .faq-toggle {
     display: none;
 }
 
-/* Заголовок вопроса */
 .faq-question {
     display: flex;
     align-items: center;
@@ -215,7 +192,6 @@ body::after {
     user-select: none;
 }
 
-/* Ховер на вопросе */
 .faq-question:hover {
     background: rgba(243, 156, 18, 0.2);
 }
@@ -226,25 +202,21 @@ body::after {
     flex-shrink: 0;
 }
 
-/* Стрелка */
 .faq-arrow {
     font-size: 0.875rem;
     transition: transform 0.3s;
     flex-shrink: 0;
 }
 
-/* Поворот стрелки при открытии */
 .faq-toggle:checked ~ .faq-question .faq-arrow {
     transform: rotate(180deg);
 }
 
-/* Активный вопрос */
 .faq-toggle:checked ~ .faq-question {
     background: rgba(243, 156, 18, 0.3);
     border-bottom: var(--border-faq);
 }
 
-/* Скрытый ответ */
 .faq-answer {
     max-height: 0;
     overflow: hidden;
@@ -252,12 +224,10 @@ body::after {
     background: rgba(255, 255, 255, 0.2);
 }
 
-/* Раскрытый ответ */
 .faq-toggle:checked ~ .faq-answer {
     max-height: 1000px;
 }
 
-/* Контент ответа */
 .faq-answer-content {
     padding: 1.5rem;
     color: var(--text-dark);
@@ -278,9 +248,6 @@ body::after {
     margin-bottom: 0.5rem;
 }
 
-/* ========================================
-   ФОРМА ВОПРОСА
-   ======================================== */
 .question-form-section {
     margin-top: 4rem;
     background: var(--bg-white-semi);
@@ -302,7 +269,6 @@ body::after {
     margin: 0 auto;
 }
 
-/* Группы полей */
 .form-group {
     margin-bottom: 1.5rem;
 }
@@ -314,7 +280,6 @@ body::after {
     font-weight: 500;
 }
 
-/* Поля ввода */
 .form-input,
 .form-textarea {
     width: 100%;
@@ -326,7 +291,6 @@ body::after {
     transition: var(--transition-smooth);
 }
 
-/* Фокус */
 .form-input:focus,
 .form-textarea:focus {
     outline: none;
@@ -340,7 +304,6 @@ body::after {
     resize: vertical;
 }
 
-/* Кнопка отправки */
 .submit-btn {
     background: linear-gradient(135deg, var(--faq-primary), var(--faq-dark));
     color: white;
@@ -359,9 +322,6 @@ body::after {
     box-shadow: var(--shadow-btn);
 }
 
-/* ========================================
-   ПУСТОЕ СОСТОЯНИЕ
-   ======================================== */
 .faq-empty {
     text-align: center;
     padding: 4rem 1rem;
@@ -372,9 +332,6 @@ body::after {
     color: var(--text-light);
 }
 
-/* ========================================
-   АНИМАЦИИ
-   ======================================== */
 @keyframes fadeInUp {
     from {
         opacity: 0;
@@ -397,9 +354,6 @@ body::after {
     }
 }
 
-/* ========================================
-   АДАПТИВНОСТЬ
-   ======================================== */
 @media (max-width: 992px) {
     .faq-list {
         max-width: 100%;
@@ -442,7 +396,6 @@ body::after {
         padding: 1.5rem;
     }
     
-    /* Горизонтальный скролл для категорий */
     .categories-grid {
         justify-content: flex-start;
         overflow-x: auto;

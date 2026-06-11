@@ -5,7 +5,6 @@ require_once __DIR__. '/includes/functions.php';
 $conn = getDBConnection();
 requireAdminAuth($conn);
 
-// Проверка прав (как в твоем примере)
 if (!hasPermission($conn, 'editor')) {
     redirectWithNotification('index.php', 'Недостаточно прав', 'error');
 }
@@ -13,7 +12,6 @@ if (!hasPermission($conn, 'editor')) {
 $action = $_GET['action'] ?? 'list';
 $id = (int)($_GET['id'] ?? 0);
 
-// --- ОБРАБОТКА POST (Добавление и Редактирование) ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = cleanInput($_POST['title'] ?? '');
     
@@ -25,9 +23,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'icon_path'   => $_POST['existing_icon'] ?? ''
     ];
 
-    // Загрузка иконки (аналогично загрузке фото в новостях)
     if (isset($_FILES['icon']) && $_FILES['icon']['error'] === UPLOAD_ERR_OK) {
-        $uploadResult = uploadImage($_FILES['icon']); // Используем ту же функцию загрузки
+        $uploadResult = uploadImage($_FILES['icon']);
         if ($uploadResult['success']) {
             $data['icon_path'] = $uploadResult['path'];
         }
@@ -46,7 +43,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// --- ОБРАБОТКА УДАЛЕНИЯ ---
 if ($action === 'delete' && $id) {
     $item = getAdvantageById($conn, $id);
     if ($item && deleteAdvantage($conn, $id)) {

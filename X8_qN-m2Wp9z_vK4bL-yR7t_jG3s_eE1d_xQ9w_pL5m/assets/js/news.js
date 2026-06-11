@@ -1,4 +1,3 @@
-// Автоматическая генерация слага
 document.getElementById('title').addEventListener('input', function() {
     const title = this.value;
     const slug = title.toLowerCase()
@@ -8,7 +7,6 @@ document.getElementById('title').addEventListener('input', function() {
     document.getElementById('slug').value = slug;
 });
 
-// Удаление изображения
 function removeImage() {
     if (confirm('Удалить текущее изображение?')) {
         const existingImage = document.querySelector('.existing-image');

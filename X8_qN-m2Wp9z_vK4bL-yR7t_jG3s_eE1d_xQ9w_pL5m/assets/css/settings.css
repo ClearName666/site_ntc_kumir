@@ -1,4 +1,3 @@
-/* Стили для кастомных блоков управления и эффекта dropzone */
 .custom-select-styled {
     border-radius: 6px;
     border: 1px solid #ced4da;
@@ -23,11 +22,10 @@
 .gap-2 { gap: 0.5rem !important; }
 .gap-3 { gap: 1rem !important; }
 
-/* Состояние блокировки панелей при глобальном сбросе */
 .uc-locked-state {
     position: relative;
-    pointer-events: none; /* Отключаем любые клики */
-    opacity: 0.4;        /* Делаем блок блеклым */
+    pointer-events: none;
+    opacity: 0.4;
     filter: blur(0.5px);
     transition: all 0.3s ease;
 }
@@ -42,7 +40,6 @@
 }
 
 
-/* Дополнительные стили для красоты */
 #text_preview_box {
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
@@ -60,7 +57,6 @@
     transform: translateY(0) !important;
 }
 
-/* Анимация для элементов предпросмотра */
 #text_preview_heading,
 #text_preview_text,
 #text_preview_link,
@@ -69,7 +65,6 @@
     transition: all 0.3s ease;
 }
 
-/* Стили для индикатора контрастности */
 #contrast_bar.good {
     background: linear-gradient(90deg, #28a745, #20c997);
 }

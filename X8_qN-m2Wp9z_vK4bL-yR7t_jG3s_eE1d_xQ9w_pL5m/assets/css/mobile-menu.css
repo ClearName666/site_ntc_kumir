@@ -1,16 +1,9 @@
-/* ==========================================================================
-   МОБИЛЬНОЕ МЕНЮ (Mobile Menu Styles)
-   Адаптивное меню для смартфонов с выезжающей панелью
-   ========================================================================== */
 
-/* Скрываем крестик на десктопе */
 .menu-close-btn {
     display: none;
 }
 
-/* Базовые стили для мобильной версии */
 @media (max-width: 768px) {
-    /* Показываем крестик только на мобильных */
     .menu-close-btn {
         display: flex;
         position: absolute;
@@ -35,7 +28,6 @@
         transform: rotate(90deg);
     }
     
-    /* Оверлей (затемнение фона) */
     .menu-overlay {
         position: fixed;
         top: 0;
@@ -54,7 +46,6 @@
         visibility: visible;
     }
     
-    /* Мобильный контейнер меню */
     .sidebar {
         position: fixed;
         top: 0;
@@ -75,7 +66,6 @@
         transform: translateX(0);
     }
     
-    /* Стили для контента меню в мобильной версии */
     .sidebar .sidebar-header {
         background: linear-gradient(135deg, var(--primary-color, #3498db), var(--secondary-color, #2c3e50));
         border-radius: 0 0 20px 20px;
@@ -111,14 +101,12 @@
         opacity: 0.8;
     }
     
-    /* Показываем текст пунктов меню */
     .sidebar .menu-item span {
         display: inline !important;
         flex: 1;
         margin-left: 15px;
     }
     
-    /* Цвет текста пунктов меню (белый фон -> темный текст) */
     .sidebar .menu-item {
         color: var(--secondary-color, #2c3e50) !important;
         padding: 14px 20px;
@@ -148,7 +136,6 @@
         border-left: 3px solid var(--primary-color, #3498db);
     }
     
-    /* Меню тайтлы */
     .sidebar .menu-title {
         color: var(--text-muted, #6c757d) !important;
         font-weight: 600;
@@ -160,7 +147,6 @@
         letter-spacing: 1px;
     }
     
-    /* Бейджи в мобильном меню */
     .sidebar .menu-badge {
         background: var(--primary-color, #3498db);
         color: white;
@@ -171,7 +157,6 @@
     }
 }
 
-/* Стили для очень маленьких экранов */
 @media (max-width: 480px) {
     .sidebar {
         width: 100%;

@@ -11,7 +11,6 @@ if (!hasPermission($conn, 'editor')) {
 $action = $_GET['action'] ?? 'list';
 $id = intval($_GET['id'] ?? 0);
 
-// --- ОБРАБОТКА POST ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $formData = [
         'contact_type' => cleanInput($_POST['contact_type'] ?? ''),
@@ -35,7 +34,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// --- УДАЛЕНИЕ ---
 if ($action === 'delete' && $id) {
     $contact = getContactById($conn, $id);
     if (deleteContact($conn, $id)) {
@@ -44,7 +42,6 @@ if ($action === 'delete' && $id) {
     }
 }
 
-// Подключаем шапку и меню...
 require_once __DIR__. '/includes/header.php';
 require_once __DIR__. '/includes/menu.php';
 ?>
@@ -63,7 +60,6 @@ require_once __DIR__. '/includes/menu.php';
         </div>
         
         <?php 
-            // Подключаем правую шапку
             require_once __DIR__. '/includes/header-right.php';
         ?>
     </header>
@@ -235,6 +231,5 @@ require_once __DIR__. '/includes/menu.php';
 <script src="assets/js/miniAdminstration.js"></script>
 
 <?php
-// Подключаем подвал
 require_once __DIR__. '/includes/footer.php';
 ?>

@@ -43,9 +43,6 @@
     --transition-transform: all 0.3s ease;
 }
 
-/* ========================================
-   БАЗОВЫЙ СБРОС И ОБЩИЕ СТИЛИ
-   ======================================== */
 * {
     margin: 0;
     padding: 0;
@@ -62,7 +59,6 @@ body {
     min-height: 100vh;
 }
 
-/* Размытый фоновый слой */
 body::before {
     content: "";
     position: fixed;
@@ -75,7 +71,6 @@ body::before {
     transform: scale(1.1);
 }
 
-/* Полупрозрачный оверлей */
 
 .container {
     max-width: 1200px;
@@ -89,15 +84,11 @@ body::before {
     padding: 0 20px;
 }
 
-/* Основной контент поверх фона */
 main {
     position: relative;
     z-index: 1;
 }
 
-/* ========================================
-   HEADER
-   ======================================== */
 .main-header {
     background: var(--bg-black);
     color: white;
@@ -113,7 +104,6 @@ main {
     padding: 15px 0;
 }
 
-/* Логотип */
 .logo {
     display: inline-block;
     text-decoration: none;
@@ -131,9 +121,6 @@ main {
     transform: scale(1.05);
 }
 
-/* ========================================
-   НАВИГАЦИЯ
-   ======================================== */
 .main-nav {
     display: flex;
     gap: 30px;
@@ -155,7 +142,6 @@ main {
     color: white;
 }
 
-/* Выпадающее меню */
 .dropdown {
     position: relative;
 }
@@ -200,16 +186,12 @@ main {
     color: white;
 }
 
-/* ========================================
-   ПРАВАЯ ЧАСТЬ HEADER
-   ======================================== */
 .header-right {
     display: flex;
     align-items: center;
     gap: 30px;
 }
 
-/* Телефон */
 .header-phone {
     display: flex;
     align-items: center;
@@ -229,7 +211,6 @@ main {
     font-size: 18px;
 }
 
-/* Кнопка личного кабинета */
 .btn-personal {
     display: flex;
     align-items: center;
@@ -264,7 +245,6 @@ main {
     white-space: nowrap;
 }
 
-/* Кнопка админки */
 .btn-admin {
     display: flex;
     align-items: center;
@@ -296,9 +276,6 @@ main {
     white-space: nowrap;
 }
 
-/* ========================================
-   МОБИЛЬНОЕ МЕНЮ
-   ======================================== */
 .mobile-menu-btn {
     display: none;
     background: none;
@@ -367,9 +344,6 @@ main {
     margin-top: 20px;
 }
 
-/* ========================================
-   HERO СЕКЦИЯ
-   ======================================== */
 .hero {
     position: relative;
     margin-top: 0;
@@ -382,8 +356,6 @@ main {
 .hero-background {
     position: absolute;
     inset: 0;
-    /*background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.7));*/
-    /*background-color: var(--bg-main);*/
     z-index: 1;
 }
 
@@ -412,20 +384,14 @@ main {
     max-width: 600px;
 }
 
-/* Главный заголовок */
 .main-title {
     font-size: 56px;
     font-weight: 700;
     color: white;
     margin-bottom: 30px;
     line-height: 1.2;
-    /* Убираем анимацию, которая смещает текст */
-    /* opacity: 0; */
-    /* transform: translateY(-30px); */
-    /* animation: slideDown 1s forwards 0.3s; */
 }
 
-/* Список характеристик */
 .features-list {
     display: flex;
     flex-direction: column;
@@ -435,11 +401,10 @@ main {
 
 
 
-/* --- ОБНОВЛЕННЫЕ CSS СТИЛИ ДЛЯ FEATURE-ITEM С НЕОНОВЫМИ ТОЧКАМИ --- */
 
 .feature-item {
     background: var(--bg-white-semi);
-    padding: 18px 20px 18px 65px; /* Увеличили левый паддинг, чтобы освободить место под точку (было 20px) */
+    padding: 18px 20px 18px 65px;
     border-radius: 10px;
     backdrop-filter: blur(10px);
     border: var(--border-white);
@@ -452,56 +417,47 @@ main {
     animation: slideInLeft 0.8s forwards;
     transition: var(--transition-default);
     
-    /* ВАЖНО: Добавляем Flexbox для выравнивания точки и текста в одну линию */
     display: flex;
     align-items: center;
-    position: relative; /* Для позиционирования точки */
+    position: relative;
 }
 
-/* Стили для самой точки */
 .feature-dot {
     position: absolute;
-    left: 30px; /* Отступ точки от левого края блока */
-    width: 10px; /* Размер точки */
+    left: 30px;
+    width: 10px;
     height: 10px;
-    background: #0055ff; /* Насыщенный синий цвет */
-    border-radius: 50%; /* Делаем круглой */
+    background: #0055ff;
+    border-radius: 50%;
     box-sizing: border-box;
     
-    /* Базовое статичное сияние точки */
     box-shadow: 0 0 8px #0055ff, 0 0 15px #0055ff, 0 0 25px rgba(0, 85, 255, 0.6);
     
-    /* Запускаем анимацию бесконечного пульсирования сияния */
     animation: neon-pulse 2.5s ease-in-out infinite;
     
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* Эффекты при наведении на весь блок feature-item */
 .feature-item:hover {
     background: rgba(255, 255, 255, 0.18);
-    transform: translateX(3px); /* Легкое смещение блока вправо при ховере */
+    transform: translateX(3px);
 }
 
-/* При наведении на блок, точка становится чуть больше и сияет ярче */
 .feature-item:hover .feature-dot {
     transform: scale(1.15);
     box-shadow: 0 0 14px #0055ff, 0 0 22px #0055ff, 0 0 40px rgba(0, 85, 255, 0.95);
 }
 
-/* Стандартные задержки появления */
 .feature-item:nth-child(1) { animation-delay: 0.5s; }
 .feature-item:nth-child(2) { animation-delay: 0.6s; }
 .feature-item:nth-child(3) { animation-delay: 0.7s; }
 .feature-item:nth-child(4) { animation-delay: 0.8s; }
 
-/* Визуальная часть hero — теперь главный опорный пункт для процентов */
 .hero-visual {
     position: relative;
     width: 100%;
 }
 
-/* Твой родной контейнер с 3D-эффектом — ОСТАЛСЯ НЕИЗМЕННЫМ */
 .hero-image-container {
     position: relative;
     border-radius: var(--radius-lg);
@@ -523,33 +479,30 @@ main {
     display: block;
 }
 
-/* --- СТИЛИ ДЛЯ ИНТЕРАКТИВНЫХ КАРТОЧЕК (РЕЗИНОВЫЕ) --- */
 .hero-card {
     position: absolute;
-    width: 40%; /* Карточки занимают 30% от ширины всей области */
+    width: 40%;
     background-color: var(--bg-glass);
     backdrop-filter: blur(10px);
     border-radius: 32px; 
-    padding: 10px 5px 5px 5px; /* Стабильные паддинги, чтобы текст не зажимало */
+    padding: 10px 5px 5px 5px;
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.18);
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
     box-sizing: border-box;
-    z-index: 10; /* Карточки всегда НАД крутящейся картинкой */
+    z-index: 10;
     
     border-bottom: 5px solid transparent; 
     transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.3s ease;
 }
 
-/* При ховере на саму карточку она слегка приподнимается */
 .hero-card:hover {
     transform: translateY(-5px) scale(1.03);
     box-shadow: 0 20px 45px rgba(0, 0, 0, 0.28);
 }
 
-/* Круглый узор внутри карточки */
 .card-pattern-box {
     max-width: 70%;
     max-height: 70%;
@@ -565,7 +518,6 @@ main {
     object-fit: contain;
 }
 
-/* Адаптивный текст надписи */
 .hero-card .card-title {
     font-size: calc(12px + 0.3vw); 
     font-weight: 700;
@@ -574,9 +526,7 @@ main {
     margin: 0;
 }
 
-/* --- КООРДИНАТЫ НАЛОЖЕНИЯ КАРТОЧЕК (%) --- */
 
-/* 1. Учет энергоресурсов (Справа вверху, заходит на картинку) */
 .card-energy {
 
     bottom: 60%;
@@ -584,23 +534,20 @@ main {
     border-color: #8a2be2; 
 }
 
-/* 2. Аналитика (Слева по центру) */
 .card-analytics {
     top: 18%;
-    left: 9%; /* Спокойно выходит за левый край фона */
+    left: 9%;
     border-color: #4facfe; 
 }
 
-/* 3. Дистанционный контроль (Справа внизу) */
 .card-control {
     top: 40%;
-    right: 20%; /* Вылезает на правый край, теперь не обрежется! */
+    right: 20%;
     border-color: #ff4e50; 
 }
 
 
 
-/* Оверлей карты */
 .map-overlay {
     position: absolute;
     bottom: 10px;
@@ -619,49 +566,33 @@ main {
     gap: 20px;
 }
 
-/* Контейнер иконки карты */
 .map-icon {
-    flex: 0 0 45px; /* Подгоняем под размер твоих новых фиолетовых точек */
+    flex: 0 0 45px;
     width: 45px;
     height: 45px;
-    background: rgba(57, 255, 20, 0.1); /* Прозрачный зеленый фон внутри круга */
-    border: 2px solid #39ff14; /* Неоново-зеленый бордер */
-    border-radius: 50%; /* Делаем круглым, как точки */
+    background: rgba(57, 255, 20, 0.1);
+    border: 2px solid #39ff14;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: var(--transition-default);
     
-    /* Базовое неоновое свечение самого круга */
     box-shadow: 0 0 10px rgba(57, 255, 20, 0.4), 
                 inset 0 0 8px rgba(57, 255, 20, 0.3);
     
-    /* Запуск бесконечной анимации зеленого неона */
     animation: neon-green-pulse 2.5s ease-in-out infinite;
 }
 
-/* Стили для твоего будущего SVG внутри контейнера */
 .map-svg-icon {
-    width: 22px; /* Оптимальный размер иконки внутри круга */
+    width: 22px;
     height: 22px;
-    fill: #39ff14; /* Заливка иконки неоновым зеленым */
+    fill: #39ff14;
     transition: var(--transition-default);
     
-    /* Свечение для линий самого SVG */
     filter: drop-shadow(0 0 4px #39ff14);
 }
 
-/* Эффект при ховере на весь блок feature-item */
-/* .hero-link-wrapper:hover .map-icon {
-    transform: scale(1.08);
-    background: rgba(57, 255, 20, 0.25);
-    box-shadow: 0 0 18px #39ff14, 
-                inset 0 0 10px rgba(57, 255, 20, 0.6);
-}
-
-.hero-link-wrapper:hover .map-svg-icon {
-    filter: drop-shadow(0 0 8px #39ff14);
-} */
 .map-text {
     flex: 1;
 }
@@ -677,7 +608,6 @@ main {
     font-size: 14px;
 }
 
-/* Блок контактов и кнопка */
 .contacts-section {
     margin-top: 30px;
     padding-top: 30px;
@@ -709,9 +639,6 @@ main {
     transform: translateY(-1px);
 }
 
-/* ========================================
-   СЕКЦИЯ "НАША ПРОДУКЦИЯ"
-   ======================================== */
 .cards-section {
     padding: 100px 0;
     background: var(--bg-glass);
@@ -725,7 +652,6 @@ main {
     margin-top: 50px;
 }
 
-/* Карточка */
 .card {
     background: var(--bg-white-strong);
     backdrop-filter: blur(5px);
@@ -780,20 +706,17 @@ main {
     line-height: 1.6;
 }
 
-/* ========================================
-   СЕКЦИЯ "ПРЕИМУЩЕСТВА" (КОМПАКТНЫЙ СТИЛЬ)
-   ======================================== */
 .advantages-section {
-    padding: 60px 0; /* Было 100px — уменьшили вертикальные отступы секции */
+    padding: 60px 0;
     background: var(--bg-glass);
     backdrop-filter: blur(10px);
 }
 
 .section-title {
     text-align: center;
-    font-size: 36px; /* Чуть уменьшили размер шрифта заголовка для аккуратности */
+    font-size: 36px;
     font-weight: 700;
-    margin-bottom: 45px; /* Было 60px */
+    margin-bottom: 45px;
     color: #2c3e50;
     position: relative;
 }
@@ -801,10 +724,10 @@ main {
 .section-title::after {
     content: '';
     position: absolute;
-    bottom: -15px; /* Поджали линию ближе к тексту */
+    bottom: -15px;
     left: 50%;
     transform: translateX(-50%);
-    width: 60px; /* Сделали линию чуть изящнее */
+    width: 60px;
     height: 3px;
     background: var(--primary-color);
     border-radius: 2px;
@@ -812,58 +735,55 @@ main {
 
 .advantages-grid {
     display: grid;
-    /* Изменили minmax с 350px на 280px, чтобы карточки были более узкими, 
-       а gap (расстояние между карточками) уменьшили с 40px до 20px */
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 20px; 
-    margin-top: 35px; /* Было 50px */
+    margin-top: 35px;
 }
 
 .advantage-item {
     background: var(--bg-white-strong);
     backdrop-filter: blur(5px);
-    border-radius: 12px; /* Сделали закругление углов чуть более строгим */
-    padding: 20px; /* Было 30px — существенно уменьшили внутренние паддинги */
+    border-radius: 12px;
+    padding: 20px;
     transition: var(--transition-default);
-    border-left: 3px solid var(--primary-color); /* Сделали боковую полоску тоньше */
+    border-left: 3px solid var(--primary-color);
 }
 
 .advantage-item:hover {
     background: var(--bg-white-card);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05); /* Более мягкая, "плоская" тень */
-    transform: translateY(-2px); /* Было -5px — теперь карточка приподнимается совсем слегка */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+    transform: translateY(-2px);
 }
 
 .advantage-header {
     display: flex;
     align-items: center;
-    gap: 14px; /* Было 20px — прижали иконку ближе к заголовку */
-    margin-bottom: 12px; /* Было 20px — уменьшили отступ до описания */
+    gap: 14px;
+    margin-bottom: 12px;
 }
 
 .advantage-icon {
-    /* Сделали иконку меньше (было 60px на 60px) */
     flex: 0 0 45px;
     width: 45px;
     height: 45px;
     background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-    border-radius: 8px; /* Уменьшили радиус под размер иконки */
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
-    font-size: 18px; /* Галочка стала аккуратнее */
+    font-size: 18px;
     overflow: hidden;
 }
 
 .advantage-icon img {
-    width: 70%; /* Чуть уменьшили изображение внутри, чтобы не упиралось в края */
+    width: 70%;
     height: 70%;
     object-fit: contain;
 }
 
 .advantage-title {
-    font-size: 16px; /* Было 18px — более плоский и аккуратный шрифт */
+    font-size: 16px;
     font-weight: 600;
     color: var(--text-dark);
     margin: 0;
@@ -872,14 +792,11 @@ main {
 
 .advantage-description {
     color: var(--text-gray);
-    line-height: 1.5; /* Сжали межстрочный интервал (было 1.7) */
-    font-size: 14px; /* Было 16px — теперь текст компактный и строгий */
+    line-height: 1.5;
+    font-size: 14px;
     margin: 0;
 }
 
-/* ========================================
-   СЕКЦИЯ "О КОМПАНИИ"
-   ======================================== */
 .about-section {
     padding: 100px 0;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -893,7 +810,6 @@ main {
     z-index: 2;
 }
 
-/* Статистика */
 .about-stats {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -934,7 +850,6 @@ main {
     opacity: 0.9;
 }
 
-/* Контент о компании */
 .about-content {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -942,7 +857,6 @@ main {
     align-items: center;
 }
 
-/* Видео */
 .video-section {
     position: relative;
 }
@@ -997,7 +911,6 @@ main {
     font-weight: 500;
 }
 
-/* Информация о компании */
 .company-info h2 {
     font-size: 36px;
     margin-bottom: 30px;
@@ -1005,50 +918,46 @@ main {
 }
 
 .company-features {
-    list-style: none; /* Полностью убираем дефолтные маркеры или галочки */
+    list-style: none;
     padding: 0;
     margin: 0;
 }
 
 .company-features li {
     position: relative;
-    padding-left: 28px; /* Хороший отступ, чтобы большая светящаяся точка не наезжала на текст */
-    font-size: 16px; /* Подстрой под свой размер текста, если он отличается */
+    padding-left: 28px;
+    font-size: 16px;
     line-height: 1.5;
-    color: #ffffff; /* Или любой твой цвет текста */
-    margin-bottom: 12px; /* Расстояние между пунктами */
+    color: #ffffff;
+    margin-bottom: 12px;
     font-weight: 500;
     
     display: flex;
-    align-items: center; /* Центрируем точку относительно первой строки текста */
+    align-items: center;
 }
 
-/* Создаем живую белую неоновую точку */
 .company-features li::before {
-    content: "" !important; /* Намертво стираем любые старые галочки/символы */
+    content: "" !important;
     position: absolute;
-    left: 4px; /* Отступ точки от левого края */
+    left: 4px;
     top: 50%;
-    transform: translateY(-50%); /* Идеальный центр по вертикали */
+    transform: translateY(-50%);
     
-    width: 9px; /* Оптимальный размер для этого списка */
+    width: 9px;
     height: 9px;
-    background: #ffffff; /* Чистый белый цвет */
+    background: #ffffff;
     border-radius: 50%;
     
-    /* Густое, глубокое белое свечение */
     box-shadow: 0 0 8px #ffffff, 0 0 16px #ffffff, 0 0 25px rgba(255, 255, 255, 0.6);
     
-    /* Подключаем плавную пульсацию белого неона */
     animation: neon-pulse-white 2.5s ease-in-out infinite;
     
     transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
-/* Эффект при наведении на строчку */
 .company-features li:hover::before {
-    transform: translateY(-50%) scale(1.3); /* Точка эффектно увеличивается */
-    box-shadow: 0 0 12px #ffffff, 0 0 22px #ffffff, 0 0 35px rgba(255, 255, 255, 0.9); /* Свечение взрывается яркостью */
+    transform: translateY(-50%) scale(1.3);
+    box-shadow: 0 0 12px #ffffff, 0 0 22px #ffffff, 0 0 35px rgba(255, 255, 255, 0.9);
 }
 
 
@@ -1059,9 +968,6 @@ main {
     opacity: 0.9;
 }
 
-/* ========================================
-   FOOTER
-   ======================================== */
 .main-footer {
     background: var(--bg-dark);
     color: white;
@@ -1126,7 +1032,6 @@ main {
     margin-bottom: 10px;
 }
 
-/* Контейнер */
 .custom-checkbox-label {
     display: flex;
     align-items: center;
@@ -1135,14 +1040,12 @@ main {
     user-select: none;
 }
 
-/* Скрываем стандартный checkbox */
 .custom-checkbox-label input {
     position: absolute;
     opacity: 0;
     pointer-events: none;
 }
 
-/* Кастомный чекбокс */
 .checkmark {
     width: 20px;
     height: 20px;
@@ -1160,20 +1063,17 @@ main {
                 -2px -2px 6px rgba(255,255,255,0.8);
 }
 
-/* Hover */
 .custom-checkbox-label:hover .checkmark {
     background: #eaeaea;
     transform: scale(1.02);
 }
 
-/* Активное состояние */
 .custom-checkbox-label input:checked + .checkmark {
     background: linear-gradient(145deg, #42a5f5, #1e88e5);
     border-color: #1e88e5;
     box-shadow: 0 0 8px rgba(33,150,243,0.5);
 }
 
-/* Галочка */
 .checkmark::after {
     content: "";
     position: absolute;
@@ -1190,19 +1090,16 @@ main {
     transition: transform 0.2s ease;
 }
 
-/* Показ галочки */
 .custom-checkbox-label input:checked + .checkmark::after {
     transform: rotate(45deg) scale(1);
 }
 
-/* Текст */
 .label-text {
     font-size: 14px;
     color: #333;
     line-height: 1.4;
 }
 
-/* Ссылка */
 .label-text a {
     color: #1e88e5;
     text-decoration: none;

@@ -1,8 +1,6 @@
 <?php
-// Подключаем database.php
 require_once __DIR__ . '/../config/database.php';
 
-// Функция для получения FAQ по категории
 function getFAQ($conn, $category = null, $limit = null) {
     global $cache;
     $cacheKey = "faq_public_" . ($category ? md5($category) : 'all') . "_lim" . intval($limit);
@@ -26,7 +24,6 @@ function getFAQ($conn, $category = null, $limit = null) {
     return $faq;
 }
 
-// Функция для получения категорий FAQ
 function getFAQCategories($conn) {
     global $cache;
     $cacheKey = "faq_categories_list";
@@ -57,9 +54,7 @@ function addFAQQuestion($conn, $name, $email, $category, $question) {
     $res = $stmt->execute();
     
     if ($res) {
-        // ОЧИСТКА: сбрасываем списки в админке, чтобы админ увидел новый вопрос
         $cache->deleteByPrefix("admin_faq_");
-        // На всякий случай сбросим и публичные списки, если они зависят от категорий
         $cache->deleteByPrefix("faq_public_");
     }
     

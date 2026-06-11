@@ -1,6 +1,3 @@
-/* ==========================================================================
-   1. БАЗОВЫЕ СТИЛИ СЕКЦИИ И КОНТЕЙНЕРА
-   ========================================================================== */
 .for-whom-section {
     padding: 120px 0;
     padding-bottom: 250px;
@@ -9,7 +6,6 @@
     background-color: #ffffff;
 }
 
-/* Мобильный заголовок по умолчанию скрыт на ПК */
 .mobile-only-title {
     display: none;
     text-align: center;
@@ -19,7 +15,6 @@
     margin-bottom: 40px;
 }
 
-/* Резиновая обертка для ПК (пропорции макета) */
 .for-whom-wrapper {
     position: relative;
     width: 100%;
@@ -28,9 +23,6 @@
     margin: 0 auto;
 }
 
-/* ==========================================================================
-   2. ЗАДНИЙ ФОН И ЦЕНТРАЛЬНЫЙ КРУГ (ПК)
-   ========================================================================== */
 .for-whom-background {
     position: absolute;
     top: 0;
@@ -41,7 +33,7 @@
     justify-content: center;
     align-items: center;
     z-index: 1;
-    pointer-events: none; /* Чтобы слой не мешал кликать по карточкам */
+    pointer-events: none;
 }
 
 .lines-img {
@@ -70,9 +62,6 @@
     opacity: 0.9;
 }
 
-/* ==========================================================================
-   3. КАРТОЧКИ (ОБЩИЕ СТИЛИ ДЛЯ ПК)
-   ========================================================================== */
 .target-item {
     position: absolute;
     width: 13.5%;
@@ -87,7 +76,6 @@
     transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Обертка для иконки */
 .target-item .icon-box {
     width: 90px;
     height: 90px;
@@ -99,7 +87,7 @@
     justify-content: center;
     align-items: center;
     margin-bottom: 16px;
-    flex-shrink: 0; /* Защита от сжатия */
+    flex-shrink: 0;
     transition: box-shadow 0.25s ease;
 }
 
@@ -109,7 +97,6 @@
     object-fit: contain;
 }
 
-/* Текст карточки */
 .target-item p {
     font-size: 11.5px;
     line-height: 1.35;
@@ -119,7 +106,6 @@
     white-space: normal;
 }
 
-/* Ховер-эффекты на ПК */
 .target-item:hover {
     transform: scale(1.08);
     z-index: 10;
@@ -129,10 +115,6 @@
     box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
 }
 
-/* ==========================================================================
-   4. ТОЧНОЕ ПОЗИЦИОНИРОВАНИЕ КАРТОЧЕК НА ПК
-   ========================================================================== */
-/* Верхний ряд */
 .pos-top-1 { top: -11%; left: -2%; }
 .pos-top-2 { top: -11%; left: 15%; }
 .pos-top-3 { top: -11%; left: 34%; }
@@ -140,15 +122,11 @@
 .pos-top-5 { top: -11%; left: 73%; }
 .pos-top-6 { top: -11%; left: 89%; }
 
-/* Нижний ряд (Жестко сбрасываем top и фиксируем bottom) */
 .pos-bottom-1 { top: auto !important; bottom: -25%; left: 20.5%; }
 .pos-bottom-2 { top: auto !important; bottom: -25%; left: 42.5%; width: 16%; }
 .pos-bottom-3 { top: auto !important; bottom: -25%; left: 68%; }
 
 
-/* ==========================================================================
-   5. АДАПТИВНАЯ МОБИЛЬНАЯ ВЕРСИЯ (Планшеты и Телефоны)
-   ========================================================================== */
 @media (max-width: 1024px) {
     
     .for-whom-section {
@@ -157,55 +135,50 @@
     }
     
     .mobile-only-title {
-        display: block; /* Показываем заголовок сверху */
+        display: block;
     }
     
-    /* Сбрасываем пропорции обертки, превращаем в аккуратный список-стопку */
     .for-whom-wrapper {
         height: auto !important;
         aspect-ratio: auto !important;
         display: flex;
-        flex-direction: column; /* Строго в один столбец */
+        flex-direction: column;
         gap: 16px;
         padding: 0 20px;
     }
     
-    /* Полностью убираем десктопную графику */
     .for-whom-background,
     .lines-img,
     .center-desktop-circle {
         display: none !important;
     }
     
-    /* Сбрасываем позиционирование карточек в поток документа */
     .target-item {
         position: static !important;
         width: 100% !important;
-        height: auto !important; /* Высота теперь автоматически под текст */
+        height: auto !important;
         
         display: flex;
-        flex-direction: row; /* Иконка слева, текст справа */
+        flex-direction: row;
         align-items: center;
         text-align: left;
         gap: 20px;
         
-        background: #f8f9fa; /* Делаем аккуратную плашку */
+        background: #f8f9fa;
         padding: 16px 20px;
         border-radius: 20px;
         border: 1px solid rgba(0, 0, 0, 0.05);
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
     }
     
-    /* Корректируем иконки под мобильный горизонтальный вид */
     .target-item .icon-box {
         margin-bottom: 0 !important;
         width: 65px !important;
-        min-width: 65px !important; /* Не дает иконке сжаться, если текст длинный */
+        min-width: 65px !important;
         height: 65px !important;
         border-radius: 16px;
     }
     
-    /* Текст на мобилках */
     .target-item p {
         font-size: 15px;
         color: #1a1f36;
@@ -213,7 +186,6 @@
         word-break: break-word;
     }
     
-    /* Отключаем десктопный ховер-эффект на смартфонах */
     .target-item:hover {
         transform: none !important;
     }

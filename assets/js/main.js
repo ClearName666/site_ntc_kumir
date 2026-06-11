@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
     
-    // Плавная прокрутка для якорных ссылок
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function(e) {
             if (this.getAttribute('href') !== '#') {
@@ -16,7 +15,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Анимация элементов при скролле
     const observerOptions = {
         threshold: 0.1,
         rootMargin: '0px 0px -100px 0px'
@@ -31,7 +29,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }, observerOptions);
     
-    // Наблюдаем за элементами
     document.querySelectorAll('.card, .advantage-item, .stat-item').forEach(el => {
         el.style.opacity = '0';
         el.style.transform = 'translateY(20px)';
@@ -39,26 +36,11 @@ document.addEventListener('DOMContentLoaded', function() {
         observer.observe(el);
     });
     
-    // Для десктопного хедера делаем его фиксированным при скролле
     let lastScrollTop = 0;
-    // const header = document.querySelector('.main-header');
     
-    // window.addEventListener('scroll', function() {
-    //     let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
         
-    //     if (scrollTop > 100) {
-    //         header.style.position = 'fixed';
-    //         header.style.top = '0';
-    //         header.style.boxShadow = '0 5px 20px rgba(0,0,0,0.3)';
-    //     } else {
-    //         header.style.position = 'relative';
-    //         header.style.boxShadow = 'none';
-    //     }
         
-    //     lastScrollTop = scrollTop;
-    // });
 
-    // Находим хедер один раз
     const header = document.querySelector('.main-header');
 
     window.addEventListener('scroll', function() {

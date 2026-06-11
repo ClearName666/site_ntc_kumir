@@ -12,7 +12,6 @@ if (!hasPermission($conn, 'admin')) {
 $action = $_GET['action'] ?? 'list';
 $id = intval($_GET['id'] ?? 0);
 
-// --- ОБРАБОТКА POST (Сохранение / Редактирование) ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $formData = [
         'title'      => cleanInput($_POST['title'] ?? ''),
@@ -35,7 +34,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// --- ОБРАБОТКА УДАЛЕНИЯ ---
 if ($action === 'delete' && $id) {
     if (hasChildMenu($conn, $id)) {
         redirectWithNotification('menu.php', 'Сначала удалите подпункты!', 'error');
@@ -48,17 +46,13 @@ if ($action === 'delete' && $id) {
     }
 }
 
-// --- ПОДГОТОВКА ДАННЫХ ДЛЯ ВЫВОДА ---
 $allMenuItems = getAllMenuItems($conn);
 $menuTree = buildMenuTree($allMenuItems);
 
-// Если редактируем, получаем данные для формы
 $menuItem = ($action === 'edit' && $id) ? getMenuItemById($conn, $id) : null;
 
-// Подключаем шапку
 require_once __DIR__. '/includes/header.php';
 
-// Подключаем меню
 require_once __DIR__. '/includes/menu.php';
 ?>
 
@@ -176,7 +170,6 @@ require_once __DIR__. '/includes/menu.php';
         <?php elseif ($action === 'add' || $action === 'edit'): ?>
         <!-- Форма добавления/редактирования -->
         <?php
-        // Получаем список родителей через функцию
         $mainMenuItems = getPotentialParents($conn, $id);
         ?>
         
@@ -239,6 +232,5 @@ require_once __DIR__. '/includes/menu.php';
 <script src="assets/js/miniAdminstration.js"></script>
 
 <?php
-// Подключаем подвал
 require_once __DIR__. '/includes/footer.php';
 ?>

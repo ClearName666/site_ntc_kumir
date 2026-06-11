@@ -12,11 +12,9 @@ if (!hasPermission($conn, 'editor')) {
 $action = $_GET['action'] ?? 'list';
 $id = (int)($_GET['id'] ?? 0);
 
-// Обработка POST (Добавление и Редактирование)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = cleanInput($_POST['title'] ?? '');
     
-    // Подготовка данных в массив
     $data = [
         'title'        => $title,
         'excerpt'      => cleanInput($_POST['excerpt'] ?? ''),
@@ -28,20 +26,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'slug'         => createSlug($title)
     ];
 
-    // Уникализация слага
     $counter = 1;
     $originalSlug = $data['slug'];
     while (!isSlugUnique($conn, 'news', $data['slug'], $id)) {
         $data['slug'] = $originalSlug . '-' . $counter++;
     }
 
-    // Загрузка фото
     if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
         $uploadResult = uploadImage($_FILES['image']);
         if ($uploadResult['success']) $data['image_path'] = $uploadResult['path'];
     }
 
-    // Вызов функций сохранения
     if ($action === 'add') {
         if (addNews($conn, $data)) {
             logAdminAction($conn, 'news_add', "Добавлена новость: $title");
@@ -55,7 +50,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Обработка удаления
 if ($action === 'delete' && $id) {
     $news = getNewsById($conn, $id);
     if ($news && deleteNews($conn, $id)) {
@@ -64,10 +58,8 @@ if ($action === 'delete' && $id) {
     }
 }
 
-// Подключаем шапку
 require_once __DIR__. '/includes/header.php';
 
-// Подключаем меню
 require_once __DIR__. '/includes/menu.php';
 ?>
 
@@ -87,7 +79,6 @@ require_once __DIR__. '/includes/menu.php';
         </div>
         
         <?php 
-            // Подключаем правую шапку
             require_once __DIR__. '/includes/header-right.php';
         ?>
     </header>
@@ -220,7 +211,6 @@ require_once __DIR__. '/includes/menu.php';
                         <input type="datetime-local" id="published_at" name="published_at" 
                             value="<?php 
                                     if (!empty($news['published_at']) && $news['published_at'] !== '0000-00-00 00:00:00') {
-                                        // Проверяем, что дата валидна
                                         $timestamp = strtotime($news['published_at']);
                                         if ($timestamp !== false) {
                                             echo date('Y-m-d\TH:i', $timestamp);
@@ -313,6 +303,5 @@ require_once __DIR__. '/includes/menu.php';
 <script src="assets/js/scripts.js"></script>
 
 <?php
-// Подключаем подвал
 require_once __DIR__. '/includes/footer.php';
 ?>

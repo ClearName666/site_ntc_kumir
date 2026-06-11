@@ -1,37 +1,28 @@
 <?php
-// Подключаем функции
 require_once __DIR__. '/includes/functions.php';
 require_once __DIR__. '/config/config.php';
 
-// подключаемся к базе 
 $conn = getDBConnection();
 $mainBg = getImage($conn, 'image_background_all');
-// Настройки пагинации
 $newsPerPage = 6;
 $currentPage = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
 $offset = ($currentPage - 1) * $newsPerPage;
 
-// Проверяем, запрошена ли конкретная новость 
 $newsItem = null;
 if (isset($_GET['news']) && !empty($_GET['news'])) {
     $newsItem = getNewsBySlug($conn, $_GET['news']);
 
-    // 1. Увеличиваем просмотры в БД (тихий запрос)
     incrementNewsViews($conn, $newsItem["id"]);
 
-    // 2. Получаем СВЕЖЕЕ число просмотров, игнорируя то, что в кэше $newsItem
     $currentViews = getActualNewsViews($conn, $newsItem['id']);
 }
 
-// --- ПОДГОТОВКА МЕТА-ДАННЫХ ДЛЯ SEO И СОЦСЕТЕЙ ---
 $siteTitle = getSetting($conn, 'site_title');
 $defaultSocialImage = getSetting($conn, 'social_default_image');
 $currentUrl = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 $baseNewsUrl = 'https://' . $_SERVER['HTTP_HOST'] . '/news.php';
 
-// Устанавливаем мета-данные страницы
 if ($newsItem) {
-    // Детальная новость
     $pageTitle = htmlspecialchars($newsItem['title']) . ' - Новости - ' . $siteTitle;
     $rawDescription = $newsItem['excerpt'] ?? $newsItem['content'];
     $pageDescription = truncateDescription($rawDescription, 160);
@@ -41,17 +32,14 @@ if ($newsItem) {
     $canonicalUrl = $currentUrl;
     $robotsDirective = 'index, follow, max-image-preview:large, max-snippet:-1';
 } else {
-    // Список новостей (возможно с пагинацией)
     $pageTitle = 'Новости - ' . $siteTitle;
     $pageDescription = 'Актуальные новости и события компании НТЦ КУМИР';
     $pageKeyword = 'новости НТЦ КУМИР, события, аскуэ, модемы, автоматизация';
     $pageImage = $defaultSocialImage ?: getSetting($conn, 'logo_path');
     $ogType = 'website';
     
-    // Канонический URL для списка без параметра page
     $canonicalUrl = $baseNewsUrl;
     if ($currentPage > 1) {
-        // Для страниц пагинации – разрешаем индексацию, но канонил ведёт на первую
         $robotsDirective = 'index, follow, max-image-preview:large';
     } else {
         $robotsDirective = 'index, follow, max-image-preview:large, max-snippet:-1';
@@ -62,14 +50,12 @@ if (empty($pageDescription)) {
     $pageDescription = 'Новости компании НТЦ КУМИР — современные решения для учёта энергоресурсов.';
 }
 
-// Получаем данные для списка новостей
 if (!$newsItem) {
     $newsList = getNews($conn, $newsPerPage, $offset);
     $totalNews = getNewsCount($conn);
     $totalPages = ceil($totalNews / $newsPerPage);
 }
 
-// Определяем пути
 $headerPath = __DIR__. '/includes/header.php';
 $footerPath = __DIR__. '/includes/footer.php';
 ?>
@@ -298,12 +284,15 @@ $footerPath = __DIR__. '/includes/footer.php';
                             <span class="news-views">👁 <?= $currentViews ?? '-' ?> просмотров</span>
                         </div>
                     </header>
-
                     <?php if (!empty($newsItem['image_path'])): ?>
-                        <img src="<?= $newsItem['image_path'] ?>"
-                            alt="<?= htmlspecialchars($newsItem['title']) ?>"
-                            class="news-detail-image"
-                            loading="lazy">
+                        <div class="news-detail-image-wrapper">
+                            <div class="image-frame">
+                                <img src="<?= $newsItem['image_path'] ?>"
+                                    alt="<?= htmlspecialchars($newsItem['title']) ?>"
+                                    class="news-detail-image"
+                                    loading="lazy">
+                            </div>
+                        </div>
                     <?php endif; ?>
 
                     <div class="news-detail-body">
@@ -357,7 +346,6 @@ $footerPath = __DIR__. '/includes/footer.php';
                 <?php if (!empty($newsList)): ?>
                     <div class="news-grid" id="newsGrid">
                         <?php foreach ($newsList as $index => $item): 
-                            // Проверяем, новая ли это новость (менее 7 дней)
                             $isNew = false;
                             if (!empty($item['published_at'])) {
                                 $publishDate = new DateTime($item['published_at']);
@@ -371,10 +359,8 @@ $footerPath = __DIR__. '/includes/footer.php';
                                      data-date="<?= $item['published_at'] ?>">
                                 <a href="?news=<?= urlencode($item['slug']) ?>" class="news-link">
                                     <?php if (!empty($item['image_path'])): ?>
-                                        <div class="news-image-container">
-                                            <img src="<?= $item['image_path'] ?>" 
-                                                 alt="<?= htmlspecialchars($item['title']) ?>"
-                                                 loading="lazy">
+                                        <div class="news-image-container" style="background-image: url('<?= $item['image_path'] ?>');">
+                                            <img src="<?= $item['image_path'] ?>" alt="<?= htmlspecialchars($item['title']) ?>" loading="lazy">
                                         </div>
                                     <?php endif; ?>
                                     
@@ -427,7 +413,7 @@ $footerPath = __DIR__. '/includes/footer.php';
     <?php include $footerPath; ?>
     
     <!-- Скрипты -->
-    <script src="../assets/js/main.js"></script>
-    <script src="../assets/js/news.js"></script>
+    <script src="/../assets/js/main.js"></script>
+    <script src="/../assets/js/news.js"></script>
 </body>
 </html>

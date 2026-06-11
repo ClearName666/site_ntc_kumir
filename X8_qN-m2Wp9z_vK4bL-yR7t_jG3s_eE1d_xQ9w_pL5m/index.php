@@ -1,38 +1,29 @@
 <?php
-// Подключаем функции
 require_once __DIR__. '/includes/functions.php';
 require_once __DIR__. '/../Cache.php';
 
-// Подключаемся к базе 
 $conn = getDBConnection();
 
-// Проверяем авторизацию
 requireAdminAuth($conn);
 
-// Обработка AJAX запроса для очистки кэша
 if (isset($_POST['action']) && $_POST['action'] === 'clear_cache') {
     header('Content-Type: application/json');
     
-    // Проверка CSRF токена
     if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
         echo json_encode(['success' => false, 'message' => 'Ошибка безопасности']);
         exit;
     }
     
-    // Используем функцию clearCache
     $result = clearCache($conn);
     
-    // Отправляем результат
     echo json_encode($result);
     exit;
 }
 
-// Генерируем CSRF токен
 if (!isset($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-// СОЗДАЕМ ОБЪЕКТ КЭША 
 $cacheStats = $cache->getStats();
 
 
@@ -40,14 +31,12 @@ $cacheStats = $cache->getStats();
 
 
 
-// Получаем данные через функции
 $admin = getCurrentAdmin($conn);
 $stats = getDashboardStats($conn);
 $recentLogs = getRecentAdminLogs($conn, 10);
 
 
 
-// Подключаем шапку и меню
 require_once __DIR__. '/includes/header.php';
 require_once __DIR__. '/includes/menu.php';
 ?>

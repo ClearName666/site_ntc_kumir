@@ -8,7 +8,6 @@ if (!hasPermission($conn, 'admin')) {
     redirectWithNotification('index.php', 'Недостаточно прав', 'error');
 }
 
-// 1. Обработка очистки (POST)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_logs'])) {
     $days = intval($_POST['days'] ?? 0);
     if ($days > 0 && clearOldLogs($conn, $days)) {
@@ -17,7 +16,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_logs'])) {
     }
 }
 
-// 2. Сбор фильтров из GET
 $filters = [
     'admin_id'  => $_GET['admin_id'] ?? null,
     'action'    => $_GET['action'] ?? null,
@@ -25,7 +23,6 @@ $filters = [
     'date_to'   => $_GET['date_to'] ?? null
 ];
 
-// 3. Получение данных
 $admins = getAdminsList($conn);
 $logsResult = getAdminLogs($conn, $filters);
 
@@ -45,7 +42,6 @@ require_once __DIR__. '/includes/menu.php';
         </div>
         
         <?php 
-            // Подключаем правую шапку
             require_once __DIR__. '/includes/header-right.php';
         ?>
     </header>
@@ -153,6 +149,5 @@ require_once __DIR__. '/includes/menu.php';
 <script src="assets/js/miniAdminstration.js"></script>
 
 <?php
-// Подключаем подвал
 require_once __DIR__. '/includes/footer.php';
 ?>

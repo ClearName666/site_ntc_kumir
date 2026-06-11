@@ -1,11 +1,8 @@
 <?php
-// Подключаем database.php
 require_once __DIR__ . '/../config/database.php';
 
-// Функция для получения всех опубликованных новостей
 function getNews($conn, $limit = null, $offset = 0) {
     global $cache;
-    // Создаем уникальный ключ для каждой страницы пагинации
     $cacheKey = "news_list_l" . intval($limit) . "_o" . intval($offset);
 
     $cached = $cache->get($cacheKey);
@@ -26,7 +23,6 @@ function getNews($conn, $limit = null, $offset = 0) {
     return $news;
 }
 
-// Получение одной новости по slug
 function getNewsBySlug($conn, $slug) {
     global $cache;
     $cacheKey = "news_single_" . md5($slug);
@@ -43,15 +39,12 @@ function getNewsBySlug($conn, $slug) {
     return $data;
 }
 
-// Функция для получения количества новостей
 function getNewsCount($conn) {
-    // $conn = getDBConnection();
     $result = $conn->query("SELECT COUNT(*) as count FROM news WHERE is_published = 1");
     $row = $result->fetch_assoc();
     return $row['count'];
 }
 
-// Получение последних новостей (например, для главной)
 function getLatestNews($conn, $limit = 3) {
     global $cache;
     $cacheKey = "news_latest_" . $limit;
@@ -68,15 +61,12 @@ function getLatestNews($conn, $limit = 3) {
     return $data;
 }
 
-// Функция для увеличения счетчика просмотров
 function incrementNewsViews($conn, $articleId) {
-    // $conn = getDBConnection();
     $stmt = $conn->prepare("UPDATE news SET views = views + 1 WHERE id = ?");
     $stmt->bind_param("i", $articleId);
     $stmt->execute();
 }
 
-// Функция для отображения карточек новостей
 function renderNewsCards($newsItems, $columns = 3, $stacked = true) {
     $className = $stacked ? 'news-card-stack' : 'news-card-grid';
     
@@ -86,17 +76,14 @@ function renderNewsCards($newsItems, $columns = 3, $stacked = true) {
         echo '<article class="' . $className . '" data-index="' . $index . '">';
         echo '<a href="?news=' . urlencode($item['slug']) . '" class="news-link" aria-label="Читать новость: ' . htmlspecialchars($item['title']) . '">';
         
-        // Изображение новости
         if (!empty($item['image_path'])) {
             echo '<div class="news-image-container">';
             echo '<img src="' . $item['image_path'] . '" alt="' . htmlspecialchars($item['title']) . '" loading="lazy">';
             echo '</div>';
         }
         
-        // Контент карточки
         echo '<div class="news-content">';
         
-        // Дата новости (важный элемент для новостей)
         if (!empty($item['published_at'])) {
             $date = date('d.m.Y', strtotime($item['published_at']));
             echo '<div class="news-date">';
@@ -126,18 +113,15 @@ function renderNewsCards($newsItems, $columns = 3, $stacked = true) {
     echo '</div>';
 }
 
-// Функция для отображения пагинации
 function renderNewsPagination($currentPage, $totalPages, $baseUrl = 'news.php') {
     if ($totalPages <= 1) return;
     
     echo '<div class="pagination">';
     
-    // Кнопка "Назад"
     if ($currentPage > 1) {
         echo '<a href="' . $baseUrl . '?page=' . ($currentPage - 1) . '" class="page-link prev">← Назад</a>';
     }
     
-    // Номера страниц
     $start = max(1, $currentPage - 2);
     $end = min($totalPages, $currentPage + 2);
     
@@ -156,7 +140,6 @@ function renderNewsPagination($currentPage, $totalPages, $baseUrl = 'news.php') 
         echo '<a href="' . $baseUrl . '?page=' . $totalPages . '" class="page-link">' . $totalPages . '</a>';
     }
     
-    // Кнопка "Вперед"
     if ($currentPage < $totalPages) {
         echo '<a href="' . $baseUrl . '?page=' . ($currentPage + 1) . '" class="page-link next">Вперед →</a>';
     }

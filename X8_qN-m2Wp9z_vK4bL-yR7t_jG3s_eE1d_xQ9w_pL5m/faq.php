@@ -11,11 +11,10 @@ if (!hasPermission($conn, 'editor')) {
 $action = $_GET['action'] ?? 'list';
 $id = intval($_GET['id'] ?? 0);
 
-// --- ОБРАБОТКА POST (Добавление/Редактирование) ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $formData = [
         'question'   => cleanInput($_POST['question'] ?? ''),
-        'answer'     => $_POST['answer'] ?? '', // Текст ответа обычно не чистят через cleanInput, если там HTML
+        'answer'     => $_POST['answer'] ?? '',
         'category'   => cleanInput($_POST['category'] ?? 'Общие вопросы'),
         'sort_order' => intval($_POST['sort_order'] ?? 0),
         'is_active'  => isset($_POST['is_active']) ? 1 : 0
@@ -34,7 +33,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// --- ОБРАБОТКА УДАЛЕНИЯ ---
 if ($action === 'delete' && $id) {
     $faq = getFaqById($conn, $id);
     if ($faq && deleteFaq($conn, $id)) {
@@ -43,7 +41,6 @@ if ($action === 'delete' && $id) {
     }
 }
 
-// Подключаем шапку и меню
 require_once __DIR__. '/includes/header.php';
 require_once __DIR__. '/includes/menu.php';
 ?>
@@ -62,7 +59,6 @@ require_once __DIR__. '/includes/menu.php';
         </div>
         
         <?php 
-            // Подключаем правую шапку
             require_once __DIR__. '/includes/header-right.php';
         ?>
     </header>
@@ -207,6 +203,5 @@ require_once __DIR__. '/includes/menu.php';
 <script src="assets/js/miniAdminstration.js"></script>
 
 <?php
-// Подключаем подвал
 require_once __DIR__. '/includes/footer.php';
 ?>

@@ -9,9 +9,7 @@ class Cache {
         }
     }
 
-    // ВАЖНО: Убираем md5 из имен файлов, чтобы мы могли искать их по префиксу
     private function getFilePath($key) {
-        // Заменяем плохие символы в ключе на подчеркивание
         $safeKey = preg_replace('/[^a-zA-Z0-9_-]/', '_', $key);
         return $this->cacheDir . $safeKey . '.cache';
     }
@@ -34,7 +32,6 @@ class Cache {
         if (file_exists($file)) unlink($file);
     }
 
-    // Новый метод: удаляет все файлы, которые начинаются на $prefix
     public function deleteByPrefix($prefix) {
         $safePrefix = preg_replace('/[^a-zA-Z0-9_-]/', '_', $prefix);
         $files = glob($this->cacheDir . $safePrefix . '*.cache');
@@ -45,13 +42,6 @@ class Cache {
         }
     }
 
-    /**
-     * ПОЛНАЯ ОЧИСТКА КЭША
-     * Удаляет все файлы кэша, но сохраняет .gitkeep
-     * 
-     * @param bool $includeGitkeep Если true, то удалит и .gitkeep (по умолчанию false)
-     * @return array Статистика очистки
-     */
     public function clearAll($includeGitkeep = false) {
         $result = [
             'success' => true,
@@ -61,30 +51,25 @@ class Cache {
             'message' => ''
         ];
         
-        // Проверяем существование директории
         if (!is_dir($this->cacheDir)) {
             $result['message'] = 'Директория кэша не существует';
             return $result;
         }
         
-        // Получаем все файлы в директории (исключаем поддиректории)
         $files = glob($this->cacheDir . '*');
         
         foreach ($files as $file) {
-            // Пропускаем директории
             if (is_dir($file)) {
                 continue;
             }
             
             $filename = basename($file);
             
-            // Проверяем, нужно ли защитить .gitkeep
             if (!$includeGitkeep && $filename === '.gitkeep') {
                 $result['protected_files']++;
                 continue;
             }
             
-            // Пытаемся удалить файл
             if (unlink($file)) {
                 $result['deleted_files']++;
             } else {
@@ -93,7 +78,6 @@ class Cache {
             }
         }
         
-        // Формируем сообщение
         $messages = [];
         if ($result['deleted_files'] > 0) {
             $messages[] = "Удалено файлов: {$result['deleted_files']}";
@@ -110,21 +94,13 @@ class Cache {
         return $result;
     }
 
-    /**
-     * ПОЛУЧИТЬ КОЛИЧЕСТВО ФАЙЛОВ В КЭШЕ
-     * 
-     * @return int Количество файлов
-     */
     public function getStats() {
-        // Проверяем существование директории
         if (!is_dir($this->cacheDir)) {
             return 0;
         }
         
-        // Получаем все файлы (исключая директории)
         $files = array_filter(glob($this->cacheDir . '*'), 'is_file');
         
-        // Возвращаем количество файлов
         return count($files);
     }
 

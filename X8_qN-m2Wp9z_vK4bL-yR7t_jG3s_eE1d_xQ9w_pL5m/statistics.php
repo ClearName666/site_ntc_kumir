@@ -11,7 +11,6 @@ if (!hasPermission($conn, 'editor')) {
 $action = $_GET['action'] ?? 'list';
 $id = (int)($_GET['id'] ?? 0);
 
-// Обработка POST (Добавление и Редактирование)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data = [
         'title'       => cleanInput($_POST['title'] ?? ''),
@@ -34,7 +33,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Удаление
 if ($action === 'delete' && $id) {
     if (deleteStat($conn, $id)) {
         logAdminAction($conn, 'stat_delete', "Удалена статистика ID: $id");

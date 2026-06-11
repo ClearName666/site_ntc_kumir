@@ -9,14 +9,12 @@ document.addEventListener("DOMContentLoaded", function () {
     let originalCards = Array.from(track.children);
     if (originalCards.length === 0) return;
 
-    // Если карточек слишком мало для прокрутки, скрываем стрелки управления
     if (originalCards.length <= 1) {
         if (prevBtn) prevBtn.style.display = 'none';
         if (nextBtn) nextBtn.style.display = 'none';
         return;
     }
 
-    // Клонируем элементы для бесконечного цикла
     originalCards.forEach(card => {
         let cloneAfter = card.cloneNode(true);
         let cloneBefore = card.cloneNode(true);
@@ -26,7 +24,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     let allCards = Array.from(track.children);
     let totalOriginals = originalCards.length;
-    let currentIndex = totalOriginals; // Старт с оригинального первого элемента
+    let currentIndex = totalOriginals;
     let isTransitioning = false;
 
     function getGapAndWidth() {
@@ -48,7 +46,6 @@ document.addEventListener("DOMContentLoaded", function () {
         track.style.transform = `translateX(${offset}px)`;
     }
 
-    // Инициализация стартовой позиции
     setTimeout(() => updatePosition(false), 50);
 
     function moveNext() {
@@ -68,7 +65,6 @@ document.addEventListener("DOMContentLoaded", function () {
     nextBtn.addEventListener("click", moveNext);
     prevBtn.addEventListener("click", movePrev);
 
-    // Контроль бесконечного прыжка без анимации на концах трека
     track.addEventListener("transitionend", function () {
         isTransitioning = false;
         
@@ -81,7 +77,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    // Обработка ресайза окна для корректного пересчета ширин
     let resizeTimeout;
     window.addEventListener("resize", function () {
         clearTimeout(resizeTimeout);

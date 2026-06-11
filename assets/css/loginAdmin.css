@@ -174,7 +174,6 @@ body {
     text-decoration: underline;
 }
 
-/* Сообщения об ошибках/успехе */
 .alert {
     padding: 15px;
     border-radius: 10px;
@@ -195,7 +194,6 @@ body {
     border: 1px solid #c3e6cb;
 }
 
-/* Анимации */
 @keyframes slideUp {
     from {
         opacity: 0;
@@ -216,7 +214,6 @@ body {
     }
 }
 
-/* Декоративные элементы */
 .login-header::before {
     content: '';
     position: absolute;
@@ -257,7 +254,6 @@ body {
     left: -100px;
 }
 
-/* Адаптивность */
 @media (max-width: 480px) {
     .login-card {
         border-radius: 15px;
@@ -276,7 +272,6 @@ body {
     }
 }
 
-/* Эффект наведения для полей ввода */
 .form-input-wrapper {
     position: relative;
 }

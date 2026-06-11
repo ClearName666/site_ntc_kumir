@@ -19,17 +19,14 @@
     --border-radius-lg: 20px;
     --border-radius-btn: 50px;
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --image-border-radius: 20px;
+    --image-frame-padding: 8px;
 }
 
-/* ========================================
-   БАЗОВЫЕ СТИЛИ И ФОН
-   ======================================== */
 body {
     position: relative;
     z-index: 0;
 }
-
-/* Размытый фоновый слой с изображением */
 body::before {
     content: "";
     position: fixed;
@@ -41,8 +38,6 @@ body::before {
     filter: blur(40px);
     transform: scale(1.1);
 }
-
-/* Полупрозрачный оверлей для читаемости */
 body::after {
     content: "";
     position: fixed;
@@ -52,9 +47,6 @@ body::after {
     backdrop-filter: blur(10px);
 }
 
-/* ========================================
-   ОБЩИЕ СТИЛИ СТРАНИЦ
-   ======================================== */
 .articles-page,
 .article-detail {
     padding: 120px 0 60px;
@@ -62,22 +54,17 @@ body::after {
     position: relative;
     z-index: 1;
 }
-
 .container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 20px;
 }
 
-/* ========================================
-   ШАПКА СТРАНИЦЫ
-   ======================================== */
 .page-header {
     text-align: center;
     margin-bottom: 70px;
     animation: fadeInUp 0.8s ease forwards;
 }
-
 .page-title {
     font-size: 3rem;
     color: var(--text-dark);
@@ -86,8 +73,6 @@ body::after {
     position: relative;
     display: inline-block;
 }
-
-/* Декоративная линия под заголовком */
 .page-title::after {
     content: '';
     position: absolute;
@@ -96,11 +81,9 @@ body::after {
     transform: translateX(-50%);
     width: 100px;
     height: 4px;
-    background: var(--news-primary);
+    background: var(--primary-blue);
     border-radius: 2px;
 }
-
-
 .page-description {
     font-size: 1.125rem;
     color: var(--text-dark);
@@ -109,16 +92,11 @@ body::after {
     line-height: 1.6;
 }
 
-/* ========================================
-   СПИСОК СТАТЕЙ (СТОПКА)
-   ======================================== */
 .articles-stack {
     max-width: 900px;
     margin: 0 auto 3rem;
     position: relative;
 }
-
-/* Карточка статьи */
 .article-card-stack {
     background-color: var(--bg-white-transparent);
     backdrop-filter: blur(10px);
@@ -131,20 +109,14 @@ body::after {
     transition: var(--transition-smooth);
     border: var(--border-white-transparent);
 }
-
-/* Показ карточки с анимацией */
 .article-card-stack.visible {
     opacity: 1;
     transform: translateY(0);
 }
-
-/* Эффект при наведении на карточку */
 .article-card-stack:hover {
     transform: translateY(-5px);
     box-shadow: var(--shadow-lg);
 }
-
-/* Ссылка-обёртка карточки */
 .article-link-stack {
     display: flex;
     min-height: 250px;
@@ -152,38 +124,58 @@ body::after {
     color: inherit;
     transition: var(--transition-smooth);
 }
-
 .article-link-stack:hover {
     text-decoration: none;
 }
 
-/* Контейнер изображения */
 .article-image-container {
-    flex: 0 0 40%;
     position: relative;
+    flex: 0 0 280px;
+    background-color: #f0f0f0;
     overflow: hidden;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    border-radius: var(--image-border-radius);
+    margin: 16px;
+    box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.2);
+    transition: var(--transition-smooth);
+}
+
+.article-image-container::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    filter: blur(20px);
+    z-index: 0;
+    background-image: inherit;
 }
 
 .article-image-container img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    transition: transform 0.8s ease;
+    object-fit: contain;
+    position: relative;
+    z-index: 1;
+    transition: transform 0.4s ease;
+    border-radius: calc(var(--image-border-radius) - 4px);
 }
 
-/* Увеличение изображения при наведении */
+.article-card-stack:hover .article-image-container {
+    border-color: var(--primary-blue);
+    box-shadow: 0 15px 25px -8px rgba(0, 0, 0, 0.3), 0 0 0 2px rgba(52, 152, 219, 0.3);
+    transform: scale(1.02);
+}
 .article-card-stack:hover .article-image-container img {
-    transform: scale(1.1);
+    transform: scale(1.08);
 }
 
-/* Контентная часть карточки */
 .article-content-stack {
     flex: 1;
-    padding: 2.5rem;
+    padding: 2rem 2rem 2rem 0;
     display: flex;
     flex-direction: column;
 }
-
 .article-title-stack {
     font-size: 1.5rem;
     color: var(--text-dark);
@@ -192,12 +184,9 @@ body::after {
     font-weight: 600;
     transition: color 0.3s ease;
 }
-
-/* Подсветка заголовка при наведении */
 .article-card-stack:hover .article-title-stack {
     color: var(--primary-blue);
 }
-
 .article-excerpt-stack {
     color: var(--text-gray);
     font-size: 1rem;
@@ -205,20 +194,15 @@ body::after {
     margin-bottom: 1.5rem;
     flex-grow: 1;
 }
-
-/* ========================================
-   МЕТА-ИНФОРМАЦИЯ СТАТЬИ
-   ======================================== */
 .article-meta-stack {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-top: 1.5rem;
+    padding-top: 1rem;
     border-top: var(--border-light);
     font-size: 0.875rem;
     color: var(--text-meta);
 }
-
 .read-more {
     color: var(--primary-blue);
     font-weight: 500;
@@ -227,25 +211,17 @@ body::after {
     gap: 0.5rem;
     transition: gap 0.3s;
 }
-
-/* Стрелка для кнопки "Читать далее" */
 .read-more::after {
     content: '→';
     transition: transform 0.3s;
 }
-
-/* Анимация стрелки при наведении */
 .article-card-stack:hover .read-more {
     gap: 0.75rem;
 }
-
 .article-card-stack:hover .read-more::after {
     transform: translateX(5px);
 }
 
-/* ========================================
-   СТРАНИЦА ОТДЕЛЬНОЙ СТАТЬИ
-   ======================================== */
 .article-container {
     max-width: 1400px;
     margin: 0 auto;
@@ -255,40 +231,58 @@ body::after {
     background-color: var(--bg-white-transparent);
     backdrop-filter: blur(10px);
 }
-
 .article-header {
     padding: 3rem 3rem 2rem;
     text-align: center;
     border-bottom: var(--border-light);
 }
 
-/* Изображение внутри статьи */
-.article-detail-image {
-    width: 100%;
-    height: 400px;
-    object-fit: cover;
-    transition: transform 0.8s;
+.article-detail-image-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    background: rgba(0, 0, 0, 0.02);
 }
 
-.article-detail-image:hover {
+.image-frame {
+    display: inline-block;
+    padding: 12px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.5), rgba(255,255,255,0.1));
+    border-radius: 32px;
+    box-shadow: 0 25px 35px -12px rgba(0, 0, 0, 0.25), inset 0 1px 1px rgba(255,255,255,0.6);
+    transition: var(--transition-smooth);
+}
+
+.image-frame:hover {
+    transform: scale(1.01);
+    box-shadow: 0 30px 40px -15px rgba(0, 0, 0, 0.3), inset 0 1px 2px rgba(255,255,255,0.8);
+}
+
+.article-detail-image {
+    max-width: 100%;
+    height: auto;
+    max-height: 500px;
+    object-fit: contain;
+    border-radius: 24px;
+    display: block;
+    transition: transform 0.5s ease;
+}
+
+.image-frame:hover .article-detail-image {
     transform: scale(1.02);
 }
 
-/* Тело статьи */
 .article-body {
     padding: 2.5rem 3rem 3rem;
     line-height: 1.8;
     font-size: 1.125rem;
 }
 
-/* ========================================
-   КНОПКА "НАЗАД"
-   ======================================== */
 .back-link-container {
     text-align: center;
     padding: 2rem 0;
 }
-
 .back-link {
     display: inline-flex;
     align-items: center;
@@ -302,8 +296,6 @@ body::after {
     transition: var(--transition-smooth);
     box-shadow: var(--shadow-blue);
 }
-
-/* Эффекты при наведении */
 .back-link:hover {
     background: var(--dark-blue);
     transform: translateY(-2px);
@@ -311,83 +303,83 @@ body::after {
     gap: 1rem;
 }
 
-/* ========================================
-   СОСТОЯНИЕ БЕЗ СТАТЕЙ
-   ======================================== */
 .no-articles {
     text-align: center;
     padding: 5rem 1.25rem;
 }
-
 .no-articles p {
     font-size: 1.125rem;
     color: var(--text-light);
 }
 
-/* ========================================
-   АНИМАЦИИ
-   ======================================== */
 @keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
     to {
         opacity: 1;
         transform: translateY(0);
     }
 }
 
-/* ========================================
-   АДАПТИВНОСТЬ
-   ======================================== */
 @media (max-width: 992px) {
     .articles-stack {
         max-width: 95%;
     }
-    
     .article-link-stack {
         flex-direction: column;
-        min-height: auto;
     }
-    
     .article-image-container {
-        flex: 0 0 200px;
+        flex: 0 0 auto;
+        width: calc(100% - 32px);
+        margin: 16px;
+    }
+    .article-content-stack {
+        padding: 0 1.5rem 1.5rem;
     }
 }
-
 @media (max-width: 768px) {
     .page-title {
         font-size: 2.25rem;
     }
-    
     .articles-page,
     .article-detail {
         padding: 100px 0 40px;
     }
-    
-    .article-content-stack,
     .article-header,
     .article-body {
         padding: 1.5rem;
     }
-    
     .article-title-stack {
         font-size: 1.25rem;
     }
+    .image-frame {
+        padding: 8px;
+    }
+    .article-detail-image {
+        max-height: 350px;
+    }
 }
-
 @media (max-width: 480px) {
     .page-title {
         font-size: 1.75rem;
     }
-    
     .article-body {
         font-size: 1rem;
         line-height: 1.6;
         padding: 1.25rem;
     }
-    
     .article-meta-stack {
         flex-direction: column;
         gap: 0.5rem;
         align-items: flex-start;
     }
+    .image-frame {
+        padding: 6px;
+        border-radius: 24px;
+    }
+    .article-detail-image {
+        border-radius: 18px;
+    }
 }
-

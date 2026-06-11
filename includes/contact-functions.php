@@ -1,8 +1,6 @@
 <?php
-// Подключаем database.php
 require_once __DIR__ . '/../config/database.php';
 
-// Функция для получения контактов по типу
 function getContactsByType($conn, $type = null) {
     global $cache;
     $cacheKey = "contacts_type_" . ($type ?? 'all');
@@ -23,7 +21,6 @@ function getContactsByType($conn, $type = null) {
     return $data;
 }
 
-// Функция для получения всех офисов
 function getOffices($conn) {
     global $cache;
     $cacheKey = "offices_all";
@@ -42,7 +39,6 @@ function getOffices($conn) {
     return $offices;
 }
 
-// Функция для получения основного офиса
 function getMainOffice($conn) {
     global $cache;
     $cacheKey = "office_main";
@@ -61,7 +57,6 @@ function getMainOffice($conn) {
 
 
 
-// Функция для отображения иконки
 function getContactIcon($icon) {
     $icons = [
         'location' => '📍',
@@ -77,7 +72,6 @@ function getContactIcon($icon) {
     return $icons[$icon] ?? '📌';
 }
 
-// Функция для отображения контактов 
 function renderContacts($contacts) {
     echo '<div class="contacts-list">';
     
@@ -85,7 +79,6 @@ function renderContacts($contacts) {
         $icon = getContactIcon($contact['icon']);
         $value = htmlspecialchars($contact['value']);
         
-        // Добавляем onclick к contact-item
         echo '<div class="contact-item" onclick="copyToClipboard(\'' . htmlspecialchars($contact['value'], ENT_QUOTES) . '\', this)">';
         echo '<div class="contact-icon">' . $icon . '</div>';
         echo '<div class="contact-content">';
@@ -111,7 +104,6 @@ function renderContacts($contacts) {
     echo '</div>';
 }
 
-// Функция для отображения офисов
 function renderOffices($offices) {
     echo '<div class="offices-grid">';
     
@@ -148,7 +140,6 @@ function renderOffices($offices) {
     echo '</div>';
 }
 
-// Функция для отображения FAQ
 function renderFAQ($faqItems, $collapsible = true) {
     echo '<div class="faq-list">';
     
@@ -187,13 +178,10 @@ function renderFAQ($faqItems, $collapsible = true) {
     echo '</div>';
 }
 
-// Функция для сохранения сообщения из формы обратной связи
 function saveFeedback($conn, $name, $email, $phone, $subject, $message) {
-    // $conn = getDBConnection();
     
     $stmt = $conn->prepare("INSERT INTO feedback (name, email, phone, subject, message) VALUES (?, ?, ?, ?, ?)");
     
-    // "sssss" означает, что мы передаем 5 строк (string)
     $stmt->bind_param("sssss", $name, $email, $phone, $subject, $message);
     
     $result = $stmt->execute();

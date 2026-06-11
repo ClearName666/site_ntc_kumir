@@ -1,6 +1,3 @@
-/* ========================================
-   БАЗОВЫЙ HEADER (Состояние на самом верху)
-   ======================================== */
 .main-header {
     background: rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(15px);
@@ -18,18 +15,14 @@
     border: none;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     
-    /* Плавность трансформаций */
     transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
-/* ========================================
-   СОСТОЯНИЕ ПРИ СКРОЛЛЕ (Анимация выезда сверху)
-   ======================================== */
 .main-header.scrolled {
     position: fixed;
     top: 20px;
     left: 50%;
-    transform: translateX(-50%) translateY(0); /* Финальная точка */
+    transform: translateX(-50%) translateY(0);
     
     width: calc(100% - 40px);
     max-width: 1400px;
@@ -39,7 +32,6 @@
     border: 1px solid rgba(255, 255, 255, 0.15);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
     
-    /* Эффект появления сверху вниз при добавлении класса */
     animation: slideDown 0.5s ease forwards;
 }
 
@@ -54,7 +46,6 @@
     }
 }
 
-/* Контент внутри хедера */
 .header-content {
     display: flex;
     align-items: center;
@@ -62,11 +53,8 @@
     padding: 15px 30px;
 }
 
-/* ========================================
-   МОБИЛЬНОЕ МЕНЮ (Выезд сверху)
-   ======================================== */
 .mobile-menu {
-    display: none; /* Скрыто по умолчанию */
+    display: none;
     position: fixed;
     top: 90px;
     left: 50%;
@@ -81,7 +69,6 @@
     overflow: hidden;
 }
 
-/* Класс активации мобильного меню */
 .mobile-menu.active {
     display: block;
     animation: mobileSlideDown 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
@@ -98,30 +85,24 @@
     }
 }
 
-/* Изменяем отступ мобильного меню, когда основной хедер скроллится */
 .main-header.scrolled ~ .mobile-menu {
     top: 105px;
 }
 
-/* ========================================
-   КОНТЕНТ (Игнорирует хедер)
-   ======================================== */
 main, .hero {
     padding-top: 0 !important;
 }
 
-/* Состояние по умолчанию: на самом верху (черный, жесткий) */
 .main-header {
     position: absolute;
     top: 0;
     left: 50%;
     transform: translateX(-50%);
     width: 100%;
-    background: rgb(0, 0, 0); /* Чистый черный */
+    background: rgb(0, 0, 0);
     border-radius: 0px;
     box-shadow: none;
     
-    /* Контроль скорости и плавности анимации отделения хедера */
     transition: 
         background 0.35s ease-in-out, 
         border-radius 0.35s ease-in-out, 
@@ -130,24 +111,20 @@ main, .hero {
         box-shadow 0.35s ease-in-out;
 }
 
-/* Состояние при отрыве от верха: плавающая капсула */
 .main-header.scrolled {
-    top: 20px; /* Отступ от верха экрана */
-    width: calc(100% - 40px); /* Сужение по бокам */
+    top: 20px;
+    width: calc(100% - 40px);
     max-width: 1400px;
     
-    background: rgba(0, 0, 0, 0.4); /* Полупрозрачность */
-    backdrop-filter: blur(15px); /* Эффект размытия */
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
     
-    border-radius: 32px; /* Закругление */
+    border-radius: 32px;
     border: 1px solid rgba(255, 255, 255, 0.15);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
-/* ========================================
-   АДАПТИВНОСТЬ
-   ======================================== */
 @media (max-width: 768px) {
     .main-header.scrolled {
         top: 10px;
@@ -161,42 +138,37 @@ main, .hero {
 
 
 
-/* Базовые стили для ссылки логотипа и самой картинки */
 .logo {
     display: inline-block;
     transition: transform 0.3s ease;
 }
 
-/* Эффект свечения на картинку */
 .logo img {
-    /* Настраиваем анимацию: название, длительность (2.5 секунды), бесконечно, плавно туда-обратно */
     animation: whiteNeonGlow 2.5s infinite ease-in-out;
     transition: filter 0.3s ease;
 }
 
-/* Немного увеличиваем логотип при наведении мышкой */
 .logo:hover {
     transform: scale(1.03);
 }
 
-/* Эффект при наведении: свечение становится еще ярче и плотнее */
 .logo:hover img {
     filter: drop-shadow(0 0 4px #ffffff) 
             drop-shadow(0 0 12px #ffffff) 
             drop-shadow(0 0 30px #ffffff);
 }
 
-/* ========================================
-   KEYFRAMES ДЛЯ БЕЛОГО НЕОНОВОГО СВЕЧЕНИЯ
-   ======================================== */
+body.no-scroll {
+    overflow: hidden;
+    height: 100%;
+}
+
 @keyframes whiteNeonGlow {
     0%, 100% {
-        /* Минимальное свечение (мягкий белый свет) */
         filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.6)) 
                 drop-shadow(0 0 8px rgba(255, 255, 255, 0.4));
     }
     50% {
-        /* Максимальное свечение (эффект разгорания неона) */
         filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.9)) 
                 drop-shadow(0 0 15px rgba(255, 255, 255, 0.7)) 
                 drop-shadow(0 0 25px rgba(255, 255, 255, 0.4));

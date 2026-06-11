@@ -31,16 +31,12 @@
     --transition-card: all 0.3s ease;
 }
 
-/* ========================================
-   БАЗОВЫЕ СТИЛИ И ФОН
-   ======================================== */
 body {
     position: relative;
     z-index: 0;
     min-height: 100vh;
 }
 
-/* Размытый фоновый слой */
 body::before {
     content: "";
     position: fixed;
@@ -53,7 +49,6 @@ body::before {
     transform: scale(1.1);
 }
 
-/* Полупрозрачный оверлей */
 body::after {
     content: "";
     position: fixed;
@@ -63,11 +58,10 @@ body::after {
     backdrop-filter: blur(10px);
 }
 
-/* Контент поверх фона */
 .contacts-page {
     position: relative;
     z-index: 1;
-    padding: 120px 0 60px;
+    padding: 100px 0 60px;
 }
 
 .container {
@@ -76,94 +70,99 @@ body::after {
     padding: 0 20px;
 }
 
-/* ========================================
-   ШАПКА СТРАНИЦЫ
-   ======================================== */
 .page-header {
     text-align: center;
-    margin-bottom: 70px;
+    margin-bottom: 40px;
     animation: fadeInUp 0.8s ease;
 }
 
 .page-title {
-    font-size: 3rem;
+    font-size: 2.5rem;
     color: var(--text-dark);
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
     font-weight: 700;
     position: relative;
     display: inline-block;
 }
 
-/* Декоративная линия */
 .page-title::after {
     content: '';
     position: absolute;
     bottom: -10px;
     left: 50%;
     transform: translateX(-50%);
-    width: 100px;
-    height: 4px;
+    width: 80px;
+    height: 3px;
     background: var(--contacts-primary);
     border-radius: 2px;
 }
 
 .page-description {
-    font-size: 1.125rem;
+    font-size: 1rem;
     color: var(--text-dark);
     max-width: 600px;
-    margin: 2rem auto 0;
-    line-height: 1.6;
+    margin: 1.5rem auto 0;
+    line-height: 1.5;
 }
 
-/* ========================================
-   ОБЩИЕ СТИЛИ СЕКЦИЙ
-   ======================================== */
-.contacts-section,
-.map-section {
-    margin-bottom: 4rem;
+.contacts-map-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.contacts-col,
+.map-col {
+    flex: 1;
+    min-width: 280px;
+}
+
+.contacts-col {
+    order: 1;
+}
+
+.map-col {
+    order: 2;
 }
 
 .section-title {
-    font-size: 2rem;
+    font-size: 1.6rem;
     color: var(--text-dark);
-    margin-bottom: 2rem;
-    padding-bottom: 0.5rem;
-    border-bottom: var(--border-section);
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.3rem;
+    border-bottom: 2px solid var(--contacts-light);
 }
 
-/* ========================================
-   СЕТКА КОНТАКТОВ
-   ======================================== */
 .contacts-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2rem;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1rem;
 }
 
-/* Карточка контакта */
 .contact-item {
     background: var(--bg-white-semi);
     backdrop-filter: blur(10px);
     border-radius: var(--radius-card);
-    padding: 1.5rem;
+    padding: 0.9rem 1rem;
     display: flex;
-    gap: 1rem;
+    gap: 0.8rem;
     align-items: flex-start;
     box-shadow: var(--shadow-sm);
     transition: var(--transition-card);
-    border-left: 4px solid var(--contacts-primary);
+    border-left: 3px solid var(--contacts-primary);
 }
 
-/* Эффект при наведении */
 .contact-item:hover {
-    transform: translateY(-5px);
+    transform: translateY(-3px);
     box-shadow: var(--shadow-purple);
-    border-left-width: 8px;
+    border-left-width: 5px;
 }
 
 .contact-icon {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     flex-shrink: 0;
+    margin-top: 0.1rem;
 }
 
 .contact-content {
@@ -171,33 +170,32 @@ body::after {
 }
 
 .contact-title {
-    font-size: 1.125rem;
+    font-size: 0.9rem;
     color: var(--text-dark);
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.25rem;
     font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .contact-value {
     color: var(--text-gray);
     text-decoration: none;
-    font-size: 1rem;
-    line-height: 1.5;
+    font-size: 0.9rem;
+    line-height: 1.4;
     transition: color 0.3s;
+    word-break: break-word;
 }
 
-/* Подсветка при наведении */
 .contact-value:hover {
     color: var(--contacts-primary);
 }
 
-/* ========================================
-   КАРТА
-   ======================================== */
 .map-container {
     border-radius: var(--radius-lg);
     overflow: hidden;
     box-shadow: var(--shadow-map);
-    height: 450px;
+    height: 400px;
     position: relative;
 }
 
@@ -206,65 +204,55 @@ body::after {
     height: 100%;
 }
 
-/* Внешний контейнер — позиционирование */
-.map-overlay {
+.map-container .map-overlay {
     position: absolute;
     top: 20px;
     left: 20px;
-    max-width: 300px;
-    z-index: 10;
-    /* Не занимает лишнего места */
-    width: fit-content;
-    height: fit-content;
-    background: none;
-    padding: 0;
-    pointer-events: none;
+    right: auto;
+    bottom: auto;
+    height: auto;
 }
-
-/* Карточка — полупрозрачная с размытием */
 .map-info-card {
-    background: rgba(0, 0, 0, 0.1) !important; /* Принудительно полупрозрачный */
-    backdrop-filter: blur(20px) !important; /* Сильное размытие */
-    -webkit-backdrop-filter: blur(20px) !important; /* Для Safari */
+    background: rgba(0, 0, 0, 0.1) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
     border-radius: var(--radius-card);
-    padding: 1rem 1.25rem;
+    padding: 0.75rem 1rem;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
     border: 1px solid rgba(255, 255, 255, 0.5);
     width: fit-content;
-    min-width: 260px;
-    height: fit-content;
+    min-width: 220px;
+    max-width: 260px;
     pointer-events: auto;
 }
 
 .map-info-title {
-    font-size: 1rem;
+    font-size: 0.95rem;
     color: var(--text-dark);
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.2rem;
     font-weight: 600;
-    line-height: 1.3;
 }
 
 .map-address {
     color: var(--text-gray);
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     line-height: 1.3;
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.6rem;
 }
 
-/* Кнопки */
 .map-actions {
     display: flex;
-    gap: 0.5rem;
+    gap: 0.4rem;
     flex-wrap: wrap;
 }
 
 .map-btn {
-    padding: 0.4rem 0.75rem;
+    padding: 0.3rem 0.6rem;
     background: var(--contacts-primary);
     color: white;
     border: none;
     border-radius: var(--radius-sm);
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     font-weight: 500;
     cursor: pointer;
     transition: var(--transition-smooth);
@@ -280,16 +268,16 @@ body::after {
     transform: translateY(-1px);
 }
 
-/* ========================================
-   ОФИСЫ
-   ======================================== */
-.offices-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2rem;
+.offices-section {
+    margin-bottom: 2rem;
 }
 
-/* Карточка офиса */
+.offices-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
 .office-card {
     background: var(--bg-white-semi);
     backdrop-filter: blur(10px);
@@ -299,48 +287,43 @@ body::after {
     transition: var(--transition-card);
 }
 
-/* Главный офис */
 .office-card.main-office {
-    border: var(--border-purple);
-    transform: scale(1.02);
+    border: 1px solid var(--contacts-primary);
+    transform: scale(1.01);
 }
 
-/* Эффект при наведении */
 .office-card:hover {
-    transform: translateY(-5px);
+    transform: translateY(-3px);
     box-shadow: var(--shadow-purple);
 }
 
-/* Шапка карточки офиса */
 .office-header {
     background: linear-gradient(135deg, var(--contacts-primary), var(--contacts-dark));
     color: white;
-    padding: 1.5rem;
+    padding: 1rem 1.2rem;
     position: relative;
 }
 
 .office-city {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     margin: 0;
     font-weight: 600;
 }
 
-/* Бейдж "Главный офис" */
 .office-badge {
     position: absolute;
-    top: 1rem;
-    right: 1rem;
+    top: 0.7rem;
+    right: 0.7rem;
     background: white;
     color: var(--contacts-primary);
-    padding: 0.25rem 0.75rem;
+    padding: 0.2rem 0.6rem;
     border-radius: var(--radius-badge);
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     font-weight: 600;
 }
 
-/* Содержимое карточки */
 .office-content {
-    padding: 1.5rem;
+    padding: 1rem 1.2rem;
 }
 
 .office-content p {
@@ -349,12 +332,14 @@ body::after {
     align-items: flex-start;
     gap: 0.5rem;
     color: var(--text-gray);
+    font-size: 0.85rem;
 }
 
 .office-content a {
     color: var(--contacts-primary);
     text-decoration: none;
     transition: color 0.3s;
+    word-break: break-word;
 }
 
 .office-content a:hover {
@@ -362,74 +347,86 @@ body::after {
     text-decoration: underline;
 }
 
-/* ========================================
-   ФОРМА ОБРАТНОЙ СВЯЗИ
-   ======================================== */
 .contact-form-section {
     background: var(--bg-white-semi);
     backdrop-filter: blur(10px);
     border-radius: var(--radius-lg);
-    padding: 3rem;
+    padding: 2rem;
     box-shadow: var(--shadow-map);
-    margin-bottom: 4rem;
+    margin-bottom: 3rem;
 }
 
 .form-title {
-    font-size: 2rem;
+    font-size: 1.6rem;
     color: var(--text-dark);
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
     text-align: center;
 }
 
 .contact-form {
-    max-width: 600px;
+    max-width: 550px;
     margin: 0 auto;
 }
 
-/* Группы полей */
 .form-group {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
 }
 
 .form-label {
     display: block;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.3rem;
     color: var(--text-dark);
     font-weight: 500;
+    font-size: 0.9rem;
 }
 
-/* Поля ввода */
 .form-input,
 .form-textarea {
     width: 100%;
-    padding: 0.75rem 1rem;
-    border: var(--border-light);
+    padding: 0.6rem 0.8rem;
+    border: 1px solid #ddd;
     border-radius: var(--radius-md);
-    font-size: 1rem;
+    font-size: 0.9rem;
     transition: var(--transition-smooth);
 }
 
-/* Фокус */
 .form-input:focus,
 .form-textarea:focus {
     outline: none;
     border-color: var(--contacts-primary);
-    box-shadow: 0 0 0 3px rgba(155, 89, 182, 0.1);
+    box-shadow: 0 0 0 2px rgba(155, 89, 182, 0.1);
 }
 
 .form-textarea {
-    min-height: 150px;
+    min-height: 100px;
     resize: vertical;
 }
 
-/* Кнопка отправки */
+.custom-checkbox-wrapper {
+    margin: 1rem 0;
+}
+
+.custom-checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--text-dark);
+    cursor: pointer;
+}
+
+.custom-checkbox-label input {
+    width: auto;
+    margin: 0;
+}
+
 .submit-btn {
     background: linear-gradient(135deg, var(--contacts-primary), var(--contacts-dark));
     color: white;
     border: none;
-    padding: 1rem 2rem;
+    padding: 0.8rem 1.5rem;
     border-radius: var(--radius-btn);
-    font-size: 1rem;
+    font-size: 0.95rem;
     font-weight: 600;
     cursor: pointer;
     transition: var(--transition-smooth);
@@ -441,9 +438,8 @@ body::after {
     box-shadow: var(--shadow-btn);
 }
 
-/* ========================================
-   АНИМАЦИИ
-   ======================================== */
+
+
 @keyframes fadeInUp {
     from {
         opacity: 0;
@@ -455,73 +451,206 @@ body::after {
     }
 }
 
-/* ========================================
-   АДАПТИВНОСТЬ
-   ======================================== */
 @media (max-width: 992px) {
     .contacts-grid,
     .offices-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     }
-    
-    /* Карта на мобильных */
-    /* .map-container {
-        height: auto;
-        display: flex;
-        flex-direction: column;
-    }
-
-    #yandex-map {
-        height: 400px;
-        order: 2;
-    }
-
-    .map-overlay {
-        position: static;
-        width: 100%;
-        max-width: 100%;
-        height: auto;
-        margin-bottom: 15px;
-        order: 1;
-        pointer-events: auto;
-    }
-
-    .map-info-card {
-        width: 100%;
-        min-width: unset;
-    } */
 }
 
 @media (max-width: 768px) {
     .contacts-page {
-        padding: 100px 0 40px;
+        padding: 80px 0 40px;
     }
     
     .page-title {
-        font-size: 2.25rem;
+        font-size: 2rem;
     }
     
-    .contact-form-section {
-        padding: 2rem;
+    .page-description {
+        font-size: 0.9rem;
+        margin-top: 1rem;
+    }
+    
+    .contacts-map-wrapper {
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+    
+    .contacts-col,
+    .map-col {
+        min-width: auto;
+        width: 100%;
     }
     
     .section-title {
-        font-size: 1.5rem;
-    }
-}
-
-@media (max-width: 480px) {
-    .page-title {
-        font-size: 1.75rem;
+        font-size: 1.4rem;
+        margin-bottom: 1rem;
     }
     
-    .form-title {
-        font-size: 1.5rem;
+    .contacts-grid {
+        grid-template-columns: 1fr;
+        gap: 0.8rem;
+    }
+    
+    .contact-item {
+        padding: 0.7rem 0.9rem;
+    }
+    
+    .map-container {
+        height: 350px;
+    }
+    
+    .map-info-card {
+        top: 10px;
+        left: 10px;
+        right: 10px;
+        max-width: calc(100% - 20px);
+        min-width: auto;
+        padding: 0.6rem 0.8rem;
+    }
+    
+    .offices-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .office-header {
+        padding: 0.8rem 1rem;
+    }
+    
+    .office-city {
+        font-size: 1.1rem;
     }
     
     .contact-form-section {
         padding: 1.5rem;
     }
     
+    .form-title {
+        font-size: 1.4rem;
+    }
+}
 
+@media (max-width: 480px) {
+    .container {
+        padding: 0 15px;
+    }
+    
+    .page-title {
+        font-size: 1.6rem;
+    }
+    
+    .page-title::after {
+        width: 60px;
+        height: 2px;
+    }
+    
+    .page-description {
+        font-size: 0.85rem;
+    }
+    
+    .section-title {
+        font-size: 1.3rem;
+    }
+    
+    .contact-item {
+        padding: 0.6rem 0.8rem;
+        gap: 0.6rem;
+    }
+    
+    .contact-icon {
+        font-size: 1.1rem;
+    }
+    
+    .contact-title {
+        font-size: 0.8rem;
+    }
+    
+    .contact-value {
+        font-size: 0.8rem;
+    }
+    
+    .map-container {
+        height: 280px;
+    }
+    
+    .map-info-card {
+        padding: 0.5rem 0.7rem;
+    }
+    
+    .map-info-title {
+        font-size: 0.85rem;
+    }
+    
+    .map-address {
+        font-size: 0.7rem;
+    }
+    
+    .map-btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.65rem;
+    }
+    
+    .office-content p {
+        font-size: 0.8rem;
+        gap: 0.4rem;
+    }
+    
+    .contact-form-section {
+        padding: 1rem;
+    }
+    
+    .form-title {
+        font-size: 1.2rem;
+    }
+    
+    .form-input,
+    .form-textarea {
+        padding: 0.5rem 0.7rem;
+        font-size: 0.85rem;
+    }
+    
+    .submit-btn {
+        padding: 0.7rem 1rem;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 360px) {
+    .page-title {
+        font-size: 1.4rem;
+    }
+    
+    .contact-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.3rem;
+    }
+    
+    .contact-icon {
+        margin-top: 0;
+    }
+    
+    .map-actions {
+        flex-direction: column;
+    }
+    
+    .map-btn {
+        white-space: normal;
+        font-size: 0.7rem;
+    }
+    
+    .office-badge {
+        position: static;
+        display: inline-block;
+        margin-top: 0.3rem;
+    }
+    
+    .office-header {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+    }
 }

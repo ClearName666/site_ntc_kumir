@@ -1,10 +1,8 @@
 <?php
-// Если сессия еще не запущена
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Простая проверка: если id админа есть в сессии, значит он вошел
 $isAdmin = isset($_SESSION['admin_id']);
 ?>
 
@@ -18,25 +16,19 @@ $isAdmin = isset($_SESSION['admin_id']);
                 
                 <nav class="main-nav">
                     <?php
-                    // Получаем все пункты меню из БД
                     $menuItems = getMenuItems($conn);
                     
-                    // Забираем первые 2 пункта меню отдельно
-                    // array_splice вырежет первые 2 элемента и вернет их в $firstTwoItems,
-                    // а в самом массиве $menuItems останутся только "оставшиеся позиции"
-                    $firstTwoItems = array_splice($menuItems, 0, 2);
+                    $firstTwoItems = array_splice($menuItems, 0, 4);
                     
-                    // Сначала отображаем первые два пункта меню
                     if (!empty($firstTwoItems)) {
                         foreach ($firstTwoItems as $item) {
                             echo '<a href="' . $item['url'] . '" class="nav-link">' . $item['title'] . '</a>';
                         }
                     }
                     
-                    // Если что-то осталось, прячем в выпадающее меню
                     if (!empty($menuItems)) {
                         echo '<div class="dropdown">';
-                        echo '<a href="#" class="nav-link dropdown-toggle">Оставшиеся позиции</a>';
+                        echo '<a href="#" class="nav-link dropdown-toggle">☰</a>';
                         echo '<div class="dropdown-menu">';
                         
                         foreach ($menuItems as $item) {
@@ -80,7 +72,6 @@ $isAdmin = isset($_SESSION['admin_id']);
     <div class="mobile-menu">
         <nav class="mobile-nav">
             <?php
-            // Получаем все пункты меню для мобильной версии
             $allMenuItems = getNavigationMenu($conn);
             foreach ($allMenuItems as $item) {
                 echo '<a href="' . $item['url'] . '" class="nav-link">' . $item['title'] . '</a>';
@@ -165,8 +156,24 @@ document.addEventListener('DOMContentLoaded', function() {
         mobileMenuBtn.addEventListener('click', function() {
             mobileMenu.classList.toggle('active');
             this.textContent = mobileMenu.classList.contains('active') ? '✕' : '☰';
+            
+            // Блокировка / разблокировка прокрутки body
+            if (mobileMenu.classList.contains('active')) {
+                document.body.classList.add('no-scroll');
+            } else {
+                document.body.classList.remove('no-scroll');
+            }
         });
     }
+});
+
+// Закрытие меню при клике на любую ссылку в мобильном меню
+document.querySelectorAll('.mobile-menu a').forEach(link => {
+    link.addEventListener('click', () => {
+        mobileMenu.classList.remove('active');
+        if (mobileMenuBtn) mobileMenuBtn.textContent = '☰';
+        document.body.classList.remove('no-scroll');
+    });
 });
 
 // Контроль трансформации хедера при скролле

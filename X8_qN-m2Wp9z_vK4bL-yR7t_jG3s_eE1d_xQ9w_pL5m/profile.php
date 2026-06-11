@@ -5,7 +5,6 @@ $conn = getDBConnection();
 requireAdminAuth($conn);
 $admin = getCurrentAdmin($conn);
 
-// Обработка обновления профиля
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['change_password'])) {
     $fullName = cleanInput($_POST['full_name'] ?? '');
     $email = cleanInput($_POST['email'] ?? '');
@@ -22,7 +21,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['change_password'])) 
     }
 }
 
-// Обработка смены пароля
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_password'])) {
     $currentPassword = $_POST['current_password'] ?? '';
     $newPassword = $_POST['new_password'] ?? '';
@@ -42,10 +40,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_password'])) {
     }
 }
 
-// Получаем статистику через одну функцию
 $stats_admin = getAdminStats($conn, $admin['id']);
 
-// Подключаем шапку и меню...
 require_once __DIR__. '/includes/header.php';
 require_once __DIR__. '/includes/menu.php';
 ?>
@@ -62,7 +58,6 @@ require_once __DIR__. '/includes/menu.php';
         </div>
         
         <?php 
-            // Подключаем правую шапку
             require_once __DIR__. '/includes/header-right.php';
         ?>
     </header>
@@ -208,9 +203,7 @@ require_once __DIR__. '/includes/menu.php';
 
 
 <?php
-// Подключаем стили
 require_once __DIR__. '/assets/css/profile.php';
 
-// Подключаем подвал
 require_once __DIR__. '/includes/footer.php';
 ?>

@@ -1,6 +1,4 @@
-// Анимация появления карточек новостей
 document.addEventListener('DOMContentLoaded', function() {
-    // Intersection Observer для плавного появления
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
@@ -13,12 +11,10 @@ document.addEventListener('DOMContentLoaded', function() {
         rootMargin: '0px 0px -50px 0px'
     });
     
-    // Наблюдаем за карточками новостей
     document.querySelectorAll('.news-card-stack').forEach(card => {
         observer.observe(card);
     });
     
-    // Сортировка по дате (если нужно будет добавить фильтры)
     const sortNewsByDate = (order = 'desc') => {
         const grid = document.getElementById('newsGrid');
         if (!grid) return;
@@ -31,16 +27,11 @@ document.addEventListener('DOMContentLoaded', function() {
             return order === 'desc' ? dateB - dateA : dateA - dateB;
         });
         
-        // Переставляем карточки в новом порядке
         cards.forEach(card => grid.appendChild(card));
     };
     
-    // Инициализация (опционально - можно добавить кнопки сортировки)
-    // sortNewsByDate('desc');
     
-    // Ленивая загрузка изображений
     if ('loading' in HTMLImageElement.prototype) {
-        // Браузер поддерживает native lazy loading
         const images = document.querySelectorAll('img[loading="lazy"]');
         images.forEach(img => {
             if (img.complete) {
@@ -53,7 +44,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Плавный скролл к началу при пагинации
     document.querySelectorAll('.page-link').forEach(link => {
         link.addEventListener('click', function(e) {
             if (!this.classList.contains('active')) {
