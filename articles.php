@@ -352,7 +352,7 @@ $footerPath = __DIR__. '/includes/footer.php';
                                         
                                         <div class="article-excerpt-stack">
                                             <?php 
-                                            $excerpt = strip_tags($item['excerpt']);
+                                            $excerpt = $item['excerpt'];
                                             echo htmlspecialchars(safeSubstr($excerpt, 0, 200) . '...');
                                             ?>
                                         </div>
