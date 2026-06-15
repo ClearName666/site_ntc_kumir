@@ -87,10 +87,7 @@ $currentUrl = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 <?php require_once __DIR__. '/includes/header.php';?>
 <main>
     <!-- Hero Section - обновляем верхний отступ -->
-     <?php
-        $hero_background_clean = str_replace('!important', '', $hero_background);
-    ?>
-    <section class="hero" style="<?= $hero_background_clean ?>">
+    <section class="hero" style="<?= $hero_background ?>">
         <div class="hero-background">
         </div>
 

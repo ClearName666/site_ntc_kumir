@@ -73,20 +73,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // --- ЦВЕТ ТЕКСТА для секций (приходит из нового блока) ---
-    $textColorFields = [
-        'hero_text_color',
-        'for_whom_text_color',
-        'our_products_text_color',
-        'advantages_of_our_system_text_color',
-        'about_the_company_text_color',
-        'geography_of_application_text_color',
-        'news_artcles_text_color'
-    ];
-    foreach ($textColorFields as $field) {
-        if (isset($_POST[$field])) {
-            updateOrInsertSetting($conn, $field, cleanInput($_POST[$field]));
-        }
-    }
+    // $textColorFields = [
+    //     'hero_text_color',
+    //     'for_whom_text_color',
+    //     'our_products_text_color',
+    //     'advantages_of_our_system_text_color',
+    //     'about_the_company_text_color',
+    //     'geography_of_application_text_color',
+    //     'news_artcles_text_color'
+    // ];
+    // foreach ($textColorFields as $field) {
+    //     if (isset($_POST[$field])) {
+    //         updateOrInsertSetting($conn, $field, cleanInput($_POST[$field]));
+    //     }
+    // }
 
     // --- НАСТРОЙКИ ФОНА из универсального конструктора ---
     if (isset($_POST['active_section']) && !empty($_POST['active_section'])) {
@@ -116,10 +116,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Если нет загруженного файла, оставляем старую картинку (ничего не делаем)
         }
         
-        // Сохраняем цвет текста из конструктора (если передан)
-        if (isset($_POST['uni_text_color'])) {
-            updateOrInsertSetting($conn, $prefix . '_text_color', cleanInput($_POST['uni_text_color']));
-        }
+        // // Сохраняем цвет текста из конструктора (если передан)
+        // if (isset($_POST['uni_text_color'])) {
+        //     updateOrInsertSetting($conn, $prefix . '_text_color', cleanInput($_POST['uni_text_color']));
+        // }
     }
 
     // --- Загрузка логотипа, фавиконки, фонового изображения (общие) ---
@@ -334,7 +334,7 @@ require_once __DIR__ . '/includes/menu.php';
                     </div>
                     
                     <!-- Блок выбора цвета текста -->
-                    <div class="form-group mt-3">
+                    <!-- <div class="form-group mt-3">
                         <label for="uni_text_color">3. Цвет текста для этой секции</label>
                         <div style="display: flex; align-items: center; gap: 15px;">
                             <input type="color" name="uni_text_color" id="uni_text_color" class="form-control" style="width: 60px; height: 60px; padding: 3px;">
@@ -351,7 +351,7 @@ require_once __DIR__ . '/includes/menu.php';
                             <div id="text_preview_text" style="margin-top: 5px;">Обычный текст параграфа для предпросмотра</div>
                             <a href="#" id="text_preview_link" style="display: block; margin-top: 5px;">Ссылка в тексте</a>
                         </div>
-                    </div>
+                    </div> -->
                     
                     <div class="form-group mb-0 mt-3">
                         <label>Предпросмотр фона:</label>
@@ -545,7 +545,7 @@ require_once __DIR__ . '/includes/menu.php';
             if (previewText) previewText.style.color = color;
             if (previewLink) previewLink.style.color = color;
             // также обновляем цвет текста в previewBox
-            if (previewBox) previewBox.style.color = color;
+            // if (previewBox) previewBox.style.color = color;
         }
         
         // Загрузка настроек выбранной секции
@@ -577,10 +577,10 @@ require_once __DIR__ . '/includes/menu.php';
             }
             
             // загружаем цвет текста
-            if (data.textColor) {
-                textColorInput.value = data.textColor;
-                updateTextColorPreview();
-            }
+            // if (data.textColor) {
+            //     textColorInput.value = data.textColor;
+            //     updateTextColorPreview();
+            // }
             updatePreview();
         }
         
