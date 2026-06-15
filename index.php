@@ -87,7 +87,10 @@ $currentUrl = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 <?php require_once __DIR__. '/includes/header.php';?>
 <main>
     <!-- Hero Section - обновляем верхний отступ -->
-    <section class="hero" style="<?= $hero_background ?>">
+     <?php
+        $hero_background_clean = str_replace('!important', '', $hero_background);
+    ?>
+    <section class="hero" style="<?= $hero_background_clean ?>">
         <div class="hero-background">
         </div>
 
@@ -636,36 +639,6 @@ document.addEventListener('DOMContentLoaded', function() {
             allElements[i].style.setProperty('color', color, 'important');
         }
     }
-
-    function applyPrimaryButtonStyles() {
-        const buttons = document.querySelectorAll('.btn-primary');
-
-        buttons.forEach(btn => {
-            // базовые стили
-            btn.style.setProperty('background-color', '#0f3966', 'important');
-            btn.style.setProperty('color', '#ffffff', 'important');
-            btn.style.setProperty('border', '2px solid #0f3966', 'important');
-
-            // transition для плавности (не обязательно)
-            btn.style.setProperty('transition', '0.2s ease', 'important');
-
-            // hover эффекты через события
-            btn.addEventListener('mouseenter', () => {
-                btn.style.setProperty('background-color', '#0b2b4d', 'important');
-                btn.style.setProperty('border-color', '#0b2b4d', 'important');
-                btn.style.setProperty('transform', 'translateY(-2px)', 'important');
-            });
-
-            btn.addEventListener('mouseleave', () => {
-                btn.style.setProperty('background-color', '#0f3966', 'important');
-                btn.style.setProperty('border-color', '#0f3966', 'important');
-                btn.style.setProperty('transform', 'translateY(0px)', 'important');
-            });
-        });
-    }
-
-    // запуск после загрузки страницы
-    document.addEventListener('DOMContentLoaded', applyPrimaryButtonStyles);
 });
 
 </script>
