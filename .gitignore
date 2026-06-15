@@ -1,5 +1,5 @@
 # Игнорируем всё внутри папки uploads, кроме .gitkeep
-assets/images/uploads/*
+# assets/images/uploads/*
 
 # Игнорируем всё внутри папки cache, кроме .gitkeep
 cache/*

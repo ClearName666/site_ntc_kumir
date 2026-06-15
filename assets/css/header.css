@@ -163,6 +163,27 @@ body.no-scroll {
     height: 100%;
 }
 
+.icon-img {
+    width: 20px;
+    height: 20px;
+    vertical-align: middle;
+    object-fit: contain;
+}
+
+.menu-img {
+    width: 24px;
+    height: 24px;
+    display: block;
+}
+
+.phone-icon {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    font-size: 0;
+    background-size: contain;
+}
+
 @keyframes whiteNeonGlow {
     0%, 100% {
         filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.6)) 
