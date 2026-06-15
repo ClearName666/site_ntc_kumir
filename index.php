@@ -111,8 +111,10 @@ $currentUrl = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
                     <!-- Подзаголовок -->
                     <p class="hero-new-subtitle">Автоматизированные решения для учета энергоресурсов</p>
 
+
                     <!-- Блок с кнопками навигации -->
                     <div class="hero-new-buttons">
+                        <link rel="stylesheet" href="/assets/css/translator.css?version=<?php echo $version_code; ?>">
                         <a href="/products.php" class="btn-hero btn-primary">Продукция <span class="arrow">›</span></a>
                         <a href="/articles.php" class="btn-hero btn-secondary">Статьи <span class="arrow">›</span></a>
                         <a href="/contacts.php" class="btn-hero btn-secondary">Контакты <span class="arrow">›</span></a>
