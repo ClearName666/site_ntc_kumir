@@ -8,8 +8,8 @@ $conn = getDBConnection();
 $mainBg = getImage($conn, 'image_background_all');
 $email = getSetting($conn, 'company_email'); 
 $copmany_name = getSetting($conn, 'company_name');
-$domen = "https:
-$privacy = "https:
+$domen = "https://ntckumir.ru/";
+$privacy = "https://ntckumir.ru/privacy.php";
 ?>
 <!DOCTYPE html>
 <html lang="ru">
