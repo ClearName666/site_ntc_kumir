@@ -72,22 +72,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // --- ЦВЕТ ТЕКСТА для секций (приходит из нового блока) ---
-    // $textColorFields = [
-    //     'hero_text_color',
-    //     'for_whom_text_color',
-    //     'our_products_text_color',
-    //     'advantages_of_our_system_text_color',
-    //     'about_the_company_text_color',
-    //     'geography_of_application_text_color',
-    //     'news_artcles_text_color'
-    // ];
-    // foreach ($textColorFields as $field) {
-    //     if (isset($_POST[$field])) {
-    //         updateOrInsertSetting($conn, $field, cleanInput($_POST[$field]));
-    //     }
-    // }
-
     // --- НАСТРОЙКИ ФОНА из универсального конструктора ---
     if (isset($_POST['active_section']) && !empty($_POST['active_section'])) {
         $section = $_POST['active_section'];               // например 'hero_background'
@@ -333,26 +317,6 @@ require_once __DIR__ . '/includes/menu.php';
                         </div>
                     </div>
                     
-                    <!-- Блок выбора цвета текста -->
-                    <!-- <div class="form-group mt-3">
-                        <label for="uni_text_color">3. Цвет текста для этой секции</label>
-                        <div style="display: flex; align-items: center; gap: 15px;">
-                            <input type="color" name="uni_text_color" id="uni_text_color" class="form-control" style="width: 60px; height: 60px; padding: 3px;">
-                            <div>
-                                <div style="font-weight: bold; margin-bottom: 5px;">Выбранный цвет: <code id="text_color_hex">#333333</code></div>
-                                <small class="text-muted">Этот цвет будет применён ко всем текстовым элементам секции</small>
-                            </div>
-                            <button type="button" id="auto_text_color_btn" class="btn btn-outline-secondary" style="margin-left: auto;">
-                                <i class="fas fa-magic"></i> Авто
-                            </button>
-                        </div>
-                        <div id="text_preview_box" style="margin-top: 15px; padding: 15px; border: 1px solid #dee2e6; border-radius: 6px; background: #f9f9f9;">
-                            <div id="text_preview_heading" style="font-size: 1.2rem; font-weight: bold;">Заголовок секции</div>
-                            <div id="text_preview_text" style="margin-top: 5px;">Обычный текст параграфа для предпросмотра</div>
-                            <a href="#" id="text_preview_link" style="display: block; margin-top: 5px;">Ссылка в тексте</a>
-                        </div>
-                    </div> -->
-                    
                     <div class="form-group mb-0 mt-3">
                         <label>Предпросмотр фона:</label>
                         <div id="uni_preview_box" style="width: 100%; height: 120px; border: 2px dashed #ccc; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #000;">
@@ -434,60 +398,52 @@ require_once __DIR__ . '/includes/menu.php';
 <script src="assets/js/scripts.js"></script>
 
 <script>
-    // Текущие настройки секций из БД (передаются в JS)
+    // Текущие настройки секций из БД
     window.backendBackgroundSettings = {
         hero_background: {
             type: `<?= $settings['hero_bg_type'] ?? 'solid' ?>`,
             c1: `<?= $settings['hero_bg_color1'] ?? '#ffffff' ?>`,
             c2: `<?= $settings['hero_bg_color2'] ?? '#ffffff' ?>`,
-            img: `<?= $settings['hero_bg_image_path'] ?? '' ?>`,
-            textColor: `<?= $settings['hero_text_color'] ?? '#333333' ?>`
+            img: `<?= $settings['hero_bg_image_path'] ?? '' ?>`
         },
         for_whom_background: {
             type: `<?= $settings['for_whom_bg_type'] ?? 'solid' ?>`,
             c1: `<?= $settings['for_whom_bg_color1'] ?? '#ffffff' ?>`,
             c2: `<?= $settings['for_whom_bg_color2'] ?? '#ffffff' ?>`,
-            img: `<?= $settings['for_whom_bg_image_path'] ?? '' ?>`,
-            textColor: `<?= $settings['for_whom_text_color'] ?? '#333333' ?>`
+            img: `<?= $settings['for_whom_bg_image_path'] ?? '' ?>`
         },
         our_products_background: {
             type: `<?= $settings['our_products_bg_type'] ?? 'solid' ?>`,
             c1: `<?= $settings['our_products_bg_color1'] ?? '#ffffff' ?>`,
             c2: `<?= $settings['our_products_bg_color2'] ?? '#ffffff' ?>`,
-            img: `<?= $settings['our_products_bg_image_path'] ?? '' ?>`,
-            textColor: `<?= $settings['our_products_text_color'] ?? '#333333' ?>`
+            img: `<?= $settings['our_products_bg_image_path'] ?? '' ?>`
         },
         advantages_of_our_system_background: {
             type: `<?= $settings['advantages_of_our_system_bg_type'] ?? 'solid' ?>`,
             c1: `<?= $settings['advantages_of_our_system_bg_color1'] ?? '#ffffff' ?>`,
             c2: `<?= $settings['advantages_of_our_system_bg_color2'] ?? '#ffffff' ?>`,
-            img: `<?= $settings['advantages_of_our_system_bg_image_path'] ?? '' ?>`,
-            textColor: `<?= $settings['advantages_of_our_system_text_color'] ?? '#333333' ?>`
+            img: `<?= $settings['advantages_of_our_system_bg_image_path'] ?? '' ?>`
         },
         about_the_company_background: {
             type: `<?= $settings['about_the_company_bg_type'] ?? 'solid' ?>`,
             c1: `<?= $settings['about_the_company_bg_color1'] ?? '#ffffff' ?>`,
             c2: `<?= $settings['about_the_company_bg_color2'] ?? '#ffffff' ?>`,
-            img: `<?= $settings['about_the_company_bg_image_path'] ?? '' ?>`,
-            textColor: `<?= $settings['about_the_company_text_color'] ?? '#333333' ?>`
+            img: `<?= $settings['about_the_company_bg_image_path'] ?? '' ?>`
         },
         geography_of_application_background: {
             type: `<?= $settings['geography_of_application_bg_type'] ?? 'solid' ?>`,
             c1: `<?= $settings['geography_of_application_bg_color1'] ?? '#ffffff' ?>`,
             c2: `<?= $settings['geography_of_application_bg_color2'] ?? '#ffffff' ?>`,
-            img: `<?= $settings['geography_of_application_bg_image_path'] ?? '' ?>`,
-            textColor: `<?= $settings['geography_of_application_text_color'] ?? '#333333' ?>`
+            img: `<?= $settings['geography_of_application_bg_image_path'] ?? '' ?>`
         },
         news_artcles_background: {
             type: `<?= $settings['news_artcles_bg_type'] ?? 'solid' ?>`,
             c1: `<?= $settings['news_artcles_bg_color1'] ?? '#ffffff' ?>`,
             c2: `<?= $settings['news_artcles_bg_color2'] ?? '#ffffff' ?>`,
-            img: `<?= $settings['news_artcles_bg_image_path'] ?? '' ?>`,
-            textColor: `<?= $settings['news_artcles_text_color'] ?? '#333333' ?>`
+            img: `<?= $settings['news_artcles_bg_image_path'] ?? '' ?>`
         }
     };
     
-    // --- Управление формой (конструктор) ---
     document.addEventListener('DOMContentLoaded', function() {
         const sectionSelect = document.getElementById('section_selector');
         const activeSectionInput = document.getElementById('active_section');
@@ -498,11 +454,8 @@ require_once __DIR__ . '/includes/menu.php';
         const colorSolid = document.getElementById('uni_color_1');
         const grad1 = document.getElementById('uni_grad_1');
         const grad2 = document.getElementById('uni_grad_2');
-        const textColorInput = document.getElementById('uni_text_color');
-        const textColorHex = document.getElementById('text_color_hex');
         const previewBox = document.getElementById('uni_preview_box');
         
-        // Функция обновления видимости блоков в зависимости от типа фона
         function updateBgBlocksVisibility() {
             const type = bgTypeSelect.value;
             solidBlock.style.display = (type === 'solid') ? 'block' : 'none';
@@ -510,45 +463,30 @@ require_once __DIR__ . '/includes/menu.php';
             imageBlock.style.display = (type === 'image') ? 'block' : 'none';
         }
         
-        // Функция обновления предпросмотра фона и цвета текста
         function updatePreview() {
             const type = bgTypeSelect.value;
             let bgStyle = '';
             if (type === 'solid') {
                 bgStyle = `background: ${colorSolid.value};`;
+                previewBox.style.cssText = bgStyle + 'height:120px; border-radius:6px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #000;';
+                previewBox.innerHTML = 'Предпросмотр секции';
             } else if (type === 'gradient') {
                 bgStyle = `background: linear-gradient(to bottom, ${grad1.value}, ${grad2.value});`;
+                previewBox.style.cssText = bgStyle + 'height:120px; border-radius:6px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #000;';
+                previewBox.innerHTML = 'Предпросмотр секции';
             } else if (type === 'image') {
                 const thumb = document.getElementById('uni_image_thumb');
                 if (thumb.src && thumb.style.display !== 'none') {
                     bgStyle = `background: url('${thumb.src}') center/cover no-repeat;`;
+                    previewBox.style.cssText = bgStyle + 'height:120px; border-radius:6px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #000;';
+                    previewBox.innerHTML = 'Предпросмотр секции';
                 } else {
-                    // если картинка не загружена, показываем сообщение
-                    bgStyle = `background: #cccccc; display: flex; align-items: center; justify-content: center;`;
+                    previewBox.style.cssText = 'background: #cccccc; height:120px; border-radius:6px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #000;';
                     previewBox.innerHTML = 'Предпросмотр секции<br><small>(изображение не выбрано)</small>';
-                    previewBox.style.cssText = bgStyle + 'height:120px; border-radius:6px; color:#000;';
-                    return;
                 }
             }
-            previewBox.style.cssText = bgStyle + 'height:120px; border-radius:6px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: ' + textColorInput.value + ';';
-            previewBox.innerHTML = 'Предпросмотр секции';
         }
         
-        // Обновление цвета текста в предпросмотре
-        function updateTextColorPreview() {
-            const color = textColorInput.value;
-            textColorHex.innerText = color;
-            const previewHeading = document.getElementById('text_preview_heading');
-            const previewText = document.getElementById('text_preview_text');
-            const previewLink = document.getElementById('text_preview_link');
-            if (previewHeading) previewHeading.style.color = color;
-            if (previewText) previewText.style.color = color;
-            if (previewLink) previewLink.style.color = color;
-            // также обновляем цвет текста в previewBox
-            // if (previewBox) previewBox.style.color = color;
-        }
-        
-        // Загрузка настроек выбранной секции
         function loadSectionSettings() {
             const sectionKey = sectionSelect.value;
             activeSectionInput.value = sectionKey;
@@ -575,16 +513,9 @@ require_once __DIR__ . '/includes/menu.php';
                     document.getElementById('uni_image_prompt').style.display = 'block';
                 }
             }
-            
-            // загружаем цвет текста
-            // if (data.textColor) {
-            //     textColorInput.value = data.textColor;
-            //     updateTextColorPreview();
-            // }
             updatePreview();
         }
         
-        // События
         sectionSelect.addEventListener('change', loadSectionSettings);
         bgTypeSelect.addEventListener('change', function() {
             updateBgBlocksVisibility();
@@ -593,58 +524,27 @@ require_once __DIR__ . '/includes/menu.php';
         colorSolid.addEventListener('input', updatePreview);
         grad1.addEventListener('input', updatePreview);
         grad2.addEventListener('input', updatePreview);
-        textColorInput.addEventListener('input', function() {
-            updateTextColorPreview();
-            updatePreview();
-        });
         
-        // Обработка загрузки файла изображения
         const fileInput = document.getElementById('uni_file_input');
         const thumb = document.getElementById('uni_image_thumb');
         const prompt = document.getElementById('uni_image_prompt');
-        fileInput.addEventListener('change', function(e) {
-            if (e.target.files && e.target.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(ev) {
-                    thumb.src = ev.target.result;
-                    thumb.style.display = 'block';
-                    prompt.style.display = 'none';
-                    updatePreview();
-                };
-                reader.readAsDataURL(e.target.files[0]);
-            }
-        });
+        if (fileInput) {
+            fileInput.addEventListener('change', function(e) {
+                if (e.target.files && e.target.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function(ev) {
+                        thumb.src = ev.target.result;
+                        thumb.style.display = 'block';
+                        prompt.style.display = 'none';
+                        updatePreview();
+                    };
+                    reader.readAsDataURL(e.target.files[0]);
+                }
+            });
+        }
         
-        // Авто-подбор цвета текста (простой пример: чёрный или белый в зависимости от яркости фона)
-        document.getElementById('auto_text_color_btn').addEventListener('click', function() {
-            // упрощённо: инвертируем цвет основного фона (если solid)
-            let bgColor = '#ffffff';
-            if (bgTypeSelect.value === 'solid') {
-                bgColor = colorSolid.value;
-            } else if (bgTypeSelect.value === 'gradient') {
-                bgColor = grad1.value; // берём верхний цвет градиента
-            } else {
-                // для изображения оставляем белый
-                bgColor = '#ffffff';
-            }
-            // преобразуем hex в RGB
-            let r, g, b;
-            if (bgColor.startsWith('#')) {
-                r = parseInt(bgColor.slice(1,3), 16);
-                g = parseInt(bgColor.slice(3,5), 16);
-                b = parseInt(bgColor.slice(5,7), 16);
-                const brightness = (r*0.299 + g*0.587 + b*0.114);
-                const textColor = (brightness > 128) ? '#000000' : '#ffffff';
-                textColorInput.value = textColor;
-                updateTextColorPreview();
-                updatePreview();
-            }
-        });
-        
-        // Инициализация
         loadSectionSettings();
         updateBgBlocksVisibility();
         updatePreview();
-        updateTextColorPreview();
     });
 </script>
