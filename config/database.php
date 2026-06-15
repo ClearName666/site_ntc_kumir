@@ -10,7 +10,7 @@ ini_set('display_errors', true);
 define('DB_HOST', 'localhost');
 define('DB_USER', 'admin');
 define('DB_PASS', 'x9zn3gp5');
-define('DB_NAME', 'ntc_kumir');
+define('DB_NAME', 'ntc-kumir');
 
 function getDBConnection() {
     static $conn = null;
