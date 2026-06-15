@@ -1,6 +1,5 @@
 <?php
-
-require_once __DIR__. '/includes/functions.php';
+require_once __DIR__ . '/includes/functions.php';
 
 $conn = getDBConnection();
 
@@ -28,6 +27,7 @@ function deleteOldSectionImage($conn, $imagePathSettingKey) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
+    // Сброс всех стилей (опционально)
     if (isset($_POST['reset_all_styles'])) {
         $styleKeys = [
             'hero_background', 'hero_bg_type', 'hero_bg_color1', 'hero_bg_color2', 'hero_bg_image_path', 'hero_text_color',
@@ -38,37 +38,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'geography_of_application_background', 'geography_of_application_bg_type', 'geography_of_application_bg_color1', 'geography_of_application_bg_color2', 'geography_of_application_bg_image_path', 'geography_of_application_text_color',
             'news_artcles_background', 'news_artcles_bg_type', 'news_artcles_bg_color1', 'news_artcles_bg_color2', 'news_artcles_bg_image_path', 'news_artcles_text_color'
         ];
-        
         foreach ($styleKeys as $key) {
             $stmt = $conn->prepare("DELETE FROM settings WHERE setting_key = ?");
             $stmt->bind_param("s", $key);
             $stmt->execute();
             $stmt->close();
         }
-        
         logAdminAction($conn, 'settings_reset', 'Сброшены все стили секций');
         redirectWithNotification('settings.php', 'Все стили сброшены до стандартных', 'success');
     }
 
+    // --- Чекбоксы отображения секций ---
+    $checkboxes = [
+        'setting_form_view', 'setting_price_view', 'setting_site_new_view',
+        'setting_for_whom_view', 'setting_our_products_view', 'setting_advantages_of_our_system_view',
+        'setting_about_the_company_view', 'setting_geography_of_application_view',
+        'setting_news_artcles_view', 'setting_office_view'
+    ];
+    foreach ($checkboxes as $cb) {
+        $_POST[$cb] = isset($_POST[$cb]) && $_POST[$cb] == 1 ? 1 : 0;
+        $key = substr($cb, 8); // убираем 'setting_'
+        updateOrInsertSetting($conn, $key, $_POST[$cb]);
+    }
 
-    $_POST['setting_form_view'] = isset($_POST['setting_form_view']) && $_POST['setting_form_view'] == 1 ? 1 : 0;
-    $_POST['setting_price_view'] = isset($_POST['setting_price_view']) && $_POST['setting_price_view'] == 1 ? 1 : 0;
-    $_POST['setting_site_new_view'] = isset($_POST['setting_site_new_view']) && $_POST['setting_site_new_view'] == 1 ? 1 : 0;
-    $_POST['setting_for_whom_view'] = isset($_POST['setting_for_whom_view']) && $_POST['setting_for_whom_view'] == 1 ? 1 : 0;
-    $_POST['setting_our_products_view'] = isset($_POST['setting_our_products_view']) && $_POST['setting_our_products_view'] == 1 ? 1 : 0;
-    $_POST['setting_advantages_of_our_system_view'] = isset($_POST['setting_advantages_of_our_system_view']) && $_POST['setting_advantages_of_our_system_view'] == 1 ? 1 : 0;
-    $_POST['setting_about_the_company_view'] = isset($_POST['setting_about_the_company_view']) && $_POST['setting_about_the_company_view'] == 1 ? 1 : 0;
-    $_POST['setting_geography_of_application_view'] = isset($_POST['setting_geography_of_application_view']) && $_POST['setting_geography_of_application_view'] == 1 ? 1 : 0;
-    $_POST['setting_news_artcles_view'] = isset($_POST['setting_news_artcles_view']) && $_POST['setting_news_artcles_view'] == 1 ? 1 : 0;
-    $_POST['setting_office_view'] = isset($_POST['setting_office_view']) && $_POST['setting_office_view'] == 1 ? 1 : 0;
-    
-    foreach ($_POST as $key => $value) {
-        if (strpos($key, 'setting_') === 0) {
-            $settingKey = substr($key, 8);
-            updateOrInsertSetting($conn, $settingKey, cleanInput($value));
+    // --- Обычные текстовые поля (site_title, phone, email и т.д.) ---
+    $textSettings = [
+        'site_title', 'company_name', 'phone', 'company_email', 'company_address',
+        'video_id', 'copyright_text', 'developer_text'
+    ];
+    foreach ($textSettings as $tKey) {
+        if (isset($_POST['setting_' . $tKey])) {
+            updateOrInsertSetting($conn, $tKey, cleanInput($_POST['setting_' . $tKey]));
         }
     }
-    
+
+    // --- ЦВЕТ ТЕКСТА для секций (приходит из нового блока) ---
     $textColorFields = [
         'hero_text_color',
         'for_whom_text_color',
@@ -78,30 +82,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'geography_of_application_text_color',
         'news_artcles_text_color'
     ];
-    
     foreach ($textColorFields as $field) {
         if (isset($_POST[$field])) {
             updateOrInsertSetting($conn, $field, cleanInput($_POST[$field]));
         }
     }
 
-    foreach ($_POST as $key => $value) {
-        if (strpos($key, 'setting_') === 0 && strpos($key, '_bg_type') !== false) {
-            if ($value !== 'image') {
-                $prefix = str_replace(['setting_', '_bg_type'], '', $key);
-                $imagePathKey = $prefix . '_bg_image_path';
-                deleteOldSectionImage($conn, $imagePathKey);
-                updateOrInsertSetting($conn, $imagePathKey, '');
-            }
+    // --- НАСТРОЙКИ ФОНА из универсального конструктора ---
+    if (isset($_POST['active_section']) && !empty($_POST['active_section'])) {
+        $section = $_POST['active_section'];               // например 'hero_background'
+        $prefix = str_replace('_background', '', $section); // 'hero'
+        
+        $bgType = $_POST['universal_bg_type'] ?? 'solid';
+        updateOrInsertSetting($conn, $prefix . '_bg_type', $bgType);
+        
+        if ($bgType === 'solid') {
+            $color1 = $_POST['uni_color_1'] ?? '#ffffff';
+            updateOrInsertSetting($conn, $prefix . '_bg_color1', $color1);
+            // Удаляем градиентный цвет2, если был
+            updateOrInsertSetting($conn, $prefix . '_bg_color2', '');
+            $css = "background: $color1;";
+            updateOrInsertSetting($conn, $section, $css);
+        } elseif ($bgType === 'gradient') {
+            $color1 = $_POST['uni_grad_1'] ?? '#ffffff';
+            $color2 = $_POST['uni_grad_2'] ?? '#ffffff';
+            updateOrInsertSetting($conn, $prefix . '_bg_color1', $color1);
+            updateOrInsertSetting($conn, $prefix . '_bg_color2', $color2);
+            $css = "background: linear-gradient(to bottom, $color1, $color2);";
+            updateOrInsertSetting($conn, $section, $css);
+        } elseif ($bgType === 'image') {
+            // Для image тип сохраняется, но CSS будет сформирован после загрузки файла
+            updateOrInsertSetting($conn, $prefix . '_bg_type', 'image');
+            // Если нет загруженного файла, оставляем старую картинку (ничего не делаем)
+        }
+        
+        // Сохраняем цвет текста из конструктора (если передан)
+        if (isset($_POST['uni_text_color'])) {
+            updateOrInsertSetting($conn, $prefix . '_text_color', cleanInput($_POST['uni_text_color']));
         }
     }
 
+    // --- Загрузка логотипа, фавиконки, фонового изображения (общие) ---
     $imageFields = [
         'logo' => 'logo_path',
         'favicon' => 'favicon_path',
         'background' => 'background_image'
     ];
-
     foreach ($imageFields as $field => $settingKey) {
         if (isset($_FILES[$field]) && $_FILES[$field]['error'] === UPLOAD_ERR_OK) {
             deleteOldSectionImage($conn, $settingKey);
@@ -114,15 +140,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
+    // --- Загрузка изображения для фона секции (universal_bg_file) ---
     if (isset($_FILES['universal_bg_file']) && $_FILES['universal_bg_file']['error'] === UPLOAD_ERR_OK) {
-        $activeSection = '';
-        foreach ($_POST as $key => $value) {
-            if (strpos($key, 'setting_') === 0 && strpos($key, '_bg_type') !== false) {
-                $activeSection = str_replace(['setting_', '_bg_type'], '', $key) . '_background';
-                break;
-            }
-        }
-
+        $activeSection = $_POST['active_section'] ?? '';
         if (!empty($activeSection)) {
             $prefix = str_replace('_background', '', $activeSection);
             $imagePathKey = $prefix . '_bg_image_path';
@@ -133,6 +153,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 updateOrInsertSetting($conn, $imagePathKey, $path);
                 $cssString = "background: url('../" . $path . "') center/cover no-repeat;";
                 updateOrInsertSetting($conn, $activeSection, $cssString);
+                updateOrInsertSetting($conn, $prefix . '_bg_type', 'image');
             }
         }
     }
@@ -141,14 +162,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     redirectWithNotification('settings.php', 'Настройки успешно сохранены', 'success');
 }
 
+// --- Загрузка текущих настроек из БД ---
 $settingsResult = $conn->query("SELECT * FROM settings");
 $settings = [];
 while ($row = $settingsResult->fetch_assoc()) {
     $settings[$row['setting_key']] = $row['setting_value'];
 }
 
-require_once __DIR__. '/includes/header.php';
-require_once __DIR__. '/includes/menu.php';
+require_once __DIR__ . '/includes/header.php';
+require_once __DIR__ . '/includes/menu.php';
 ?>
 
 <div class="main-content">
@@ -159,11 +181,12 @@ require_once __DIR__. '/includes/menu.php';
             </button>
             <h1 class="header-title">Настройки сайта</h1>
         </div>
-        <?php require_once __DIR__. '/includes/header-right.php'; ?>
+        <?php require_once __DIR__ . '/includes/header-right.php'; ?>
     </header>
     
     <div class="content-container">
-        <form method="POST" action="" enctype="multipart/form-data">
+        <form method="POST" action="" enctype="multipart/form-data" id="settingsForm">
+            <!-- ========== ОСНОВНЫЕ НАСТРОЙКИ ========== -->
             <div class="card">
                 <div class="card-header">
                     <h3><i class="fas fa-cog"></i> Основные настройки</h3>
@@ -197,106 +220,58 @@ require_once __DIR__. '/includes/menu.php';
                         <div class="form-group col-md-6">
                             <label for="setting_company_address">Адрес компании</label>
                             <input type="text" id="setting_company_address" name="setting_company_address" 
-                                    value="<?php echo htmlspecialchars($settings['company_address'] ?? ''); ?>">
+                                   value="<?php echo htmlspecialchars($settings['company_address'] ?? ''); ?>">
                         </div>
                     </div>
+                    
                     <div class="form-row">
                         <div class="form-group col-md-6">
                             <label for="setting_video_id">ID Rutub видео о компании</label>
                             <input type="text" id="setting_video_id" name="setting_video_id" 
-                                value="<?php echo htmlspecialchars($settings['video_id'] ?? ''); ?>">
+                                   value="<?php echo htmlspecialchars($settings['video_id'] ?? ''); ?>">
                         </div>
                     </div>
                     
+                    <!-- Чекбоксы отображения -->
                     <div class="form-group">
-                        <label for="setting_form_view">
-                            <input type="checkbox" id="setting_form_view" name="setting_form_view" value="1" 
-                                <?php echo (($settings['form_view'] ?? 0) == 1) ? 'checked' : ''; ?>>
-                            Форма отображения
-                        </label>
+                        <label><input type="checkbox" name="setting_form_view" value="1" <?php echo (($settings['form_view'] ?? 0) == 1) ? 'checked' : ''; ?>> Форма отображения</label>
                     </div>
                     <div class="form-group">
-                        <label for="setting_price_view">
-                            <input type="checkbox" id="setting_price_view" name="setting_price_view" value="1" 
-                                <?php echo (($settings['price_view'] ?? 0) == 1) ? 'checked' : ''; ?>>
-                            Цены товаров отображение
-                        </label>
+                        <label><input type="checkbox" name="setting_price_view" value="1" <?php echo (($settings['price_view'] ?? 0) == 1) ? 'checked' : ''; ?>> Цены товаров отображение</label>
                     </div>
                     <div class="form-group">
-                        <label for="setting_site_new_view">
-                            <input type="checkbox" id="setting_site_new_view" name="setting_site_new_view" value="1" 
-                                <?php echo (($settings['site_new_view'] ?? 0) == 1) ? 'checked' : ''; ?>>
-                            Новый вариант сайта
-                        </label>
+                        <label><input type="checkbox" name="setting_site_new_view" value="1" <?php echo (($settings['site_new_view'] ?? 0) == 1) ? 'checked' : ''; ?>> Новый вариант сайта</label>
                     </div>
                     <div class="form-group">
-                        <label for="setting_for_whom_view">
-                            <input type="checkbox" id="setting_for_whom_view" name="setting_for_whom_view" value="1" 
-                                <?php echo (($settings['for_whom_view'] ?? 0) == 1) ? 'checked' : ''; ?>>
-                            Секция "Для кого" отображение
-                        </label>
+                        <label><input type="checkbox" name="setting_for_whom_view" value="1" <?php echo (($settings['for_whom_view'] ?? 0) == 1) ? 'checked' : ''; ?>> Секция "Для кого" отображение</label>
                     </div>
                     <div class="form-group">
-                        <label for="setting_our_products_view">
-                            <input type="checkbox" id="setting_our_products_view" name="setting_our_products_view" value="1" 
-                                <?php echo (($settings['our_products_view'] ?? 0) == 1) ? 'checked' : ''; ?>>
-                            Секция "Наша продукция" отображение
-                        </label>
+                        <label><input type="checkbox" name="setting_our_products_view" value="1" <?php echo (($settings['our_products_view'] ?? 0) == 1) ? 'checked' : ''; ?>> Секция "Наша продукция" отображение</label>
                     </div>
                     <div class="form-group">
-                        <label for="setting_advantages_of_our_system_view">
-                            <input type="checkbox" id="setting_advantages_of_our_system_view" name="setting_advantages_of_our_system_view" value="1" 
-                                <?php echo (($settings['advantages_of_our_system_view'] ?? 0) == 1) ? 'checked' : ''; ?>>
-                            Секция "Преимущества нашей системы" отображение
-                        </label>
+                        <label><input type="checkbox" name="setting_advantages_of_our_system_view" value="1" <?php echo (($settings['advantages_of_our_system_view'] ?? 0) == 1) ? 'checked' : ''; ?>> Секция "Преимущества нашей системы" отображение</label>
                     </div>
                     <div class="form-group">
-                        <label for="setting_about_the_company_view">
-                            <input type="checkbox" id="setting_about_the_company_view" name="setting_about_the_company_view" value="1" 
-                                <?php echo (($settings['about_the_company_view'] ?? 0) == 1) ? 'checked' : ''; ?>>
-                            Секция "О компании" отображение
-                        </label>
+                        <label><input type="checkbox" name="setting_about_the_company_view" value="1" <?php echo (($settings['about_the_company_view'] ?? 0) == 1) ? 'checked' : ''; ?>> Секция "О компании" отображение</label>
                     </div>
                     <div class="form-group">
-                        <label for="setting_geography_of_application_view">
-                            <input type="checkbox" id="setting_geography_of_application_view" name="setting_geography_of_application_view" value="1" 
-                                <?php echo (($settings['geography_of_application_view'] ?? 0) == 1) ? 'checked' : ''; ?>>
-                            Секция "География применения" отображение
-                        </label>
+                        <label><input type="checkbox" name="setting_geography_of_application_view" value="1" <?php echo (($settings['geography_of_application_view'] ?? 0) == 1) ? 'checked' : ''; ?>> Секция "География применения" отображение</label>
                     </div>
                     <div class="form-group">
-                        <label for="setting_news_artcles_view">
-                            <input type="checkbox" id="setting_news_artcles_view" name="setting_news_artcles_view" value="1" 
-                                <?php echo (($settings['news_artcles_view'] ?? 0) == 1) ? 'checked' : ''; ?>>
-                            Секция "Статьи и новости"
-                        </label>
+                        <label><input type="checkbox" name="setting_news_artcles_view" value="1" <?php echo (($settings['news_artcles_view'] ?? 0) == 1) ? 'checked' : ''; ?>> Секция "Статьи и новости"</label>
                     </div>
                     <div class="form-group">
-                        <label for="setting_office_view">
-                            <input type="checkbox" id="setting_office_view" name="setting_office_view" value="1" 
-                                <?php echo (($settings['office_view'] ?? 0) == 1) ? 'checked' : ''; ?>>
-                            Секция "Наши офисы"
-                        </label>
+                        <label><input type="checkbox" name="setting_office_view" value="1" <?php echo (($settings['office_view'] ?? 0) == 1) ? 'checked' : ''; ?>> Секция "Наши офисы"</label>
                     </div>
                 </div>
             </div>
             
+            <!-- ========== КОНСТРУКТОР ФОНОВ И ТЕКСТА ========== -->
             <div class="card mt-4">
-                    <!-- <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-                        <h3 style="margin: 0;"><i class="fas fa-paint-brush"></i> Конструктор фонов и текста</h3>
-                        <button type="submit" name="reset_all_styles" value="1" class="btn btn-danger btn-sm" 
-                                onclick="return confirm('Вы уверены? Это удалит ВСЕ настройки фонов и цветов текста для всех секций!');"
-                                style="padding: 5px 15px;">
-                            <i class="fas fa-undo"></i> Сбросить все стили
-                        </button>
-                    </div> -->
                 <div class="card-body">
-                    <input type="hidden" id="final_css_output" name="">
-                    <input type="hidden" id="final_bg_type" name="">
-                    <input type="hidden" id="final_color1" name="">
-                    <input type="hidden" id="final_color2" name="">
-                    <input type="hidden" id="final_text_color" name="">
-
+                    <!-- Скрытое поле для активной секции -->
+                    <input type="hidden" name="active_section" id="active_section" value="hero_background">
+                    
                     <div class="form-group">
                         <label for="section_selector" style="font-weight: bold; color: #0055ff;">1. Выберите секцию:</label>
                         <select id="section_selector" class="form-control" style="border: 2px solid #0055ff;">
@@ -309,39 +284,39 @@ require_once __DIR__. '/includes/menu.php';
                             <option value="news_artcles_background">Секция "Статьи и новости"</option>
                         </select>
                     </div>
-
+                    
                     <hr>
-
+                    
                     <div class="form-group">
                         <label for="universal_bg_type">2. Тип заднего фона</label>
-                        <select id="universal_bg_type" class="form-control">
+                        <select name="universal_bg_type" id="universal_bg_type" class="form-control">
                             <option value="solid">Сплошной цвет</option>
                             <option value="gradient">Вертикальный градиент</option>
                             <option value="image">Фоновое изображение</option>
                         </select>
                     </div>
-
+                    
                     <div class="bg-options-container" style="background: rgba(0,0,0,0.03); padding: 15px; border-radius: 6px; margin-bottom: 15px;">
                         <div class="bg-option-block" id="uni_block_solid">
                             <div class="form-group mb-0">
                                 <label>Цвет заливки:</label>
-                                <input type="color" id="uni_color_1" class="form-control" style="width: 80px; height: 40px; padding: 2px;">
+                                <input type="color" name="uni_color_1" id="uni_color_1" class="form-control" style="width: 80px; height: 40px; padding: 2px;">
                             </div>
                         </div>
-
+                        
                         <div class="bg-option-block" id="uni_block_gradient" style="display:none;">
                             <div class="form-row mb-0">
                                 <div class="form-group col-md-3">
                                     <label>Цвет СВЕРХУ:</label>
-                                    <input type="color" id="uni_grad_1" class="form-control" style="height: 40px;">
+                                    <input type="color" name="uni_grad_1" id="uni_grad_1" class="form-control" style="height: 40px;">
                                 </div>
                                 <div class="form-group col-md-3">
                                     <label>Цвет СНИЗУ:</label>
-                                    <input type="color" id="uni_grad_2" class="form-control" style="height: 40px;">
+                                    <input type="color" name="uni_grad_2" id="uni_grad_2" class="form-control" style="height: 40px;">
                                 </div>
                             </div>
                         </div>
-
+                        
                         <div class="bg-option-block" id="uni_block_image" style="display:none;">
                             <div class="form-group mb-0">
                                 <label>Загрузить изображение фона:</label>
@@ -357,32 +332,28 @@ require_once __DIR__. '/includes/menu.php';
                             </div>
                         </div>
                     </div>
-
-                    <!-- НАСТРОЙКА ЦВЕТА ТЕКСТА - ПРОСТО -->
-                    <!-- <div class="card mt-3" style="border: 1px solid #28a745;">
-                        <div class="card-header" style="background: #f8f9fa;">
-                            <h5 style="margin:0;"><i class="fas fa-font"></i> 3. Цвет текста для этой секции</h5>
-                        </div>
-                        <div class="card-body">
-                            <div style="display: flex; align-items: center; gap: 15px;">
-                                <input type="color" id="uni_text_color" class="form-control" style="width: 60px; height: 60px; padding: 3px;" value="#333333">
-                                <div>
-                                    <div style="font-weight: bold; margin-bottom: 5px;">Выбранный цвет: <code id="text_color_hex">#333333</code></div>
-                                    <small class="text-muted">Этот цвет будет применён ко ВСЕМ текстовым элементам секции</small>
-                                </div>
-                                <button type="button" id="auto_text_color_btn" class="btn btn-outline-secondary" style="margin-left: auto;">
-                                    <i class="fas fa-magic"></i> Авто
-                                </button>
+                    
+                    <!-- Блок выбора цвета текста -->
+                    <div class="form-group mt-3">
+                        <label for="uni_text_color">3. Цвет текста для этой секции</label>
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <input type="color" name="uni_text_color" id="uni_text_color" class="form-control" style="width: 60px; height: 60px; padding: 3px;">
+                            <div>
+                                <div style="font-weight: bold; margin-bottom: 5px;">Выбранный цвет: <code id="text_color_hex">#333333</code></div>
+                                <small class="text-muted">Этот цвет будет применён ко всем текстовым элементам секции</small>
                             </div>
-                            <div id="text_preview_box" style="margin-top: 15px; padding: 15px; border: 1px solid #dee2e6; border-radius: 6px; background: #fff;">
-                                <div id="text_preview_heading" style="font-size: 1.2rem; font-weight: bold;">Заголовок секции</div>
-                                <div id="text_preview_text" style="margin-top: 5px;">Обычный текст параграфа для предпросмотра</div>
-                                <a href="#" id="text_preview_link" style="display: block; margin-top: 5px;">Ссылка в тексте</a>
-                            </div>
+                            <button type="button" id="auto_text_color_btn" class="btn btn-outline-secondary" style="margin-left: auto;">
+                                <i class="fas fa-magic"></i> Авто
+                            </button>
                         </div>
-                    </div> -->
-
-                    <div class="form-group mb-0 mt-3" id="uni_preview_wrapper">
+                        <div id="text_preview_box" style="margin-top: 15px; padding: 15px; border: 1px solid #dee2e6; border-radius: 6px; background: #f9f9f9;">
+                            <div id="text_preview_heading" style="font-size: 1.2rem; font-weight: bold;">Заголовок секции</div>
+                            <div id="text_preview_text" style="margin-top: 5px;">Обычный текст параграфа для предпросмотра</div>
+                            <a href="#" id="text_preview_link" style="display: block; margin-top: 5px;">Ссылка в тексте</a>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group mb-0 mt-3">
                         <label>Предпросмотр фона:</label>
                         <div id="uni_preview_box" style="width: 100%; height: 120px; border: 2px dashed #ccc; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #000;">
                             Предпросмотр секции
@@ -390,7 +361,8 @@ require_once __DIR__. '/includes/menu.php';
                     </div>
                 </div>
             </div>
-
+            
+            <!-- ========== ИЗОБРАЖЕНИЯ (логотип, фавикон) ========== -->
             <div class="card mt-4">
                 <div class="card-header">
                     <h3><i class="fas fa-images"></i> Изображения</h3>
@@ -427,6 +399,7 @@ require_once __DIR__. '/includes/menu.php';
                 </div>
             </div>
             
+            <!-- ========== ТЕКСТЫ (копирайт и т.д.) ========== -->
             <div class="card mt-4">
                 <div class="card-header">
                     <h3><i class="fas fa-file-alt"></i> Тексты</h3>
@@ -456,14 +429,14 @@ require_once __DIR__. '/includes/menu.php';
     </div>
 </div>
 
-<?php require_once __DIR__. '/includes/footer.php'; ?>
+<?php require_once __DIR__ . '/includes/footer.php'; ?>
 
 <script src="assets/js/scripts.js"></script>
 
 <script>
+    // Текущие настройки секций из БД (передаются в JS)
     window.backendBackgroundSettings = {
         hero_background: {
-            css: `<?= $settings['hero_background'] ?? '' ?>`,
             type: `<?= $settings['hero_bg_type'] ?? 'solid' ?>`,
             c1: `<?= $settings['hero_bg_color1'] ?? '#ffffff' ?>`,
             c2: `<?= $settings['hero_bg_color2'] ?? '#ffffff' ?>`,
@@ -471,7 +444,6 @@ require_once __DIR__. '/includes/menu.php';
             textColor: `<?= $settings['hero_text_color'] ?? '#333333' ?>`
         },
         for_whom_background: {
-            css: `<?= $settings['for_whom_background'] ?? '' ?>`,
             type: `<?= $settings['for_whom_bg_type'] ?? 'solid' ?>`,
             c1: `<?= $settings['for_whom_bg_color1'] ?? '#ffffff' ?>`,
             c2: `<?= $settings['for_whom_bg_color2'] ?? '#ffffff' ?>`,
@@ -479,7 +451,6 @@ require_once __DIR__. '/includes/menu.php';
             textColor: `<?= $settings['for_whom_text_color'] ?? '#333333' ?>`
         },
         our_products_background: {
-            css: `<?= $settings['our_products_background'] ?? '' ?>`,
             type: `<?= $settings['our_products_bg_type'] ?? 'solid' ?>`,
             c1: `<?= $settings['our_products_bg_color1'] ?? '#ffffff' ?>`,
             c2: `<?= $settings['our_products_bg_color2'] ?? '#ffffff' ?>`,
@@ -487,7 +458,6 @@ require_once __DIR__. '/includes/menu.php';
             textColor: `<?= $settings['our_products_text_color'] ?? '#333333' ?>`
         },
         advantages_of_our_system_background: {
-            css: `<?= $settings['advantages_of_our_system_background'] ?? '' ?>`,
             type: `<?= $settings['advantages_of_our_system_bg_type'] ?? 'solid' ?>`,
             c1: `<?= $settings['advantages_of_our_system_bg_color1'] ?? '#ffffff' ?>`,
             c2: `<?= $settings['advantages_of_our_system_bg_color2'] ?? '#ffffff' ?>`,
@@ -495,7 +465,6 @@ require_once __DIR__. '/includes/menu.php';
             textColor: `<?= $settings['advantages_of_our_system_text_color'] ?? '#333333' ?>`
         },
         about_the_company_background: {
-            css: `<?= $settings['about_the_company_background'] ?? '' ?>`,
             type: `<?= $settings['about_the_company_bg_type'] ?? 'solid' ?>`,
             c1: `<?= $settings['about_the_company_bg_color1'] ?? '#ffffff' ?>`,
             c2: `<?= $settings['about_the_company_bg_color2'] ?? '#ffffff' ?>`,
@@ -503,7 +472,6 @@ require_once __DIR__. '/includes/menu.php';
             textColor: `<?= $settings['about_the_company_text_color'] ?? '#333333' ?>`
         },
         geography_of_application_background: {
-            css: `<?= $settings['geography_of_application_background'] ?? '' ?>`,
             type: `<?= $settings['geography_of_application_bg_type'] ?? 'solid' ?>`,
             c1: `<?= $settings['geography_of_application_bg_color1'] ?? '#ffffff' ?>`,
             c2: `<?= $settings['geography_of_application_bg_color2'] ?? '#ffffff' ?>`,
@@ -511,7 +479,6 @@ require_once __DIR__. '/includes/menu.php';
             textColor: `<?= $settings['geography_of_application_text_color'] ?? '#333333' ?>`
         },
         news_artcles_background: {
-            css: `<?= $settings['news_artcles_background'] ?? '' ?>`,
             type: `<?= $settings['news_artcles_bg_type'] ?? 'solid' ?>`,
             c1: `<?= $settings['news_artcles_bg_color1'] ?? '#ffffff' ?>`,
             c2: `<?= $settings['news_artcles_bg_color2'] ?? '#ffffff' ?>`,
@@ -519,6 +486,165 @@ require_once __DIR__. '/includes/menu.php';
             textColor: `<?= $settings['news_artcles_text_color'] ?? '#333333' ?>`
         }
     };
+    
+    // --- Управление формой (конструктор) ---
+    document.addEventListener('DOMContentLoaded', function() {
+        const sectionSelect = document.getElementById('section_selector');
+        const activeSectionInput = document.getElementById('active_section');
+        const bgTypeSelect = document.getElementById('universal_bg_type');
+        const solidBlock = document.getElementById('uni_block_solid');
+        const gradientBlock = document.getElementById('uni_block_gradient');
+        const imageBlock = document.getElementById('uni_block_image');
+        const colorSolid = document.getElementById('uni_color_1');
+        const grad1 = document.getElementById('uni_grad_1');
+        const grad2 = document.getElementById('uni_grad_2');
+        const textColorInput = document.getElementById('uni_text_color');
+        const textColorHex = document.getElementById('text_color_hex');
+        const previewBox = document.getElementById('uni_preview_box');
+        
+        // Функция обновления видимости блоков в зависимости от типа фона
+        function updateBgBlocksVisibility() {
+            const type = bgTypeSelect.value;
+            solidBlock.style.display = (type === 'solid') ? 'block' : 'none';
+            gradientBlock.style.display = (type === 'gradient') ? 'flex' : 'none';
+            imageBlock.style.display = (type === 'image') ? 'block' : 'none';
+        }
+        
+        // Функция обновления предпросмотра фона и цвета текста
+        function updatePreview() {
+            const type = bgTypeSelect.value;
+            let bgStyle = '';
+            if (type === 'solid') {
+                bgStyle = `background: ${colorSolid.value};`;
+            } else if (type === 'gradient') {
+                bgStyle = `background: linear-gradient(to bottom, ${grad1.value}, ${grad2.value});`;
+            } else if (type === 'image') {
+                const thumb = document.getElementById('uni_image_thumb');
+                if (thumb.src && thumb.style.display !== 'none') {
+                    bgStyle = `background: url('${thumb.src}') center/cover no-repeat;`;
+                } else {
+                    // если картинка не загружена, показываем сообщение
+                    bgStyle = `background: #cccccc; display: flex; align-items: center; justify-content: center;`;
+                    previewBox.innerHTML = 'Предпросмотр секции<br><small>(изображение не выбрано)</small>';
+                    previewBox.style.cssText = bgStyle + 'height:120px; border-radius:6px; color:#000;';
+                    return;
+                }
+            }
+            previewBox.style.cssText = bgStyle + 'height:120px; border-radius:6px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: ' + textColorInput.value + ';';
+            previewBox.innerHTML = 'Предпросмотр секции';
+        }
+        
+        // Обновление цвета текста в предпросмотре
+        function updateTextColorPreview() {
+            const color = textColorInput.value;
+            textColorHex.innerText = color;
+            const previewHeading = document.getElementById('text_preview_heading');
+            const previewText = document.getElementById('text_preview_text');
+            const previewLink = document.getElementById('text_preview_link');
+            if (previewHeading) previewHeading.style.color = color;
+            if (previewText) previewText.style.color = color;
+            if (previewLink) previewLink.style.color = color;
+            // также обновляем цвет текста в previewBox
+            if (previewBox) previewBox.style.color = color;
+        }
+        
+        // Загрузка настроек выбранной секции
+        function loadSectionSettings() {
+            const sectionKey = sectionSelect.value;
+            activeSectionInput.value = sectionKey;
+            const data = window.backendBackgroundSettings[sectionKey];
+            if (!data) return;
+            
+            bgTypeSelect.value = data.type;
+            updateBgBlocksVisibility();
+            
+            if (data.type === 'solid') {
+                colorSolid.value = data.c1;
+            } else if (data.type === 'gradient') {
+                grad1.value = data.c1;
+                grad2.value = data.c2;
+            } else if (data.type === 'image') {
+                if (data.img) {
+                    const imgPath = '../' + data.img;
+                    const thumb = document.getElementById('uni_image_thumb');
+                    thumb.src = imgPath;
+                    thumb.style.display = 'block';
+                    document.getElementById('uni_image_prompt').style.display = 'none';
+                } else {
+                    document.getElementById('uni_image_thumb').style.display = 'none';
+                    document.getElementById('uni_image_prompt').style.display = 'block';
+                }
+            }
+            
+            // загружаем цвет текста
+            if (data.textColor) {
+                textColorInput.value = data.textColor;
+                updateTextColorPreview();
+            }
+            updatePreview();
+        }
+        
+        // События
+        sectionSelect.addEventListener('change', loadSectionSettings);
+        bgTypeSelect.addEventListener('change', function() {
+            updateBgBlocksVisibility();
+            updatePreview();
+        });
+        colorSolid.addEventListener('input', updatePreview);
+        grad1.addEventListener('input', updatePreview);
+        grad2.addEventListener('input', updatePreview);
+        textColorInput.addEventListener('input', function() {
+            updateTextColorPreview();
+            updatePreview();
+        });
+        
+        // Обработка загрузки файла изображения
+        const fileInput = document.getElementById('uni_file_input');
+        const thumb = document.getElementById('uni_image_thumb');
+        const prompt = document.getElementById('uni_image_prompt');
+        fileInput.addEventListener('change', function(e) {
+            if (e.target.files && e.target.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    thumb.src = ev.target.result;
+                    thumb.style.display = 'block';
+                    prompt.style.display = 'none';
+                    updatePreview();
+                };
+                reader.readAsDataURL(e.target.files[0]);
+            }
+        });
+        
+        // Авто-подбор цвета текста (простой пример: чёрный или белый в зависимости от яркости фона)
+        document.getElementById('auto_text_color_btn').addEventListener('click', function() {
+            // упрощённо: инвертируем цвет основного фона (если solid)
+            let bgColor = '#ffffff';
+            if (bgTypeSelect.value === 'solid') {
+                bgColor = colorSolid.value;
+            } else if (bgTypeSelect.value === 'gradient') {
+                bgColor = grad1.value; // берём верхний цвет градиента
+            } else {
+                // для изображения оставляем белый
+                bgColor = '#ffffff';
+            }
+            // преобразуем hex в RGB
+            let r, g, b;
+            if (bgColor.startsWith('#')) {
+                r = parseInt(bgColor.slice(1,3), 16);
+                g = parseInt(bgColor.slice(3,5), 16);
+                b = parseInt(bgColor.slice(5,7), 16);
+                const brightness = (r*0.299 + g*0.587 + b*0.114);
+                const textColor = (brightness > 128) ? '#000000' : '#ffffff';
+                textColorInput.value = textColor;
+                updateTextColorPreview();
+                updatePreview();
+            }
+        });
+        
+        // Инициализация
+        loadSectionSettings();
+        updateBgBlocksVisibility();
+        updatePreview();
+        updateTextColorPreview();
+    });
 </script>
-
-<script src="assets/js/castomBackrgound.js"></script>
