@@ -45,17 +45,13 @@ $isAdmin = isset($_SESSION['admin_id']);
                 <div class="header-right">
                     <!-- Телефон -->
                     <a href="tel:<?php echo preg_replace('/[^0-9+]/', '', getSetting($conn, 'phone')); ?>" class="header-phone">
-                        <span class="phone-icon">
-                            <img src="/assets/images/static/phone-icon.svg" alt="Телефон" class="icon-img">
-                        </span>
+                        <span class="phone-icon">📞</span>
                         <span><?php echo getSetting($conn, 'phone'); ?></span>
                     </a>
                     
                     <!-- Личный кабинет  заменить на /userKumir/index.php-->
                     <a href="https://v4.ntckumir.ru/" class="btn-personal">
-                        <span class="btn-icon">
-                            <img src="/assets/images/static/user-icon.svg" alt="Личный кабинет" class="icon-img">
-                        </span>
+                        <span class="btn-icon">👤</span>
                         <span class="btn-text">Личный кабинет</span>
                     </a>
                     
@@ -85,16 +81,12 @@ $isAdmin = isset($_SESSION['admin_id']);
         
         <div class="mobile-contact">
             <a href="tel:<?php echo preg_replace('/[^0-9+]/', '', getSetting($conn, 'phone')); ?>" class="header-phone">
-                <span class="phone-icon">
-                    <img src="/assets/images/static/phone-icon.svg" alt="Телефон" class="icon-img">
-                </span>
+                <span class="phone-icon">📞</span>
                 <span><?php echo getSetting($conn, 'phone'); ?></span>
             </a>
             
             <a href="https://v4.ntckumir.ru/" class="btn-personal">
-                <span class="btn-icon">
-                    <img src="/assets/images/static/user-icon.svg" alt="Личный кабинет" class="icon-img">
-                </span>
+                <span class="btn-icon">👤</span>
                 <span class="btn-text">Личный кабинет</span>
             </a>
             
