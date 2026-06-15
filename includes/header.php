@@ -6,110 +6,124 @@ if (session_status() === PHP_SESSION_NONE) {
 $isAdmin = isset($_SESSION['admin_id']);
 ?>
 
-    <header class="main-header">
-        <div class="container">
-            <div class="header-content">
-                <!-- Логотип -->
-                <a href="/index.php" class="logo">
-                    <img src="/<?php echo getSetting($conn, 'logo_path'); ?>" alt="<?php echo getSetting($conn, 'company_name'); ?>">
+<header class="main-header">
+    <div class="container">
+        <div class="header-content">
+            <!-- Логотип -->
+            <a href="/index.php" class="logo">
+                <img src="/<?php echo getSetting($conn, 'logo_path'); ?>" alt="<?php echo getSetting($conn, 'company_name'); ?>">
+            </a>
+
+            <nav class="main-nav">
+                <?php
+                $menuItems = getMenuItems($conn);
+
+                $firstTwoItems = array_splice($menuItems, 0, 4);
+
+                if (!empty($firstTwoItems)) {
+                    foreach ($firstTwoItems as $item) {
+                        echo '<a href="' . $item['url'] . '" class="nav-link">' . $item['title'] . '</a>';
+                    }
+                }
+
+                if (!empty($menuItems)) {
+                    echo '<div class="dropdown">';
+                    echo '<a href="#" class="nav-link dropdown-toggle">☰</a>';
+                    echo '<div class="dropdown-menu">';
+
+                    foreach ($menuItems as $item) {
+                        echo '<a href="' . $item['url'] . '" class="dropdown-item">' . $item['title'] . '</a>';
+                    }
+
+                    echo '</div>';
+                    echo '</div>';
+                }
+                ?>
+            </nav>
+
+            <!-- Правая часть -->
+            <div class="header-right">
+                <!-- Телефон -->
+                <a href="tel:<?php echo preg_replace('/[^0-9+]/', '', getSetting($conn, 'phone')); ?>" class="header-phone">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none" /><path fill="currentColor" d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24c1.12.37 2.33.57 3.57.57c.55 0 1 .45 1 1V20c0 .55-.45 1-1 1c-9.39 0-17-7.61-17-17c0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1c0 1.25.2 2.45.57 3.57c.11.35.03.74-.25 1.02z" /></svg>
+
+
+                    <span><?php echo getSetting($conn, 'phone'); ?></span>
                 </a>
-                
-                <nav class="main-nav">
-                    <?php
-                    $menuItems = getMenuItems($conn);
-                    
-                    $firstTwoItems = array_splice($menuItems, 0, 4);
-                    
-                    if (!empty($firstTwoItems)) {
-                        foreach ($firstTwoItems as $item) {
-                            echo '<a href="' . $item['url'] . '" class="nav-link">' . $item['title'] . '</a>';
-                        }
-                    }
-                    
-                    if (!empty($menuItems)) {
-                        echo '<div class="dropdown">';
-                        echo '<a href="#" class="nav-link dropdown-toggle">☰</a>';
-                        echo '<div class="dropdown-menu">';
-                        
-                        foreach ($menuItems as $item) {
-                            echo '<a href="' . $item['url'] . '" class="dropdown-item">' . $item['title'] . '</a>';
-                        }
-                        
-                        echo '</div>';
-                        echo '</div>';
-                    }
-                    ?>
-                </nav>
-                
-                <!-- Правая часть -->
-                <div class="header-right">
-                    <!-- Телефон -->
-                    <a href="tel:<?php echo preg_replace('/[^0-9+]/', '', getSetting($conn, 'phone')); ?>" class="header-phone">
-                        <span class="phone-icon">📞</span>
-                        <span><?php echo getSetting($conn, 'phone'); ?></span>
-                    </a>
-                    
-                    <!-- Личный кабинет  заменить на /userKumir/index.php-->
-                    <a href="https://v4.ntckumir.ru/" class="btn-personal">
-                        <span class="btn-icon">👤</span>
-                        <span class="btn-text">Личный кабинет</span>
-                    </a>
-                    
-                    <!-- Кнопка входа в админ-панель -->
-                    <!-- <a href="/admin/login.php" class="btn-admin">
-                        <span class="admin-icon">🔐</span>
-                        <span class="admin-text">Вход</span>
-                    </a> -->
-                    
-                    <!-- Кнопка мобильного меню -->
-                    <button class="mobile-menu-btn">☰</button>
-                </div>
+
+                <!-- Личный кабинет  заменить на /userKumir/index.php-->
+                <a href="https://v4.ntckumir.ru/" class="btn-personal">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24">
+                      <path d="M0 0h24v24H0z" fill="none" />
+                      <path fill="currentColor" d="M12 4a4 4 0 1 1 0 8a4 4 0 0 1 0-8m0 16s8 0 8-2c0-2.4-3.9-5-8-5s-8 2.6-8 5c0 2 8 2 8 2" />
+                    </svg>
+                    <span class="btn-text">Личный кабинет</span>
+                </a>
+
+                <!-- Кнопка входа в админ-панель -->
+                <!-- <a href="/admin/login.php" class="btn-admin">
+                    <span class="admin-icon">🔐</span>
+                    <span class="admin-text">Вход</span>
+                </a> -->
+
+                <!-- Кнопка мобильного меню -->
+                <button class="mobile-menu-btn">☰</button>
             </div>
         </div>
-    </header>
-    
-    <!-- Мобильное меню -->
-    <div class="mobile-menu">
-        <nav class="mobile-nav">
-            <?php
-            $allMenuItems = getNavigationMenu($conn);
-            foreach ($allMenuItems as $item) {
-                echo '<a href="' . $item['url'] . '" class="nav-link">' . $item['title'] . '</a>';
-            }
-            ?>
-        </nav>
-        
-        <div class="mobile-contact">
-            <a href="tel:<?php echo preg_replace('/[^0-9+]/', '', getSetting($conn, 'phone')); ?>" class="header-phone">
-                <span class="phone-icon">📞</span>
-                <span><?php echo getSetting($conn, 'phone'); ?></span>
-            </a>
-            
-            <a href="https://v4.ntckumir.ru/" class="btn-personal">
-                <span class="btn-icon">👤</span>
-                <span class="btn-text">Личный кабинет</span>
-            </a>
-            
-            <!-- Кнопка входа в админку для мобильной версии -->
-            <!-- <div class="mobile-admin-btn">
-                <a href="/admin/login.php" class="btn-admin">
-                    <span class="admin-icon">🔐</span>
-                    <span class="admin-text">Вход в админку</span>
-                </a>
-            </div>-->
-        </div>
     </div>
-    
+</header>
+
+<!-- Мобильное меню -->
+<div class="mobile-menu">
+    <nav class="mobile-nav">
+        <?php
+        $allMenuItems = getNavigationMenu($conn);
+        foreach ($allMenuItems as $item) {
+            echo '<a href="' . $item['url'] . '" class="nav-link">' . $item['title'] . '</a>';
+        }
+        ?>
+    </nav>
+
+    <div class="mobile-contact">
+        <a href="tel:<?php echo preg_replace('/[^0-9+]/', '', getSetting($conn, 'phone')); ?>" class="header-phone">
+<!--
+            <span class="phone-icon">📞</span>
+-->
+            <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none" /><path fill="currentColor" d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24c1.12.37 2.33.57 3.57.57c.55 0 1 .45 1 1V20c0 .55-.45 1-1 1c-9.39 0-17-7.61-17-17c0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1c0 1.25.2 2.45.57 3.57c.11.35.03.74-.25 1.02z" /></svg>
+            <span><?php echo getSetting($conn, 'phone'); ?></span>
+        </a>
+
+        <a href="https://v4.ntckumir.ru/" class="btn-personal">
+<!--
+            <span class="btn-icon">👤</span>
+-->
+            <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24">
+              <path d="M0 0h24v24H0z" fill="none" />
+              <path fill="currentColor" d="M12 4a4 4 0 1 1 0 8a4 4 0 0 1 0-8m0 16s8 0 8-2c0-2.4-3.9-5-8-5s-8 2.6-8 5c0 2 8 2 8 2" />
+            </svg>
+            <span class="btn-text">Личный кабинет</span>
+        </a>
+
+        <!-- Кнопка входа в админку для мобильной версии -->
+        <!-- <div class="mobile-admin-btn">
+            <a href="/admin/login.php" class="btn-admin">
+                <span class="admin-icon">🔐</span>
+                <span class="admin-text">Вход в админку</span>
+            </a>
+        </div>-->
+    </div>
+</div>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const isAdmin = <?php echo $isAdmin ? 'true' : 'false'; ?>;
-    
+
     if (isAdmin) {
         // 1. Кнопка для ПК (вставляем в блок .header-right перед кнопкой гамбургера)
         const desktopContainer = document.querySelector('.header-right');
         if (desktopContainer) {
             const desktopAdminHtml = `
-                <a href="/X8_qN-m2Wp9z_vK4bL-yR7t_jG3s_eE1d_xQ9w_pL5m/index.php" class="btn-admin">
+                <a href="/admin.php" class="btn-admin">
                     <span class="admin-icon">👑</span>
                     <span class="admin-text">Админка</span>
                 </a>
@@ -122,13 +136,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 desktopContainer.insertAdjacentHTML('beforeend', desktopAdminHtml);
             }
         }
-        
+
         // 2. Кнопка для телефона (вставляем в самый конец блока .mobile-contact)
         const mobileContainer = document.querySelector('.mobile-contact');
         if (mobileContainer) {
             const mobileAdminHtml = `
                 <div class="mobile-admin-btn">
-                    <a href="/X8_qN-m2Wp9z_vK4bL-yR7t_jG3s_eE1d_xQ9w_pL5m/index.php" class="btn-admin">
+                    <a href="/admin.php" class="btn-admin">
                         <span class="admin-icon">👑</span>
                         <span class="admin-text">Админка</span>
                     </a>
@@ -137,7 +151,7 @@ document.addEventListener('DOMContentLoaded', function() {
             mobileContainer.insertAdjacentHTML('beforeend', mobileAdminHtml);
         }
     }
-    
+
     const header = document.querySelector('.main-header');
     const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
     const mobileMenu = document.querySelector('.mobile-menu');
@@ -156,7 +170,7 @@ document.addEventListener('DOMContentLoaded', function() {
         mobileMenuBtn.addEventListener('click', function() {
             mobileMenu.classList.toggle('active');
             this.textContent = mobileMenu.classList.contains('active') ? '✕' : '☰';
-            
+
             // Блокировка / разблокировка прокрутки body
             if (mobileMenu.classList.contains('active')) {
                 document.body.classList.add('no-scroll');

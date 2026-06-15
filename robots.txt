@@ -8,7 +8,6 @@ Disallow: /css_defaults/
 
 # Запрещаем индексировать админку и личный кабинет
 Disallow: /X8_qN-m2Wp9z_vK4bL-yR7t_jG3s_eE1d_xQ9w_pL5m/
-Disallow: /userKumir/
 
 # Указываем путь к карте сайта (если она будет)
 Sitemap: https://ntckumir.ru//sitemap.xml

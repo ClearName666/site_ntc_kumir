@@ -90,21 +90,26 @@ $currentUrl = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
     <section class="hero" style="<?= $hero_background ?>">
         <div class="hero-background">
         </div>
-        
+
         <?php if ($site_new_view): ?>
             <div class="container-main">
                 <div class="hero-new-content">
-                    
+
                     <!-- Логотип компании -->
+<!--
                     <div class="hero-new-logo">
                         <img src="/assets/images/static/new/001 - logo.svg" alt="НТЦ КУМИР" class="hero-logo-img">
                     </div>
+-->
 
                     <!-- Главный заголовок из базы данных -->
+<!--
                     <h1 class="hero-new-title"><?php echo $siteTitle; ?></h1>
-                    
+-->
+                    <h1 class="hero-new-title">НТЦ «КУМИр»</h1>
+
                     <!-- Подзаголовок -->
-                    <p class="hero-new-subtitle">Высокотехнологичные ИТ-решения для сложных задач и устойчивого роста</p>
+                    <p class="hero-new-subtitle">Автоматизированные решения для учета энергоресурсов</p>
 
                     <!-- Блок с кнопками навигации -->
                     <div class="hero-new-buttons">
@@ -115,41 +120,37 @@ $currentUrl = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 
                     <!-- Нижняя полупрозрачная панель преимуществ -->
                     <div class="hero-features-panel">
-                        
+
                         <div class="panel-item">
                             <div class="panel-icon">
-                                <!-- Иконка Разработка -->
                                 <img src="/assets/images/static/new/chip-component-svgrepo-com.svg" alt="">
                             </div>
-                            <h3>Разработка и интеграция</h3>
-                            <p>Создаём надёжные программные решения и системы</p>
+                            <h3>Управление тепловой автоматикой</h3>
+                            <p>Автоматизация тепловых пунктов и инженерных систем для повышения энергоэффективности, снижения затрат и обеспечения стабильной работы оборудования.</p>
                         </div>
 
                         <div class="panel-item">
                             <div class="panel-icon">
-                                <!-- Иконка Безопасность -->
                                 <img src="/assets/images/static/new/security-svgrepo-com.svg" alt="">
                             </div>
-                            <h3>Информационная безопасность</h3>
-                            <p>Защищаем данные и обеспечиваем соответствие стандартам</p>
+                            <h3>Дистанционный контроль параметров</h3>
+                            <p>Круглосуточный мониторинг состояния оборудования и потребления ресурсов с возможностью оперативного реагирования на аварийные ситуации.</p>
                         </div>
 
                         <div class="panel-item">
                             <div class="panel-icon">
-                                <!-- Иконка Аналитика -->
                                 <img src="/assets/images/static/new/analytics-reference-svgrepo-com.svg" alt="">
                             </div>
-                            <h3>Аналитика и данные</h3>
-                            <p>Превращаем данные в полезные инсайты для бизнеса</p>
+                            <h3>Анализ качества энергоресурсов</h3>
+                            <p>Сбор и обработка данных о качестве электроэнергии, тепла и других ресурсов для выявления отклонений и оптимизации эксплуатации.</p>
                         </div>
 
                         <div class="panel-item">
                             <div class="panel-icon">
-                                <!-- Иконка Облако -->
                                 <img src="/assets/images/static/new/cloud-svgrepo-com.svg" alt="">
                             </div>
-                            <h3>Инфраструктура и облака</h3>
-                            <p>Проектируем и развиваем отказоустойчивую ИТ-инфраструктуру</p>
+                            <h3>Разработка оборудования телеметрии</h3>
+                            <p>Проектирование и производство устройств телеметрии для удаленного сбора, передачи и хранения данных с объектов любой сложности.</p>
                         </div>
 
                     </div>
@@ -162,7 +163,7 @@ $currentUrl = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
                     <div class="hero-main">
                         <div class="hero-text">
                             <h1 class="main-title"><?php echo $mainTitle['content']; ?></h1>
-                            
+
                             <div class="features-list">
                                 <?php renderFeatures($conn); ?>
                                 <a href="contacts.php#map-location" class="hero-link-wrapper" style="text-decoration: none; color: inherit; display: block;">
@@ -179,7 +180,7 @@ $currentUrl = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
                                     </div>
                                 </a>
                             </div>
-                            
+
                             <!-- <div class="contacts-section">
                                 <div class="analytics-badge">
                                     <span>📊</span>
@@ -199,10 +200,10 @@ $currentUrl = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
                             <div class="hero-image-container">
                                 <img src="<?php echo $heroImage['image_path']; ?>" alt="<?php echo $heroImage['alt_text']; ?>" class="hero-image">
                             </div>
-                            
+
                             <div class="hero-card card-energy">
                                 <div class="card-pattern-box">
-                                    <img src="/assets/images/static/firstDisplay--3.png" alt="" class="pattern-img"> 
+                                    <img src="/assets/images/static/firstDisplay--3.png" alt="" class="pattern-img">
                                 </div>
                                 <div class="card-title">Учет энергоресурсов</div>
                             </div>
@@ -231,14 +232,14 @@ $currentUrl = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
     <?php if ($for_whom_view): ?>
         <section class="for-whom-section" style="<?= $for_whom_background ?>">
             <div class="container-main">
-                
+
                 <h2 class="section-title mobile-only-title">Для кого</h2>
-                
+
                 <div class="for-whom-wrapper">
-                    
+
                     <div class="for-whom-background">
                         <img src="/assets/images/static/category_background.svg" alt="Линии распределения" class="lines-img">
-                        
+
                         <div class="center-desktop-circle">
                             <span>Для кого</span>
                         </div>
@@ -314,31 +315,31 @@ $currentUrl = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
                 <div class="about-stats">
                     <?php renderStatistics($conn); ?>
                 </div>
-                
+
                 <div class="about-content">
                 <div class="video-section">
                     <div class="video-container" id="video-wrapper">
                         <?php if (!empty($videoId)): ?>
-                            <iframe 
-                                width="100%" 
-                                height="360" 
-                                src="https://rutube.ru/play/embed/<?php echo $videoId; ?>/" 
-                                frameborder="0" 
-                                allow="autoplay; encrypted-media" 
-                                allowfullscreen 
+                            <iframe
+                                width="100%"
+                                height="360"
+                                src="https://rutube.ru/play/embed/<?php echo $videoId; ?>/"
+                                frameborder="0"
+                                allow="autoplay; encrypted-media"
+                                allowfullscreen
                                 style="border-radius: 8px;">
                             </iframe>
                         <?php endif; ?>
                     </div>
                 </div>
-                    
+
                     <div class="company-info">
-                        <?php 
+                        <?php
                         $aboutContent = getContentBlock($conn, 'about_content');
                         $aboutFeatures = getContentBlock($conn, 'about_features');
                         ?>
                         <h2><?php echo getContentBlock($conn, 'about_title')['content']; ?></h2>
-                        
+
                         <ul class="company-features">
                             <?php
                             $featuresList = explode("\n", $aboutFeatures['content']);
@@ -349,7 +350,7 @@ $currentUrl = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
                             }
                             ?>
                         </ul>
-                        
+
                         <p class="company-description">
                             <?php echo $aboutContent['content']; ?>
                         </p>
@@ -378,7 +379,7 @@ $currentUrl = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
             ?>
             <section class="media-section" style="<?= $news_artcles_background ?>">
                 <div class="container-main">
-                    
+
                     <div class="media-section-header">
                         <div class="media-title-block">
                             <span class="media-subtitle">Статьи и новости</span>
@@ -429,7 +430,7 @@ $currentUrl = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
                                                     <time class="media-card-date">📅 <?= date('d.m.Y', strtotime($item['published_at'])) ?></time>
                                                     <h3 class="media-card-title"><?= htmlspecialchars($item['title']) ?></h3>
                                                     <p class="media-card-excerpt">
-                                                        <?php 
+                                                        <?php
                                                             $excerpt = !empty($item['excerpt']) ? $item['excerpt'] : strip_tags($item['content']);
                                                             echo htmlspecialchars(mb_strimwidth($excerpt, 0, 120, "..."));
                                                         ?>
@@ -463,7 +464,7 @@ $currentUrl = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
         <section class="geography-section" style="<?= $geography_of_application_background ?>">
             <div class="container-main">
                 <h2 class="section-title">География применения</h2>
-                
+
                 <div class="map-wrapper">
                     <div class="map-bg-container">
                         <img src="/assets/images/static/map_background__lines.png" alt="Карта географии поставок" class="map-img">
@@ -556,12 +557,12 @@ $currentUrl = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
                     </div>
                         <div class="map-badge pos-logo-brand company-about-fullwidth">
                             <div class="map-about-box-white">
-                                <?php 
+                                <?php
                                 $aboutContent = getContentBlock($conn, 'about_content');
                                 $aboutFeatures = getContentBlock($conn, 'about_features');
                                 $aboutTitle = getContentBlock($conn, 'about_title');
                                 ?>
-                                
+
                                 <div class="about-white-logo">
                                     <a href="/index.php" class="about-logo-link">
                                         <img src="/<?php echo getSetting($conn, 'logo_path'); ?>" alt="<?php echo getSetting($conn, 'company_name'); ?>">
@@ -569,14 +570,14 @@ $currentUrl = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
                                 </div>
 
                                 <div class="about-white-left">
-                                    
+
                                     <ul class="about-white-features">
                                         <?php
                                         if (!empty($aboutFeatures['content'])) {
                                             $featuresList = explode("\n", $aboutFeatures['content']);
                                             foreach ($featuresList as $feature) {
                                                 $trimmed = trim($feature);
-                                                if ($trimmed) { 
+                                                if ($trimmed) {
                                                     echo '<li>' . $trimmed . '</li>';
                                                 }
                                             }
@@ -584,7 +585,7 @@ $currentUrl = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
                                         ?>
                                     </ul>
                                 </div>
-                                
+
                                 <div class="about-white-right">
                                     <p class="about-white-desc">
                                         <?php echo $aboutContent['content']; ?>
@@ -620,14 +621,14 @@ document.addEventListener('DOMContentLoaded', function() {
         '.geography-section': '<?= getSetting($conn, "geography_of_application_text_color") ?>',
         '.media-section': '<?= getSetting($conn, "news_artcles_text_color") ?>'
     };
-    
+
     for (var selector in textColors) {
         var color = textColors[selector];
         if (!color || color === '') continue;
-        
+
         var section = document.querySelector(selector);
         if (!section) continue;
-        
+
         // Применяем цвет ко ВСЕМ элементам внутри секции
         var allElements = section.querySelectorAll('*');
         for (var i = 0; i < allElements.length; i++) {
