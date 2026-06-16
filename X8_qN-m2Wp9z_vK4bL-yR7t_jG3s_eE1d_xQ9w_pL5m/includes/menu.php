@@ -142,4 +142,3 @@ $current_page = basename($_SERVER['PHP_SELF']);
 <!-- Подключаем скрипты -->
 <script src="assets/js/setPositionScroll.js"></script>
 <script src="assets/js/mobile-menu.js"></script>
-<script src="assets/js/menu.js"></script>
