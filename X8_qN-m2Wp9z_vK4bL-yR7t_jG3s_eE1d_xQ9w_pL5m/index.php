@@ -64,12 +64,12 @@ require_once __DIR__. '/includes/menu.php';
         <div class="stats-grid">
             <?php 
             $cards = [
-                ['icon' => 'fa-newspaper', 'title' => 'Статьи', 'val' => $stats['articles'], 'href' => '/X8_qN-m2Wp9z_vK4bL-yR7t_jG3s_eE1d_xQ9w_pL5m/articles.php'],
-                ['icon' => 'fa-bullhorn', 'title' => 'Новости', 'val' => $stats['news'], 'href' => '/X8_qN-m2Wp9z_vK4bL-yR7t_jG3s_eE1d_xQ9w_pL5m/news.php'],
-                ['icon' => 'fa-box', 'title' => 'Товары', 'val' => $stats['products'], 'href' => '/X8_qN-m2Wp9z_vK4bL-yR7t_jG3s_eE1d_xQ9w_pL5m/products.php'],
-                ['icon' => 'fa-question-circle', 'title' => 'Вопросы', 'val' => $stats['faq'], 'href' => '/X8_qN-m2Wp9z_vK4bL-yR7t_jG3s_eE1d_xQ9w_pL5m/faq.php'],
-                ['icon' => 'fa-tags', 'title' => 'Категории', 'val' => $stats['categories'], 'href' => '/X8_qN-m2Wp9z_vK4bL-yR7t_jG3s_eE1d_xQ9w_pL5m/categories.php'],
-                ['icon' => 'fa-users', 'title' => 'Админы', 'val' => $stats['admins'], 'href' => '/X8_qN-m2Wp9z_vK4bL-yR7t_jG3s_eE1d_xQ9w_pL5m/admins.php'],
+                ['icon' => 'fa-newspaper', 'title' => 'Статьи', 'val' => $stats['articles'], 'href' => '/admin/articles.php'],
+                ['icon' => 'fa-bullhorn', 'title' => 'Новости', 'val' => $stats['news'], 'href' => '/admin/news.php'],
+                ['icon' => 'fa-box', 'title' => 'Товары', 'val' => $stats['products'], 'href' => '/admin/products.php'],
+                ['icon' => 'fa-question-circle', 'title' => 'Вопросы', 'val' => $stats['faq'], 'href' => '/admin/faq.php'],
+                ['icon' => 'fa-tags', 'title' => 'Категории', 'val' => $stats['categories'], 'href' => '/admin/categories.php'],
+                ['icon' => 'fa-users', 'title' => 'Админы', 'val' => $stats['admins'], 'href' => '/admin/admins.php'],
             ];
             foreach ($cards as $card): ?>
                 
