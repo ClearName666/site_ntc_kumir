@@ -320,7 +320,7 @@ $currentUrl = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
                 <div class="about-content">
                 <div class="video-section">
                     <div class="video-container" id="video-wrapper">
-                        <?php if (!empty($videoId)): ?>
+                        <?php if (!empty($videoId) && $videoId != 'ffffffffffffffffffffffffffffffff'): ?>
                             <iframe
                                 width="100%"
                                 height="360"
@@ -330,6 +330,11 @@ $currentUrl = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
                                 allowfullscreen
                                 style="border-radius: 8px;">
                             </iframe>
+                        <?php else: ?>
+                            <video width="100%" height="360" controls>
+                                <source src="/assets/videos/VID_20260616_115105_474.mp4" type="video/mp4">
+                                Ваш браузер не поддерживает видео.
+                            </video>
                         <?php endif; ?>
                     </div>
                 </div>

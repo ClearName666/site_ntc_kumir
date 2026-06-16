@@ -29,7 +29,7 @@ $conn = getDBConnection();
             </div>
             
             <div class="footer-bottom">
-                <p><?php echo getSetting($conn, 'copyright_text'); ?> | <?php echo getSetting($conn, 'developer_text'); ?></p>
+                <p><?php echo getSetting($conn, 'copyright_text'); ?> | <?php echo getSetting($conn, 'developer_text'), date('Y'); ?></p>
             </div>
         </div>
     </footer>
