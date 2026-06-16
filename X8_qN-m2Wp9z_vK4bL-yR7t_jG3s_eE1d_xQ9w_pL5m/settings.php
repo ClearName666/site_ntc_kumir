@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/includes/functions.php';
+require_once __DIR__. '/includes/functions.php';
 
 $conn = getDBConnection();
 
@@ -37,13 +37,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'about_the_company_background', 'about_the_company_bg_type', 'about_the_company_bg_color1', 'about_the_company_bg_color2', 'about_the_company_bg_image_path', 'about_the_company_text_color',
             'geography_of_application_background', 'geography_of_application_bg_type', 'geography_of_application_bg_color1', 'geography_of_application_bg_color2', 'geography_of_application_bg_image_path', 'geography_of_application_text_color',
             'news_artcles_background', 'news_artcles_bg_type', 'news_artcles_bg_color1', 'news_artcles_bg_color2', 'news_artcles_bg_image_path', 'news_artcles_text_color'
-        ];
+        ];        
         foreach ($styleKeys as $key) {
             $stmt = $conn->prepare("DELETE FROM settings WHERE setting_key = ?");
             $stmt->bind_param("s", $key);
             $stmt->execute();
             $stmt->close();
-        }
+        }        
         logAdminAction($conn, 'settings_reset', 'Сброшены все стили секций');
         redirectWithNotification('settings.php', 'Все стили сброшены до стандартных', 'success');
     }
@@ -71,12 +71,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             updateOrInsertSetting($conn, $tKey, cleanInput($_POST['setting_' . $tKey]));
         }
     }
-
+    
     // --- НАСТРОЙКИ ФОНА из универсального конструктора ---
     if (isset($_POST['active_section']) && !empty($_POST['active_section'])) {
         $section = $_POST['active_section'];               // например 'hero_background'
         $prefix = str_replace('_background', '', $section); // 'hero'
-        
+    
         $bgType = $_POST['universal_bg_type'] ?? 'solid';
         updateOrInsertSetting($conn, $prefix . '_bg_type', $bgType);
         
@@ -98,8 +98,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Для image тип сохраняется, но CSS будет сформирован после загрузки файла
             updateOrInsertSetting($conn, $prefix . '_bg_type', 'image');
             // Если нет загруженного файла, оставляем старую картинку (ничего не делаем)
-        }
-        
+    }
+
         // // Сохраняем цвет текста из конструктора (если передан)
         // if (isset($_POST['uni_text_color'])) {
         //     updateOrInsertSetting($conn, $prefix . '_text_color', cleanInput($_POST['uni_text_color']));
@@ -153,8 +153,8 @@ while ($row = $settingsResult->fetch_assoc()) {
     $settings[$row['setting_key']] = $row['setting_value'];
 }
 
-require_once __DIR__ . '/includes/header.php';
-require_once __DIR__ . '/includes/menu.php';
+require_once __DIR__. '/includes/header.php';
+require_once __DIR__. '/includes/menu.php';
 ?>
 
 <div class="main-content">
@@ -165,7 +165,7 @@ require_once __DIR__ . '/includes/menu.php';
             </button>
             <h1 class="header-title">Настройки сайта</h1>
         </div>
-        <?php require_once __DIR__ . '/includes/header-right.php'; ?>
+        <?php require_once __DIR__. '/includes/header-right.php'; ?>
     </header>
     
     <div class="content-container">
@@ -204,7 +204,7 @@ require_once __DIR__ . '/includes/menu.php';
                         <div class="form-group col-md-6">
                             <label for="setting_company_address">Адрес компании</label>
                             <input type="text" id="setting_company_address" name="setting_company_address" 
-                                   value="<?php echo htmlspecialchars($settings['company_address'] ?? ''); ?>">
+                                    value="<?php echo htmlspecialchars($settings['company_address'] ?? ''); ?>">
                         </div>
                     </div>
                     
@@ -212,7 +212,7 @@ require_once __DIR__ . '/includes/menu.php';
                         <div class="form-group col-md-6">
                             <label for="setting_video_id">ID Rutub видео о компании</label>
                             <input type="text" id="setting_video_id" name="setting_video_id" 
-                                   value="<?php echo htmlspecialchars($settings['video_id'] ?? ''); ?>">
+                                value="<?php echo htmlspecialchars($settings['video_id'] ?? ''); ?>">
                         </div>
                     </div>
                     
@@ -255,7 +255,7 @@ require_once __DIR__ . '/includes/menu.php';
                 <div class="card-body">
                     <!-- Скрытое поле для активной секции -->
                     <input type="hidden" name="active_section" id="active_section" value="hero_background">
-                    
+
                     <div class="form-group">
                         <label for="section_selector" style="font-weight: bold; color: #0055ff;">1. Выберите секцию:</label>
                         <select id="section_selector" class="form-control" style="border: 2px solid #0055ff;">
@@ -268,9 +268,9 @@ require_once __DIR__ . '/includes/menu.php';
                             <option value="news_artcles_background">Секция "Статьи и новости"</option>
                         </select>
                     </div>
-                    
+
                     <hr>
-                    
+
                     <div class="form-group">
                         <label for="universal_bg_type">2. Тип заднего фона</label>
                         <select name="universal_bg_type" id="universal_bg_type" class="form-control">
@@ -279,7 +279,7 @@ require_once __DIR__ . '/includes/menu.php';
                             <option value="image">Фоновое изображение</option>
                         </select>
                     </div>
-                    
+
                     <div class="bg-options-container" style="background: rgba(0,0,0,0.03); padding: 15px; border-radius: 6px; margin-bottom: 15px;">
                         <div class="bg-option-block" id="uni_block_solid">
                             <div class="form-group mb-0">
@@ -287,7 +287,7 @@ require_once __DIR__ . '/includes/menu.php';
                                 <input type="color" name="uni_color_1" id="uni_color_1" class="form-control" style="width: 80px; height: 40px; padding: 2px;">
                             </div>
                         </div>
-                        
+
                         <div class="bg-option-block" id="uni_block_gradient" style="display:none;">
                             <div class="form-row mb-0">
                                 <div class="form-group col-md-3">
@@ -300,7 +300,7 @@ require_once __DIR__ . '/includes/menu.php';
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="bg-option-block" id="uni_block_image" style="display:none;">
                             <div class="form-group mb-0">
                                 <label>Загрузить изображение фона:</label>
@@ -316,7 +316,7 @@ require_once __DIR__ . '/includes/menu.php';
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="form-group mb-0 mt-3">
                         <label>Предпросмотр фона:</label>
                         <div id="uni_preview_box" style="width: 100%; height: 120px; border: 2px dashed #ccc; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #000;">
@@ -325,7 +325,7 @@ require_once __DIR__ . '/includes/menu.php';
                     </div>
                 </div>
             </div>
-            
+
             <!-- ========== ИЗОБРАЖЕНИЯ (логотип, фавикон) ========== -->
             <div class="card mt-4">
                 <div class="card-header">
@@ -393,7 +393,7 @@ require_once __DIR__ . '/includes/menu.php';
     </div>
 </div>
 
-<?php require_once __DIR__ . '/includes/footer.php'; ?>
+<?php require_once __DIR__. '/includes/footer.php'; ?>
 
 <script src="assets/js/scripts.js"></script>
 
@@ -443,7 +443,7 @@ require_once __DIR__ . '/includes/menu.php';
             img: `<?= $settings['news_artcles_bg_image_path'] ?? '' ?>`
         }
     };
-    
+
     document.addEventListener('DOMContentLoaded', function() {
         const sectionSelect = document.getElementById('section_selector');
         const activeSectionInput = document.getElementById('active_section');

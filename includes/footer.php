@@ -1,4 +1,4 @@
-<?php 
+<?php
 $conn = getDBConnection();
 ?>
 
@@ -17,7 +17,7 @@ $conn = getDBConnection();
                         <li><a href="/../privacy.php">Политика обработки персональных данных</a></li>
                     </ul>
                 </div>
-                
+
                 <div class="footer-column">
                     <h3>Контакты</h3>
                     <div class="contact-info">
@@ -27,11 +27,19 @@ $conn = getDBConnection();
                     </div>
                 </div>
             </div>
-            
+
             <div class="footer-bottom">
-                <p><?php echo getSetting($conn, 'copyright_text'); ?> | <?php echo getSetting($conn, 'developer_text'), Date(' Y'); ?></p>
+                <p><?php echo getSetting($conn, 'copyright_text'), ', 2012 &ndash; ' . date('Y');
+
+                  $developer_text = getSetting($conn, 'developer_text');
+
+                  if ($developer_text) {
+                    echo " | $developer_text";
+                  }
+
+                ?></p>
             </div>
         </div>
     </footer>
-    
+
     <script src="/assets/js/main.js"></script>

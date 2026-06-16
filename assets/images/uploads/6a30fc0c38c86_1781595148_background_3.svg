@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="3840"
+   height="2160"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.4.4 (1:1.4.4+202605061436+dcaf3e7d9e)"
+   sodipodi:docname="background_3.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="px"
+     inkscape:zoom="0.18796998"
+     inkscape:cx="1425.7596"
+     inkscape:cy="755.43978"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1">
+    <linearGradient
+       id="linearGradient1"
+       inkscape:collect="always">
+      <stop
+         style="stop-color:#e3eff9;stop-opacity:0.72448087;"
+         offset="0"
+         id="stop1" />
+      <stop
+         style="stop-color:#9cc9ab;stop-opacity:1;"
+         offset="1"
+         id="stop2" />
+    </linearGradient>
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient1"
+       id="radialGradient2"
+       cx="1920"
+       cy="698.42218"
+       fx="1920"
+       fy="698.42218"
+       r="1920"
+       gradientTransform="matrix(0.9646375,0,0,0.75922911,67.896015,260.03256)"
+       gradientUnits="userSpaceOnUse" />
+  </defs>
+  <g
+     inkscape:label="Слой 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <rect
+       style="fill:#9cc9ab;fill-opacity:1;stroke:none;stroke-width:33.6623;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:7;stroke-dashoffset:8.31494"
+       id="rect2"
+       width="3840"
+       height="2160"
+       x="0"
+       y="0" />
+    <rect
+       style="fill:url(#radialGradient2);stroke-width:51.7608;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:7;stroke-dashoffset:8.31494;stroke:none"
+       id="rect1"
+       width="3840"
+       height="2160"
+       x="0"
+       y="0"
+       rx="0"
+       ry="0" />
+  </g>
+</svg>

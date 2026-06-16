@@ -87,11 +87,9 @@ $currentUrl = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 <?php require_once __DIR__. '/includes/header.php';?>
 <main>
     <!-- Hero Section - обновляем верхний отступ -->
+        <?php if ($site_new_view) { ?>
     <section class="hero" style="<?= $hero_background ?>">
-        <div class="hero-background">
-        </div>
-
-        <?php if ($site_new_view): ?>
+        <div class="hero-background"></div>
             <div class="container-main">
                 <div class="hero-new-content">
 
@@ -106,25 +104,29 @@ $currentUrl = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 <!--
                     <h1 class="hero-new-title"><?php echo $siteTitle; ?></h1>
 -->
-                    <h1 class="hero-new-title">НТЦ «КУМИр»</h1>
+                    <h1 class="hero-new-title">Автоматизированные решения для учета энергоресурсов</h1>
 
                     <!-- Подзаголовок -->
+<!--
                     <p class="hero-new-subtitle">Автоматизированные решения для учета энергоресурсов</p>
+-->
 
 
                     <!-- Блок с кнопками навигации -->
+<!--
                     <div class="hero-new-buttons">
                         <a href="/products.php" class="btn-hero btn-primary">Продукция <span class="arrow">›</span></a>
                         <a href="/articles.php" class="btn-hero btn-secondary">Статьи <span class="arrow">›</span></a>
                         <a href="/contacts.php" class="btn-hero btn-secondary">Контакты <span class="arrow">›</span></a>
                     </div>
+-->
 
                     <!-- Нижняя полупрозрачная панель преимуществ -->
                     <div class="hero-features-panel">
 
                         <div class="panel-item">
                             <div class="panel-icon">
-                                <img src="/assets/images/static/new/chip-component-svgrepo-com.svg" alt="">
+                              <img src="/assets/images/static/new/cloud-svgrepo-com.svg" alt="">
                             </div>
                             <h3>Управление тепловой автоматикой</h3>
                             <p>Автоматизация тепловых пунктов и инженерных систем для повышения энергоэффективности, снижения затрат и обеспечения стабильной работы оборудования.</p>
@@ -148,7 +150,7 @@ $currentUrl = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 
                         <div class="panel-item">
                             <div class="panel-icon">
-                                <img src="/assets/images/static/new/cloud-svgrepo-com.svg" alt="">
+                                <img src="/assets/images/static/new/chip-component-svgrepo-com.svg" alt="">
                             </div>
                             <h3>Разработка оборудования телеметрии</h3>
                             <p>Проектирование и производство устройств телеметрии для удаленного сбора, передачи и хранения данных с объектов любой сложности.</p>
@@ -158,7 +160,9 @@ $currentUrl = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 
                 </div>
             </div>
-        <?php else: ?>
+        <?php } else { ?>
+      <section class="hero" style="background: #001028;">
+          <div class="hero-background"></div>
             <div class="container-main">
                 <div class="hero-content">
                     <div class="hero-main">
@@ -226,7 +230,7 @@ $currentUrl = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
                     </div>
                 </div>
             </div>
-        <?php endif; ?>
+        <?php } ?>
 
     </section>
 
@@ -365,11 +369,6 @@ $currentUrl = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
             </div>
         </section>
     <?php endif; ?>
-
-
-
-
-
         <?php if ($news_artcles_view): ?>
             <?php
                 $homeNews = function_exists('getNews') ? getNews($conn, 3, 0) : [];
@@ -575,28 +574,28 @@ $currentUrl = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
                                     </a>
                                 </div>
 
-                                <div class="about-white-left">
+                                <!-- <div class="about-white-left">
 
                                     <ul class="about-white-features">
                                         <?php
-                                        if (!empty($aboutFeatures['content'])) {
-                                            $featuresList = explode("\n", $aboutFeatures['content']);
-                                            foreach ($featuresList as $feature) {
-                                                $trimmed = trim($feature);
-                                                if ($trimmed) {
-                                                    echo '<li>' . $trimmed . '</li>';
-                                                }
-                                            }
-                                        }
+                                        // if (!empty($aboutFeatures['content'])) {
+                                        //     $featuresList = explode("\n", $aboutFeatures['content']);
+                                        //     foreach ($featuresList as $feature) {
+                                        //         $trimmed = trim($feature);
+                                        //         if ($trimmed) {
+                                        //             echo '<li>' . $trimmed . '</li>';
+                                        //         }
+                                        //     }
+                                        // }
                                         ?>
                                     </ul>
                                 </div>
 
                                 <div class="about-white-right">
                                     <p class="about-white-desc">
-                                        <?php echo $aboutContent['content']; ?>
+                                        <?php // echo $aboutContent['content']; ?>
                                     </p>
-                                </div>
+                                </div> -->
                             </div>
                         </div>
                 </div>

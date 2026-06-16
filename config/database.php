@@ -10,7 +10,7 @@ ini_set('display_errors', true);
 define('DB_HOST', 'localhost');
 define('DB_USER', 'admin');
 define('DB_PASS', 'x9zn3gp5');
-define('DB_NAME', 'ntc-kumir');
+define('DB_NAME', 'ntc_kumir');
 
 function getDBConnection() {
     static $conn = null;
@@ -42,13 +42,28 @@ function getDBConnection() {
 }
 
 function getSetting($conn, $key) {
-    $stmt = $conn->prepare('SELECT setting_value FROM settings WHERE setting_key = ?');
-    $stmt->bind_param('s', $key);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    static $settings = null;
 
-    if ($row = $result->fetch_assoc()) {
-        return $row['setting_value'];
+    if ($settings === null) {
+      $stmt = $conn->prepare('SELECT * FROM settings');
+      //$stmt->bind_param('s', $key);
+      $stmt->execute();
+
+      $result = $stmt->get_result();
+
+      $settings = $result->fetch_all(MYSQLI_ASSOC);
+    }
+
+    //$found_key = array_search($key, array_column($settings, 'setting_key'));
+
+    //if ($found_key !== false) {
+      //return $settings[$found_key]['setting_value'];
+    //}
+
+    foreach ($settings as $i => $s) {
+      if ($s['setting_key'] ===  $key) {
+        return $s['setting_value'];
+      }
     }
 
     return null;

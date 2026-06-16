@@ -116,30 +116,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
-document.addEventListener('DOMContentLoaded', function() {
-    const modal = document.getElementById('kpModal');
-    const openBtns = document.querySelectorAll('.open-kp-modal');
-    const closeBtn = document.querySelector('.close-modal');
-
-    openBtns.forEach(btn => {
-        btn.addEventListener('click', function() {
-            const productName = this.getAttribute('data-product');
-            document.getElementById('modalProductName').textContent = 'Товар: ' + productName;
-            document.getElementById('kpProductInput').value = productName;
-            modal.style.display = 'flex';
-        });
-    });
-
-    closeBtn.onclick = function() {
-        modal.style.display = 'none';
-    }
-
-    window.onclick = function(event) {
-        if (event.target == modal) {
-            modal.style.display = 'none';
-        }
-    }
-});
 
 document.addEventListener('DOMContentLoaded', function() {
     const modal = document.getElementById('kpModal');
@@ -158,15 +134,18 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
 
-        closeBtn.onclick = function() {
-            modal.style.display = 'none';
-        }
-
-        window.onclick = function(event) {
-            if (event.target == modal) {
+        if (closeBtn != null) {
+            closeBtn.onclick = function() {
                 modal.style.display = 'none';
             }
+
+            window.onclick = function(event) {
+                if (event.target == modal) {
+                    modal.style.display = 'none';
+                }
+            }            
         }
+
     }
 
     if (kpForm) {

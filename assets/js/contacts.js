@@ -1,37 +1,39 @@
-document.getElementById('contactForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-            
-    const form = this;
-    const submitBtn = form.querySelector('.submit-btn');
-    const originalText = submitBtn.textContent;
-            
-    submitBtn.textContent = 'Отправка...';
-    submitBtn.disabled = true;
-            
-    const formData = new FormData(form);
-            
-    fetch(window.location.href, {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === 'success') {
-            alert(data.message);
-            form.reset();
-        } else {
-            alert('Ошибка: ' + data.message);
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Произошла ошибка при отправке.');
-    })
-    .finally(() => {
-        submitBtn.textContent = originalText;
-        submitBtn.disabled = false;
+if (document.getElementById('contactForm') != null) {
+    document.getElementById('contactForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+                
+        const form = this;
+        const submitBtn = form.querySelector('.submit-btn');
+        const originalText = submitBtn.textContent;
+                
+        submitBtn.textContent = 'Отправка...';
+        submitBtn.disabled = true;
+                
+        const formData = new FormData(form);
+                
+        fetch(window.location.href, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                alert(data.message);
+                form.reset();
+            } else {
+                alert('Ошибка: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Произошла ошибка при отправке.');
+        })
+        .finally(() => {
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
+        });
     });
-});
+}
 
 
 
